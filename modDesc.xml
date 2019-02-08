@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="40">
+	<author>Dschonny, Slivicon, sperrgebiet</author>
+	<version>1.0.0.0</version>
+	<title>VehicleSort Alpha</title>
+	<description>
+			Blah
+	</description>
+	<iconFilename>icon.dds</iconFilename>
+	<multiplayer supported="false" />
+
+	<extraSourceFiles>
+		<sourceFile filename="RegisterSpecialization.lua" />
+	</extraSourceFiles>
+
+	<registerSpecializations>
+		<registerSpecialization name="vehicleSort" className="VehicleSort" filename="VehicleSort.lua" searchedSpecializations="Enterable"/>
+	</registerSpecializations>	
+
+	<actions>
+		<action name="vsToggleList" axisType="HALF" />
+		<action name="vsLockListItem" axisType="HALF" />
+		<action name="vsMoveCursorUp" axisType="HALF" />
+		<action name="vsMoveCursorDown" axisType="HALF" />
+		<action name="vsMoveCursorUpFast" axisType="HALF" />
+		<action name="vsMoveCursorDownFast" axisType="HALF" />
+		<action name="vsChangeVehicle" axisType="HALF" />
+		<action name="vsShowConfig" axisType="HALF" />
+		<action name="vsTogglePark" axisType="HALF" />
+	</actions>
+	<inputBinding>	
+		<actionBinding action="vsToggleList">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_0" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsLockListItem">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsMoveCursorUp">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_8" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsMoveCursorDown">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_2" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsMoveCursorUpFast">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_1" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsMoveCursorDownFast">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_2" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsChangeVehicle">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_enter" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+		<actionBinding action="vsShowConfig">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_minus" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>		
+		<actionBinding action="vsTogglePark">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_plus" axisComponent="+" neutralInput="0" index="1" />
+		</actionBinding>
+    </inputBinding>	
+	
+	<l10n>
+		<text name="input_vsToggleList">
+			<de>VehicleSort: Fahrzeugliste anzeigen</de>
+			<en>VehicleSort: Show vehicle list</en>
+		</text>
+		<text name="input_vsLockListItem">
+			<de>VehicleSort: Listeneintrag auswählen</de>
+			<en>VehicleSort: Select list entry</en>
+		</text>
+		<text name="input_vsMoveCursorUp">
+			<de>VehicleSort: Auswahl hoch</de>
+			<en>VehicleSort: Move cursor up</en>
+		</text>
+		<text name="input_vsMoveCursorDown">
+			<de>VehicleSort: Auswahl runter</de>
+			<en>VehicleSort: Move cursor down</en>
+		</text>
+		<text name="input_vsMoveCursorUpFast">
+			<de>VehicleSort: Auswahl schnell hoch</de>
+			<en>VehicleSort: Move cursor up fast</en>
+		</text>		
+		<text name="input_vsMoveCursorDownFast">
+			<de>VehicleSort: Auswahl schnell runter</de>
+			<en>VehicleSort: Move cursor down fast</en>
+		</text>	
+		<text name="input_vsChangeVehicle">
+			<de>VehicleSort: Ins Fahrzeug wechseln</de>
+			<en>VehicleSort: Enter selected vehicle</en>
+		</text>
+		<text name="input_vsShowConfig">
+			<de>VehicleSort: Konfiguration anzeigen</de>
+			<en>VehicleSort: Show configuration</en>
+		</text>
+		<text name="input_vsTogglePark">
+			<de>VehicleSort: Fahrzeug parken/entparken</de>
+			<en>VehicleSort: Toggle vehicle parking</en>
+		</text>	
+		<text name="configHeadline">
+			<de>VehicleSort-Konfiguration</de>
+			<en>VehicleSort Configuration</en>
+		</text>
+		<text name="with">
+			<de>mit</de>
+			<en>with</en>
+		</text>
+		<text name="showTrain">
+			<de>Züge in Fahrzeugliste anzeigen</de>
+			<en>Show trains in vehicle list</en>
+		</text>
+		<text name="showCrane">
+			<de>Zug-Kräne in Fahrzeugliste anzeigen</de>
+			<en>Show train cranes in vehicle list</en>
+		</text>
+		<text name="showBrand">
+			<de>Markenname in Fahrzeugliste anzeigen</de>
+			<en>Show brand name in vehicle list</en>
+		</text>
+		<text name="showType">
+			<de>Typ in Fahrzeugliste anzeigen</de>
+			<en>Show type in vehicle list</en>
+		</text>
+		<text name="showNames">
+			<de>Namen von Spielern in der Fahrzeugliste anzeigen</de>
+			<en>Show names of players in vehicle list</en>
+		</text>
+		<text name="showFillLevels">
+			<de>Füllstandsanzeige in Fahrzeugliste</de>
+			<en>Show fill level in vehicle list</en>
+		</text>
+		<text name="showPercentages">
+			<de>Füllstandsanzeige in Prozent</de>
+			<en>Show fill level as percentage</en>
+		</text>
+		<text name="showEmpty">
+			<de>Füllstandsanzeige bei leeren Fahrzeugen anzeigen</de>
+			<en>Show fill level of empty vehicles</en>
+		</text>
+		<text name="bgTrans">
+			<de>Hintergrund Alpha Transparenz</de>
+			<en>Background alpha transparency</en>
+		</text>
+		<text name="txtSize">
+			<de>Textgröße</de>
+			<en>Text size</en>
+		</text>
+		<text name="vs_on">
+			<de>An</de>
+			<en>On</en>
+		</text>
+		<text name="vs_off">
+			<de>Aus</de>
+			<en>Off</en>
+		</text>
+		<text name="vs_train">
+			<de>Zug</de>
+			<en>Train</en>
+		</text>
+		<text name="vs_crane">
+			<de>Zug-Kran</de>
+			<en>Train crane</en>
+		</text>
+		<text name="vs_implement">
+			<de>Geräte</de>
+			<en>Implement</en>
+		</text>
+		<text name="hired">
+			<de>Helfer</de>
+			<en>Helper</en>
+		</text>
+		<text name="courseplay">
+			<de>CoursePlay</de>
+			<en>CoursePlay</en>
+		</text>
+		<text name="followme">
+			<de>FollowMe</de>
+			<en>FollowMe</en>
+		</text>
+	</l10n>
+	<extraSourceFiles>
+		<sourceFile filename="VehicleSort.lua" />
+	</extraSourceFiles>
+</modDesc>
