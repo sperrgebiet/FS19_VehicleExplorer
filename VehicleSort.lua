@@ -179,8 +179,6 @@ end;
 function VehicleSort.registerEventListeners(vehicleType)
 	local functionNames = {
 		"onLoad"
-		,"onUpdate"
-		,"onDraw"
 		,"postLoad"
 	};
 	
@@ -195,14 +193,14 @@ end;
 function VehicleSort:keyEvent(unicode, sym, modifier, isDown)
 end;
 
-function VehicleSort:update(dt)
+function VehicleSort:update()
   if not VehicleSort.isInitialized  then
     VehicleSort:init();
     VehicleSort.isInitialized = true;
   end;
 end;
 
-function VehicleSort:draw(dt)
+function VehicleSort:draw()
 	if g_server ~= nil and g_client ~= nil and g_dedicatedServerInfo ~= nil or not VehicleSort.isInitialized then --do not draw on dedicated server, or if hud is not displayed, or if VehicleSort is not initialized
 		return;
 	end;
@@ -323,8 +321,13 @@ end;
 function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsChangeVehicle fires", "action_vsChangeVehicle");
 	if VehicleSort.showSteerables then
-		if not g_currentMission.vehicles[VehicleSort.selectedIndex]:getIsControlled() then
-			g_currentMission:requestToEnterVehicle(g_currentMission.vehicles[VehicleSort.selectedIndex]);
+		local selIndex = VehicleSort.selectedIndex;
+		print("selIndex" .. selIndex);
+		local selVeh = VehicleSort.userOrder[selIndex];
+		local realId = selVeh.id;
+		print("realId" .. realId);
+		if not g_currentMission.vehicles[realId]:getIsControlled() then
+			g_currentMission:requestToEnterVehicle(g_currentMission.vehicles[realId]);
 		end;
 	end
 end;
@@ -419,7 +422,10 @@ function VehicleSort:drawConfig()
 end
 
 function VehicleSort:drawList()
-  local cnt = #VehicleSort:getVehicles();
+  vehList = VehicleSort:getVehicles();
+  --VehicleSort:dp(vehList, 'drawList', 'vehList');
+  
+  local cnt = #vehList;
   if cnt == 0 then
     return;
   end;
@@ -438,23 +444,27 @@ function VehicleSort:drawList()
   VehicleSort.bgY = y - VehicleSort.tPos.spacing;
   VehicleSort.bgW = getTextWidth(size, txt) + VehicleSort.tPos.padSides;
   local chk = yPos + size + VehicleSort.tPos.spacing;
+
   for i = 1, cnt do --loop through lines to see if there will be multiple columns needed
-    local veh = g_currentMission.vehicles[i];
+    local veh = vehList[i];
     if not VehicleSort:isHidden(veh) then
       chk = chk - size - VehicleSort.tPos.spacing;
     end;
   end;
+
   local isMultiCol = chk < (size + VehicleSort.tPos.spacing + VehicleSort.tPos.padHeight);
   local addCol = false;
   local minY = ((4 * (size + VehicleSort.tPos.spacing)) + VehicleSort.tPos.padHeight);
+
   for i = 1, cnt do
-    local veh = g_currentMission.vehicles[i];
+    veh = vehList[i];
     if not VehicleSort:isHidden(veh) then
       if addCol then
         minBgW = VehicleSort.bgW;
         addCol = false;
         isMultiCol = true;
       end;
+	  --VehicleSort:dp(veh, 'drawList()', 'Just before getTextColor');
       local clr = VehicleSort:getTextColor(i, veh);
       local t = VehicleSort:getFullVehicleName(i);
       txt = table.concat(t);
@@ -483,6 +493,7 @@ function VehicleSort:drawList()
         txt = table.concat(t);
         w = minBgW + getTextWidth(size, txt);
       end;
+	  --VehicleSort:dp(veh, 'drawList', 'Before check getIsControlled');
       bold = veh:getIsControlled() and (not g_currentMission.missionDynamicInfo.isMultiplayer or veh:getControllerName() == g_gameSettings.nickname);
       if string.len(txt) > 0 then
         table.insert(texts, {xPos, yPos, size, bold, clr, txt});
@@ -529,11 +540,11 @@ function VehicleSort:drawList()
 end
 
 function VehicleSort:getVehicles()
-	allveh = g_currentMission.vehicles
-	veh = {}
+	local allveh = g_currentMission.vehicles
+	local veh = {}
 	
 	for k, v in ipairs(allveh) do
-		if v.spec_enterable ~= nil then
+		if v.spec_vehicleSort ~= nil then
 			table.insert(veh, v);
 		end;
 	end;
@@ -573,13 +584,14 @@ end
 
 function VehicleSort:getFullVehicleName(index)
   --VehicleSort:dp(index, 'getFullVehicleName', 'index');
-  if index > #VehicleSort:getVehicles() then
+  local VehList = VehicleSort:getVehicles();
+  if index > #VehList then
     return nil;
   end;
   local nam = '';
   local ret = {};
   local fmt = '(%s) ';
-  local veh = g_currentMission.vehicles[index];
+  local veh = VehList[index];
   local con = veh.controllerName;
   
   --VehicleSort:dp(veh, 'getFullVehicleName', 'Variable veh');
@@ -606,9 +618,10 @@ function VehicleSort:getFullVehicleName(index)
 			veh.spec_vehicleSort.name = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_crane;
 		  elseif VehicleSort.config[3][2] then -- Show brand
 			nam = nam .. string.format('%s ', veh.spec_vehicleSort.brand);
-		  end;
+		  else
 		  --VehicleSort:dp(veh.spec_vehicleSort, 'getFullVehicleName', 'Table spec_vehicleSort');
 		  nam = nam .. string.format('%s ', veh.spec_vehicleSort.name);
+		  end;
 	else
 		nam = "TEST Unknown";
 	end
@@ -646,38 +659,20 @@ function VehicleSort:getFullVehicleName(index)
 end
 
 function VehicleSort:getName(obj, sFallback)
-  local nam = getXMLString(obj.xmlFile, 'vehicle.storeData.name.' .. g_languageShort);
-  if nam == nil then
-    nam = getXMLString(obj.xmlFile, 'vehicle.storeData.name');
-  end;
-  if nam ~= nil then
-    nam = VehicleSort:getTrans(obj, nam, 'vehicle.storeData.name');
-  else
-    if nam == nil then
-      nam = getXMLString(obj.xmlFile, 'vehicle.name.' .. g_languageShort);
-    end;
-    if nam == nil then
-      nam = getXMLString(obj.xmlFile, 'vehicle.name');
-    end;
-    if nam ~= nil then
-      nam = VehicleSort:getTrans(obj, nam, 'vehicle.name');
-    end;
-  end;
-  if nam == nil or nam == '' then
-    nam = getXMLString(obj.xmlFile, 'vehicle#type');
-    if nam ~= nil then
-      nam = VehicleSort:getTrans(obj, nam, 'vehicle#type');
-    end;
-  end;
-  if nam == nil or nam == '' then
-    return sFallback;
-  else
-    return nam;
-  end;
+	nam = obj:getName();
+	if nam == nil then
+		nam = obj.typeName;
+	end	
+	if nam == nil or nam == '' then
+		return sFallback;
+	else
+		return nam;
+	end;
 end
 
 function VehicleSort:getNameBrand(obj)
-	return Utils.getNoNil(getXMLString(obj.xmlFile, 'vehicle.storeData.brand'), 'LIZARD');
+	--return Utils.getNoNil(getXMLString(obj.xmlFile, 'vehicle.storeData.brand'), 'LIZARD');
+	return obj:getFullName();
 end
 
 function VehicleSort:getOrder(saved)
@@ -731,6 +726,7 @@ function VehicleSort:getOrder(saved)
 end
 
 function VehicleSort:getTextColor(ind, veh)
+	--VehicleSort:dp(veh, 'getTextColor');
   if ind == VehicleSort.selectedIndex then
     if VehicleSort.selectedLock then
       return VehicleSort.tColor.locked;
@@ -826,26 +822,28 @@ function VehicleSort:init()
   VehicleSort.dbgX = 0.01;
   VehicleSort.dbgY = 0.5;
   VehicleSort.tPos = {};
-  --VehicleSort.tPos.x = g_currentMission.inGameMessage.posX;  -- x Position of Textfield, originally hardcoded 0.3
-  VehicleSort.tPos.x = 0.3;
-  --VehicleSort.tPos.y = g_currentMission.tutorialStatusBar.y;  -- y Position of Textfield, originally hardcoded 0.9
-  VehicleSort.tPos.y = 0.9;
-  --VehicleSort.tPos.yOffset = g_currentMission.cruiseControlTextOffsetY * 1.5; -- y Position offset for headings, originally hardcoded 0.007
-  VehicleSort.tPos.yOffset = 0.007;
-  --VehicleSort.tPos.size = g_currentMission.helpBoxTextSize;  -- TextSize, originally hardcoded 0.018
-  VehicleSort.tPos.size = 0.018;
-  --VehicleSort.tPos.sizeBig = g_currentMission.ingameNotificationTextSize;
-  VehicleSort.tPos.sizeBig = 0.020;
-  --VehicleSort.tPos.sizeSmall = g_currentMission.timeScaleTextSize; -- smallest default hud text size
-  VehicleSort.tPos.sizeSmall = 0.010;
-  --VehicleSort.tPos.sizeIncr = g_currentMission.cruiseControlTextOffsetY; -- Text size increase for headings
-  VehicleSort.tPos.sizeIncr = 0.005;
-  --VehicleSort.tPos.spacing = g_currentMission.cruiseControlTextOffsetY;  -- Spacing between lines, originally hardcoded 0.005
-  VehicleSort.tPos.spacing = 0.005;
+  -- g_currentMission.inGameMenu.hud
+  VehicleSort.tPos.x = g_currentMission.inGameMenu.hud.topNotification.origX;  -- x Position of Textfield, originally hardcoded 0.3
+  --VehicleSort.tPos.x = 0.3;
+  VehicleSort.tPos.y = g_currentMission.inGameMenu.hud.topNotification.origY;  -- y Position of Textfield, originally hardcoded 0.9
+  --VehicleSort.tPos.y = 0.9;
+  VehicleSort.tPos.yOffset = g_currentMission.inGameMenu.hud.topNotification.titleOffsetY;  --* 1.5; -- y Position offset for headings, originally hardcoded 0.007
+  --VehicleSort.tPos.yOffset = 0.007;
+  VehicleSort.tPos.size = g_currentMission.inGameMenu.hud.topNotification.infoTextSize;  -- TextSize, originally hardcoded 0.018
+  --VehicleSort.tPos.size = 0.018;
+  VehicleSort.tPos.sizeBig = g_currentMission.inGameMenu.hud.topNotification.titleTextSize;
+  --VehicleSort.tPos.sizeBig = 0.020;
+  VehicleSort.tPos.sizeSmall = g_currentMission.inGameMenu.hud.gameInfoDisplay.timeScaleTextSize; -- smallest default hud text size
+  --VehicleSort.tPos.sizeSmall = 0.010;
+  VehicleSort.tPos.sizeIncr = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY; -- Text size increase for headings
+  --VehicleSort.tPos.sizeIncr = 0.005;
+  VehicleSort.tPos.spacing = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY;  -- Spacing between lines, originally hardcoded 0.005
+  --VehicleSort.tPos.spacing = 0.005;
   VehicleSort.tPos.padHeight = 2 * VehicleSort.tPos.spacing;
   VehicleSort.tPos.padSides = VehicleSort.tPos.padHeight;
   VehicleSort.tPos.columnWidth = (((1 - VehicleSort.tPos.x) / 2) - VehicleSort.tPos.padSides);
   VehicleSort.tPos.alignment = RenderText.ALIGN_LEFT;  -- Text Alignment
+
   if g_seasons ~= nil then
     VehicleSort:dp('Seasons mod detected. Lowering VehicleSort display to below the seasons weather display to avoid overlap', 'VehicleSort:init');
     VehicleSort.tPos.y = VehicleSort.tPos.y - (6 * VehicleSort.tPos.size) - (6 * VehicleSort.tPos.spacing);
@@ -1179,7 +1177,7 @@ function VehicleSort.loadSteerable(self, savegame)
   end;
   if g_dedicatedServerInfo == nil then
     if self.spec_vehicleSort.brand == nil then
-      --self.spec_vehicleSort.brand = VehicleSort:getNameBrand(self);
+      self.spec_vehicleSort.brand = VehicleSort:getNameBrand(self);
     end;
     if self.spec_vehicleSort.name == nil then
       self.spec_vehicleSort.name = VehicleSort:getName(self, 'Steerable');
