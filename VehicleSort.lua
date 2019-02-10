@@ -3,7 +3,6 @@ VehicleSort.ModName = g_currentModName;
 VehicleSort.Version = "0.0.0.1";
 
 VehicleSort.eventName = {};
-VehicleSort.showHelp = true;
 VehicleSort.debug = true;
 
 VehicleSort.bgTransDef = 0.8;
@@ -20,7 +19,8 @@ VehicleSort.config = {
   {'showEmpty', false},
   {'txtSize', VehicleSort.txtSizeDef},
   {'bgTrans', VehicleSort.bgTransDef},
-  {'showSteerableImplements', true}
+  {'showSteerableImplements', true},
+  {'showHelp', true}
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -108,62 +108,57 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsToggleList',self, VehicleSort.action_vsToggleList ,false ,true ,false ,true)
 	if result then
 		table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsLockListItem',self, VehicleSort.action_vsLockListItem ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorUp',self, VehicleSort.action_vsMoveCursorUp ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorDown',self, VehicleSort.action_vsMoveCursorDown ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorUpFast',self, VehicleSort.action_vsMoveCursorUpFast ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorDownFast',self, VehicleSort.action_vsMoveCursorDownFast ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsChangeVehicle',self, VehicleSort.action_vsChangeVehicle ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsShowConfig',self, VehicleSort.action_vsShowConfig ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end	
 	
 	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTogglePark',self, VehicleSort.action_vsTogglePark ,false ,true ,false ,true)
 	if result then
         table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.showHelp;
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[12][2];
     end	
-	
-
-	--if VehicleSort.debug then
-	--	print("--- VehicleSort Debug ... VehicleSort:registerActionEventsPlayer(VehicleSort.eventName)");
-	--	DebugUtil.printTableRecursively(VehicleSort.eventName,"----",0,1)
-	--end	
+		
 end
 
 function VehicleSort:removeActionEvents()
@@ -464,7 +459,6 @@ function VehicleSort:drawList()
         txt = table.concat(t);
         w = minBgW + getTextWidth(size, txt);
       end
-	  --VehicleSort:dp(veh, 'drawList', 'Before check getIsControlled');
       bold = VehicleSort:isControlled(realId) and (not g_currentMission.missionDynamicInfo.isMultiplayer or VehicleSort:getControllerName(realId) == g_gameSettings.nickname);
       if string.len(txt) > 0 then
         table.insert(texts, {xPos, yPos, size, bold, clr, txt});
@@ -534,12 +528,30 @@ end
 function VehicleSort:getAttachment(obj, i)
 	local val = '';
 	if VehicleSort.config[3][2] then
-		val = val .. string.format('%s ', obj:getFullName());
+		--val = val .. string.format('%s ', obj:getFullName());
+		local brand = VehicleSort:getAttachmentBrand(obj);
+		if brand ~= nil then
+			val = val .. string.format('%s %s', brand, obj:getName());
+		else
+			val = val .. string.format('%s ', obj:getName());
+		end
 	else
 		val = val .. string.format('%s ', obj:getName());
 	end
   
 	return val;
+end
+
+function VehicleSort:getAttachmentBrand(obj)
+    local storeItem = g_storeManager:getItemByXMLFilename(obj.configFileName);
+    if storeItem ~= nil then
+        local brand = g_brandManager:getBrandByIndex(storeItem.brandIndex);
+        if brand ~= nil then
+            return brand.title;
+		else
+			return 'Lizard';
+        end
+    end
 end
 
 function VehicleSort:getFillLevel(obj)
@@ -563,7 +575,7 @@ function VehicleSort:getFillDisplay(obj)
 	local ret = '';
 	if VehicleSort.config[6][2] then -- Fill-Level-Display active?
 		local f, c = VehicleSort:getFillLevel(obj);
-		--local f, c = VehicleSort:calcFillLevel(obj);
+		
 		if VehicleSort.config[8][2] or f > 0 then -- Empty should be shown or is not empty
 			if c > 0 then -- Capacity more than zero
 				if VehicleSort.config[7][2] then -- Display as percentage
@@ -579,25 +591,25 @@ function VehicleSort:getFillDisplay(obj)
 end
 
 function VehicleSort:getFullVehicleName(realId)
-  local nam = '';
-  local ret = {};
-  local fmt = '(%s) ';
+	local nam = '';
+	local ret = {};
+	local fmt = '(%s) ';
   
-  if VehicleSort:isParked(realId) then
-    nam = '[P] '; -- Prefix for parked (not part of tab list) vehicles
-  end
-  if VehicleSort:isHired(realId) then -- credit: Vehicle Groups Switcher mod
-    nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
---  elseif (veh.getIsCourseplayDriving ~= nil and veh:getIsCourseplayDriving()) then -- CoursePlay mod
---    nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
---  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
---    nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
-  elseif VehicleSort:isControlled(realId) then
-	local con = VehicleSort:getControllerName(realId);
-    if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
-      nam = nam .. string.format(fmt, con);
-    end
-  end
+	if VehicleSort:isParked(realId) then
+		nam = '[P] '; -- Prefix for parked (not part of tab list) vehicles
+	end
+	if (g_currentMission.vehicles[realId].getIsCourseplayDriving ~= nil and g_currentMission.vehicles[realId]:getIsCourseplayDriving()) then -- CoursePlay
+		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
+	elseif VehicleSort:isHired(realId) then -- credit: Vehicle Groups Switcher mod
+		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
+	--elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
+	--	nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
+	elseif VehicleSort:isControlled(realId) then
+		local con = VehicleSort:getControllerName(realId);
+			if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
+				nam = nam .. string.format(fmt, con);
+			end
+	end
 
 
 	if VehicleSort:isTrain(realId) then
@@ -620,19 +632,19 @@ function VehicleSort:getFullVehicleName(realId)
 
 	table.insert(ret, nam .. VehicleSort:getFillDisplay(g_currentMission.vehicles[realId]));
 
-  if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
-    local implements = VehicleSort:getVehImplements(realId);
-	local imp = implements[1];
-	--VehicleSort:dp(imp, 'VehicleSort:getFullVehicleName', 'getAttachedImplements');
-    if (imp ~= nil and imp.object ~= nil) then
-      table.insert(ret, string.format('%s %s%s ', g_i18n.modEnvironments[VehicleSort.ModName].texts.with, VehicleSort:getAttachment(imp.object, 1), VehicleSort:getFillDisplay(imp.object)));
-      imp = implements[2];
-      if (imp ~= nil and imp.object ~= nil) then -- second attachment
-        table.insert(ret, string.format('& %s%s ', VehicleSort:getAttachment(imp.object, 2), VehicleSort:getFillDisplay(imp.object)));
-      end
-    end
-  end
-  return ret;
+	if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
+		local implements = VehicleSort:getVehImplements(realId);
+		local imp = implements[1];
+		--VehicleSort:dp(imp, 'VehicleSort:getFullVehicleName', 'getAttachedImplements');
+		if (imp ~= nil and imp.object ~= nil) then
+			table.insert(ret, string.format('%s %s%s ', g_i18n.modEnvironments[VehicleSort.ModName].texts.with, VehicleSort:getAttachment(imp.object, 1), VehicleSort:getFillDisplay(imp.object)));
+			imp = implements[2];
+			if (imp ~= nil and imp.object ~= nil) then -- second attachment
+				table.insert(ret, string.format('& %s%s ', VehicleSort:getAttachment(imp.object, 2), VehicleSort:getFillDisplay(imp.object)));
+			end
+		end
+	end
+	return ret;
 end
 
 function VehicleSort:getName(realId, sFallback)
@@ -750,7 +762,7 @@ function VehicleSort:getTextSize()
 end
 
 function VehicleSort:getHorsePower(realId)
-	veh = g_currentMission.vehicles[realId];
+	local veh = g_currentMission.vehicles[realId];
 	if veh.spec_motorized ~= nil then
 		local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque;
 		local maxRpm = veh.spec_motorized.motor.maxRpm;
@@ -759,9 +771,10 @@ function VehicleSort:getHorsePower(realId)
 end
 
 function VehicleSort:getControllerName(realId)
-	if g_currentMission.vehicles[realId].getControllerName ~= nil then
-		-- ToDo: apparently getControllerName is not working properly
-		return g_currentMission.vehicles[realId]:getControllerName();
+	if not VehicleSort:isHired(realId) then
+		if g_currentMission.vehicles[realId].getControllerName ~= nil then
+			return g_currentMission.vehicles[realId]:getControllerName();
+		end
 	end
 end
 
@@ -840,7 +853,7 @@ function VehicleSort:isSteerableImplement(realId)
 end
 
 function VehicleSort:isControlled(realId)
-	if g_currentMission.vehicles[realId].getIsControlled ~= nil then
+	if not VehicleSort:isHired(realId) and g_currentMission.vehicles[realId].getIsControlled ~= nil then
 		return g_currentMission.vehicles[realId]:getIsControlled(); 
 	end
 end
@@ -851,7 +864,7 @@ end
 
 -- ToDo
 function VehicleSort:isHired(realId)
-	return false;
+	return g_currentMission.vehicles[realId].spec_aiVehicle.isActive;
 end
 
 function VehicleSort:keyEvent(unicode, sym, modifier, isDown)	
@@ -947,11 +960,6 @@ function VehicleSort:moveConfigUp()
 	end
 end
 
---function VehicleSort:getRealVeh(vsId)
---	local realId = VehicleSort.userOrder[vsId]['realId'];
---	return g_currentMission.vehicles[realId];
---end
-
 function VehicleSort:renderBg(y, w, h)
   setOverlayColor(VehicleSort.bg, 0, 0, 0, VehicleSort.config[10][2]);
   renderOverlay(VehicleSort.bg, VehicleSort.bgX, y, w, h); -- dark background
@@ -982,7 +990,6 @@ function VehicleSort:toggleParkState(selectedIndex)
 	VehicleSort:dp(string.format('realId {%d} - parked {%s}', realId, tostring(parked)), 'VehicleSort:toggleParkState');
 end
 
---TODO Config ueberarbeiten
 function VehicleSort:saveConfig()
 	VehicleSort.saveFile = createXMLFile('VehicleSort.saveFile', VehicleSort.xmlFilename, VehicleSort.keyCon);
 	for i = 1, #VehicleSort.config do

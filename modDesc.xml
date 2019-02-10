@@ -139,6 +139,10 @@
 			<de>Füllstandsanzeige bei leeren Fahrzeugen anzeigen</de>
 			<en>Show fill level of empty vehicles</en>
 		</text>
+		<text name="showHelp">
+			<de>Tastenbelegung anzeigen (erst nach Neustart aktiv)</de>
+			<en>Show input binding (needs restart to take effect)</en>
+		</text>
 		<text name="bgTrans">
 			<de>Hintergrund Alpha Transparenz</de>
 			<en>Background alpha transparency</en>
@@ -176,8 +180,8 @@
 			<en>Helper</en>
 		</text>
 		<text name="courseplay">
-			<de>CoursePlay</de>
-			<en>CoursePlay</en>
+			<de>CoursePlay 6</de>
+			<en>CoursePlay 6</en>
 		</text>
 		<text name="followme">
 			<de>FollowMe</de>
