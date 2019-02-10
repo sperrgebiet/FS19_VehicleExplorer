@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="40">
 	<author>Dschonny, Slivicon, sperrgebiet</author>
-	<version>1.0.0.0</version>
+	<version>0.0.0.1</version>
 	<title>VehicleSort Alpha</title>
 	<description>
 			Blah
@@ -103,6 +103,10 @@
 			<de>mit</de>
 			<en>with</en>
 		</text>
+		<text name="horsePower">
+			<de>PS</de>
+			<en>HP</en>
+		</text>
 		<text name="showTrain">
 			<de>Züge in Fahrzeugliste anzeigen</de>
 			<en>Show trains in vehicle list</en>
@@ -115,9 +119,9 @@
 			<de>Markenname in Fahrzeugliste anzeigen</de>
 			<en>Show brand name in vehicle list</en>
 		</text>
-		<text name="showType">
-			<de>Typ in Fahrzeugliste anzeigen</de>
-			<en>Show type in vehicle list</en>
+		<text name="showHorsepower">
+			<de>PS anzeigen</de>
+			<en>Show horse power</en>
 		</text>
 		<text name="showNames">
 			<de>Namen von Spielern in der Fahrzeugliste anzeigen</de>
@@ -143,6 +147,10 @@
 			<de>Textgröße</de>
 			<en>Text size</en>
 		</text>
+		<text name="showSteerableImplements">
+			<de>Steuerbare Werkzeuge anzeigenn</de>
+			<en>Show steerable implements</en>
+		</text>		
 		<text name="vs_on">
 			<de>An</de>
 			<en>On</en>

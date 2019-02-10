@@ -13,13 +13,14 @@ VehicleSort.config = {
   {'showTrain', true},
   {'showCrane', false},
   {'showBrand', false},
-  {'showType', false},
+  {'showHorsepower', true},
   {'showNames', true},
   {'showFillLevels', true},
   {'showPercentages', true},
   {'showEmpty', false},
   {'txtSize', VehicleSort.txtSizeDef},
-  {'bgTrans', VehicleSort.bgTransDef}
+  {'bgTrans', VehicleSort.bgTransDef},
+  {'showSteerableImplements', true}
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -31,15 +32,13 @@ VehicleSort.tColor.hired 		= {0.0, 0.5, 1.0, 1.0}; 	-- blue
 VehicleSort.tColor.followme 	= {0.92, 0.31, 0.69, 1.0}; 	-- light pink
 VehicleSort.tColor.self  		= {0.0, 1.0, 0.0, 1.0}; -- green
 
-VehicleSort.key = 'vehicleSort';
-VehicleSort.keyCon = VehicleSort.key .. '.config';
+VehicleSort.keyCon = 'VSConfig';
 VehicleSort.selectedConfigIndex = 1;
 VehicleSort.selectedIndex = 1;
 VehicleSort.selectedLock = false;
 VehicleSort.showConfig = false;
 VehicleSort.showSteerables = false;
 VehicleSort.xmlAttrId = '#vsid';
-VehicleSort.xmlAttrMapId = '#mapid';
 VehicleSort.xmlAttrOrder = '#vsorder';
 VehicleSort.xmlAttrParked = '#vsparked';
 VehicleSort.Sorted = {};
@@ -74,8 +73,9 @@ function VehicleSort:prerequisitesPresent(specializations)
     return true;
 end
 
-
 function VehicleSort:loadMap(name)
+	VehicleSort:initVS();
+	VehicleSort:loadConfig();
 end
 
 function VehicleSort:onLoad(savegame)
@@ -85,14 +85,14 @@ end
 
 function VehicleSort:onPostLoad(savegame)
 
-	VehicleSort:initVS();
-
 	if savegame ~= nil then
 		local xmlFile = savegame.xmlFile;
 		local key = savegame.key..".VehicleSort";
 		
 		local orderId = getXMLInt(xmlFile, key.."#UserOrder");
-		VehicleSort:dp(string.format('Loaded orderId {%d} for vehicleId {%d}', orderId, self.id), 'onPostLoad');
+		if orderId ~= nil then
+			VehicleSort:dp(string.format('Loaded orderId {%d} for vehicleId {%d}', orderId, self.id), 'onPostLoad');
+		end
 		
 		if self.spec_vehicleSort ~= nil then
 			local specVS = self.spec_vehicleSort;
@@ -338,22 +338,8 @@ end
 -- VehicleSort specific functions
 --
 function VehicleSort:calcPercentage(curVal, maxVal)
-  local per = curVal / maxVal * 100;
-  return (math.floor(per * 10)/10);
-end
-
-function VehicleSort:calcFillLevel(obj)
-  local lvl = 0;
-  local cap = 0;
-  if obj ~= nil then
-    if obj.getFillLevel ~= nil then
-      lvl = lvl + obj:getFillLevel();
-    end
-    if obj.getCapacity ~= nil then
-      cap = cap + obj:getCapacity();
-    end
-  end
-  return lvl, cap;
+	local per = curVal / maxVal * 100;
+	return (math.floor(per * 10)/10);
 end
 
 function VehicleSort:drawConfig()
@@ -556,21 +542,36 @@ function VehicleSort:getAttachment(obj, i)
 	return val;
 end
 
+function VehicleSort:getFillLevel(obj)
+	local fillLevel = 0;
+	local cap = 0;
+	if obj.getFillLevelInformation ~= nil then
+		local fillLevelTable = {};
+		obj:getFillLevelInformation(fillLevelTable);
+		
+		for _,fillLevelVehicle in pairs(fillLevelTable) do
+			fillLevel = fillLevelVehicle.fillLevel;
+			cap = fillLevelVehicle.capacity;
+			--VehicleSort:dp(string.format('FillLevel - realId {%f} - fillLevel {%f} - capacity {%f}', realId, fillLevel, cap), 'getFillLevel');
+		end
+		
+		return fillLevel, cap;
+	end
+end
+
 function VehicleSort:getFillDisplay(obj)
 	local ret = '';
 	if VehicleSort.config[6][2] then -- Fill-Level-Display active?
-    --local f, c = VehicleSort:calcFillLevel(obj);
-    --if VehicleSort.config[8][2] or f > 0 then -- Empty should be shown or is not empty
-    --  if c > 0 then -- Capacity more than zero
-    --    if VehicleSort.config[7][2] then -- Display as percentage
-    --      ret = string.format(' (%d%%)', VehicleSort:calcPercentage(f, c));
-    --    else -- Display as amount of total capacity
-    --      ret = string.format(' (%d/%d)', math.floor(f), c);
-    --    end
-    --  end
-    --end
-		if obj.spec_fillUnit ~= nil then
-			--ret = string.format(' (%d))', obj.getFillUnitFillLevelPercentage());
+		local f, c = VehicleSort:getFillLevel(obj);
+		--local f, c = VehicleSort:calcFillLevel(obj);
+		if VehicleSort.config[8][2] or f > 0 then -- Empty should be shown or is not empty
+			if c > 0 then -- Capacity more than zero
+				if VehicleSort.config[7][2] then -- Display as percentage
+					ret = string.format(' (%d%%) ', VehicleSort:calcPercentage(f, c));
+				else -- Display as amount of total capacity
+					ret = string.format(' (%d/%d) ', math.floor(f), c);
+				end
+			end
 		end
 	end
 	
@@ -578,13 +579,9 @@ function VehicleSort:getFillDisplay(obj)
 end
 
 function VehicleSort:getFullVehicleName(realId)
-  --VehicleSort:dp(index, 'getFullVehicleName', 'index');
   local nam = '';
   local ret = {};
   local fmt = '(%s) ';
-  local con = VehicleSort:getControllerName(realId);
-  
-  --VehicleSort:dp(veh, 'getFullVehicleName', 'Variable veh');
   
   if VehicleSort:isParked(realId) then
     nam = '[P] '; -- Prefix for parked (not part of tab list) vehicles
@@ -596,6 +593,7 @@ function VehicleSort:getFullVehicleName(realId)
 --  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
 --    nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
   elseif VehicleSort:isControlled(realId) then
+	local con = VehicleSort:getControllerName(realId);
     if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
       nam = nam .. string.format(fmt, con);
     end
@@ -603,7 +601,7 @@ function VehicleSort:getFullVehicleName(realId)
 
 
 	if VehicleSort:isTrain(realId) then
-		nam = nam .. string.format('%s', g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_train);
+		nam = nam .. VehicleSort:getName(realId, string.format('%s', g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_train));
 	elseif VehicleSort:isCrane(realId) then
 		nam = nam .. string.format('%s', g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_crane);
 	elseif VehicleSort.config[3][2] then -- Show brand
@@ -613,20 +611,15 @@ function VehicleSort:getFullVehicleName(realId)
 	  nam = nam .. string.format('%s ', VehicleSort:getName(realId));
 	end
 		  
-	-- ToDo Add config for it
-	local horsePower = VehicleSort:getHorsePower(realId);
-	if horsePower ~= nil then
-		nam = nam .. " (" .. horsePower .. " PS) ";
+	if VehicleSort.config[4][2] then
+		local horsePower = VehicleSort:getHorsePower(realId);
+		if horsePower ~= nil then
+			nam = nam .. " (" .. horsePower .. string.format(' %s) ', g_i18n.modEnvironments[VehicleSort.ModName].texts.horsePower);
+		end
 	end
-  
--- TODO: Properly remove this. IMHO useless, maybe to use it for PS
---  if VehicleSort.config[4][2] then -- Show type
---    if veh.typeDesc ~= nil then
---      nam = nam .. string.format('[%s] ', veh.typeDesc);
---    end
---  end
-  -- TODO
-  table.insert(ret, nam .. VehicleSort:getFillDisplay(g_currentMission.vehicles[realId]));
+
+	table.insert(ret, nam .. VehicleSort:getFillDisplay(g_currentMission.vehicles[realId]));
+
   if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
     local implements = VehicleSort:getVehImplements(realId);
 	local imp = implements[1];
@@ -702,46 +695,7 @@ function VehicleSort:getOrderedVehicles()
 	
 	VehicleSort:SyncSorted();
 	return ordered;
--- for k, v in ipairs(saved) do -- check saved vehicles and filter out any which no longer exist
---   for sk, sv in ipairs(VehicleSort:getVehicles()) do
---     if sv.spec_vehicleSort.id == v.id and not sv.isDeleted and (VehicleSort.resetID == 0 or (VehicleSort.resetID > 0 and VehicleSort.resetNewSteerableID == sv.id)) then
---       sv:setIsTabbable(not v.isParked);
---       table.insert(ordered, sv);
---       VehicleSort:dp(string.format('Saved vehicle matched to existing vehicle id [%d], vsid [%d]', sv.id, v.id), 'VehicleSort:getOrder');
---       break;
---     end
---   end
--- end
--- local unsaved = {};
--- for sk, sv in ipairs(VehicleSort:getVehicles()) do -- check vehicles for any not already saved
---   local found = false;
---   for k, v in ipairs(ordered) do
---     if sv.spec_vehicleSort.id == v.spec_vehicleSort.id and not sv.isDeleted then
---       found = true;
---       break;
---     end
---   end
---   if not found then
---	table.insert(unsaved, sv);
---   --VehicleSort:dp(string.format('Adding unsaved id [%d], vsid [%s]', sv.id, tostring(sv.spec_vehicleSort.id)), 'VehicleSort:getOrder'); --sv.spec_vehicleSort.id may be nil on client, but will get value from readStream
---     
---   end
--- end
--- for k, v in ipairs(unsaved) do
---   table.insert(ordered, v);-- append unsaved vehicles
--- end
---
--- local ret = {};
--- for k, v in ipairs(ordered) do -- generate user order
---   local t = {};
---   t.id = v.id;
---   t.isParked = not v:getIsTabbable();
---	t.realId = v.spec_vehicleSort.realId;
---   table.insert(ret, t);
---   VehicleSort:dp(string.format('User order id [%d] isParked [%s]', t.id, tostring(t.isParked)), 'VehicleSort:getOrder');
--- end
--- VehicleSort.saved = false;
--- return ret;
+
 end
 
 function VehicleSort:reshuffleVehicles(list)
@@ -807,49 +761,9 @@ end
 function VehicleSort:getControllerName(realId)
 	if g_currentMission.vehicles[realId].getControllerName ~= nil then
 		-- ToDo: apparently getControllerName is not working properly
-		--local conName = g_currentMission.vehicles[realId]:getControllerName();
-	end
-	if conName ~= nil then
-		return conName;
-	else
-		return '';
+		return g_currentMission.vehicles[realId]:getControllerName();
 	end
 end
-
---function VehicleSort:getUniqueId(id)
---  if id ~= nil then
---    id = tonumber(id);
---  else
---    VehicleSort:dp('id was nil, setting to initial new id state of 1', 'VehicleSort:getUniqueId');
---    id = 1;
---  end
---  if id < 1 then
---    VehicleSort:dp(string.format('id < 1: [%d], setting to 1', id), 'VehicleSort:getUniqueId');
---    id = 1;
---  end
---  if VehicleSort.ids == nil then
---    VehicleSort.ids = {};
---  end
---  while true do
---    if VehicleSort:hasVal(VehicleSort.ids, id) then
---      id = VehicleSort.nextId;
---      VehicleSort.nextId = VehicleSort.nextId + 1;
---    else
---      table.insert(VehicleSort.ids, id);
---      break;
---    end
---  end
---  return tonumber(id);
---end
---
---function VehicleSort:hasVal(tbl, val)
---  for k, v in pairs(tbl) do
---    if v == val then
---      return true;
---    end
---  end
---  return false;
---end
 
 function VehicleSort:initVS()
   VehicleSort:dp('Start Init', 'VehicleSort:init');
@@ -913,12 +827,16 @@ function VehicleSort:isCrane(realId)
 end
 
 function VehicleSort:isHidden(realId)
-	return (VehicleSort:isTrain(realId) and not VehicleSort.config[1][2]) or (VehicleSort:isCrane(realId) and not VehicleSort.config[2][2]);
+	return (VehicleSort:isTrain(realId) and not VehicleSort.config[1][2]) or (VehicleSort:isCrane(realId) and not VehicleSort.config[2][2]) or (VehicleSort:isSteerableImplement(realId) and not VehicleSort.config[11][2]);
 end
 
 function VehicleSort:isTrain(realId)
 	--VehicleSort:dp(string.format('realId {%d}', realId), 'isTrain');
 	return g_currentMission.vehicles[realId]['typeName'] == 'locomotive';
+end
+
+function VehicleSort:isSteerableImplement(realId)
+	return g_currentMission.vehicles[realId]['spec_attachable'] ~= nil;
 end
 
 function VehicleSort:isControlled(realId)
@@ -939,115 +857,80 @@ end
 function VehicleSort:keyEvent(unicode, sym, modifier, isDown)	
 end
 
---function VehicleSort:loadVehicleOrder()
---  if g_dedicatedServerInfo ~= nil then -- Dedicated server does not need to load user order
---    VehicleSort:dp('Skipping undesired load from user xml file on dedicated server.', 'VehicleSort:loadVehicleOrder');
---    return;
---  end
---  local xml = 'VehicleSort.loadFile';
---  
---  if fileExists(VehicleSort.xmlFilename) then
---    VehicleSort.saveFile = loadXMLFile(xml, VehicleSort.xmlFilename);
---  else
---    VehicleSort.saveFile = createXMLFile(xml, VehicleSort.xmlFilename, VehicleSort.key);
---  end
---  local saved = {};
---  
---  if hasXMLProperty(VehicleSort.saveFile, VehicleSort.key) then
---    VehicleSort:dp(string.format('Found key [%s]', VehicleSort.key), 'VehicleSort:loadVehicleOrder');
---    local newMap = false;
---    local mapKey = VehicleSort.key .. VehicleSort.xmlAttrMapId;
---    if hasXMLProperty(VehicleSort.saveFile, mapKey) then
---      if getXMLString(VehicleSort.saveFile, mapKey) ~= g_currentMission.missionInfo.mapId then
---        newMap = true;
---      end
---    end
---	
---    if not newMap then
---      local i = 1;
---      while true do
---        local k = string.format('%s.vehicle%d', VehicleSort.key, i);
---        if not hasXMLProperty(VehicleSort.saveFile, k) then
---          break;
---        end
---        local t = {};
---        t.id = getXMLInt(VehicleSort.saveFile, k .. VehicleSort.xmlAttrId);
---        t.isParked = getXMLBool(VehicleSort.saveFile, k .. VehicleSort.xmlAttrParked);
---        saved[i] = t;
---        VehicleSort:dp(string.format('Loaded saved vehicle key [%s] vsid [%s] isParked [%s]', k, t.id, tostring(t.isParked)), 'VehicleSort:loadVehicleOrder');
---        i = i + 1;
---      end
---    end
---  end
---
---  VehicleSort.userOrder = VehicleSort:getOrder(saved);
---  if hasXMLProperty(VehicleSort.saveFile, VehicleSort.keyCon) then
---
---    VehicleSort:dp('Config file found.', 'VehicleSort:loadVehicleOrder');
---    for i = 1, #VehicleSort.config do
---      if i == 9 then
---        local int = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to int
---        if tonumber(int) == nil or tonumber(int) <= 0 or tonumber(int) > 3 then
---          int = VehicleSort.txtSizeDef;
---        else
---          int = math.floor(tonumber(int));
---        end
---        VehicleSort.config[i][2] = int;
---        VehicleSort:dp(string.format('txtSize value set to [%d]', int), 'VehicleSort:loadVehicleOrder');
---      elseif i == 10 then
---        local flt = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to float
---        if tonumber(flt) == nil or tonumber(flt) <= 0 or tonumber(flt) > 1 then
---          flt = VehicleSort.bgTransDef;
---        else
---          flt = tonumber(string.format('%.1f', tonumber(flt)));
---        end
---        VehicleSort.config[i][2] = flt;
---        VehicleSort:dp(string.format('bgTrans value set to [%f]', flt), 'VehicleSort:loadVehicleOrder');
---      else
---        local b = getXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1]);
---        if b ~= nil then
---          VehicleSort.config[i][2] = b;
---        end
---      end
---    end
---  end
---end
+
+function VehicleSort:loadConfig()
+	if fileExists(VehicleSort.xmlFilename) then
+		VehicleSort.saveFile = loadXMLFile('VehicleSort.loadFile', VehicleSort.xmlFilename);
+
+		if hasXMLProperty(VehicleSort.saveFile, VehicleSort.keyCon) then
+
+			VehicleSort:dp('Config file found.', 'VehicleSort:loadConfig');
+			for i = 1, #VehicleSort.config do
+				if i == 9 then
+					local int = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to int
+					if tonumber(int) == nil or tonumber(int) <= 0 or tonumber(int) > 3 then
+						int = VehicleSort.txtSizeDef;
+					else
+						int = math.floor(tonumber(int));
+					end
+					VehicleSort.config[i][2] = int;
+					VehicleSort:dp(string.format('txtSize value set to [%d]', int), 'VehicleSort:loadConfig');
+				elseif i == 10 then
+					local flt = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to float
+					if tonumber(flt) == nil or tonumber(flt) <= 0 or tonumber(flt) > 1 then
+						flt = VehicleSort.bgTransDef;
+					else
+						flt = tonumber(string.format('%.1f', tonumber(flt)));
+					end
+					VehicleSort.config[i][2] = flt;
+					VehicleSort:dp(string.format('bgTrans value set to [%f]', flt), 'VehicleSort:loadConfig');
+				else
+					local b = getXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
+					if b ~= nil then
+						VehicleSort.config[i][2] = b;
+					end
+				end
+			end
+			print("VSConfig loaded");
+		end
+	end
+end
 
 function VehicleSort:mouseEvent(posX, posY, isDown, isUp, button)
 end
 
 function VehicleSort:moveDown(moveSpeed)
-  if moveSpeed == nil then
-	moveSpeed = 1;
-  end
-  local oldIndex = VehicleSort.selectedIndex;
-  VehicleSort.selectedIndex = VehicleSort.selectedIndex + moveSpeed;
-  if VehicleSort.selectedIndex > #VehicleSort.Sorted then
-    VehicleSort.selectedIndex = 1;
-  end
---  if VehicleSort:isHidden(VehicleSort.Sorted[VehicleSort.selectedIndex]) then
---    VehicleSort:moveDown();
---  end
-  if VehicleSort.selectedLock then
-    VehicleSort:reSort(oldIndex, VehicleSort.selectedIndex);
-  end
+	if moveSpeed == nil then
+		moveSpeed = 1;
+	end
+	local oldIndex = VehicleSort.selectedIndex;
+	VehicleSort.selectedIndex = VehicleSort.selectedIndex + moveSpeed;
+	if VehicleSort.selectedIndex > #VehicleSort.Sorted then
+		VehicleSort.selectedIndex = 1;
+	end
+	if VehicleSort:isHidden(VehicleSort.Sorted[VehicleSort.selectedIndex]) then
+		VehicleSort:moveDown();
+	end
+	if VehicleSort.selectedLock then
+		VehicleSort:reSort(oldIndex, VehicleSort.selectedIndex);
+	end
 end
 
 function VehicleSort:moveUp(moveSpeed)
-  if moveSpeed == nil then
-	moveSpeed = 1;
-  end
-  local oldIndex = VehicleSort.selectedIndex;
-  VehicleSort.selectedIndex = VehicleSort.selectedIndex - moveSpeed;
-  if VehicleSort.selectedIndex < 1 then
-    VehicleSort.selectedIndex = #VehicleSort.Sorted;
-  end
---  if VehicleSort:isHidden(VehicleSort.Sorted[VehicleSort.selectedIndex]) then
---    VehicleSort:moveUp();
---  end
-  if VehicleSort.selectedLock then
-    VehicleSort:reSort(oldIndex, VehicleSort.selectedIndex);
-  end
+	if moveSpeed == nil then
+		moveSpeed = 1;
+	end
+	local oldIndex = VehicleSort.selectedIndex;
+	VehicleSort.selectedIndex = VehicleSort.selectedIndex - moveSpeed;
+	if VehicleSort.selectedIndex < 1 then
+		VehicleSort.selectedIndex = #VehicleSort.Sorted;
+	end
+	if VehicleSort:isHidden(VehicleSort.Sorted[VehicleSort.selectedIndex]) then
+		VehicleSort:moveUp();
+	end
+	if VehicleSort.selectedLock then
+		VehicleSort:reSort(oldIndex, VehicleSort.selectedIndex);
+	end
 end
 
 function VehicleSort:moveConfigDown()
@@ -1099,22 +982,21 @@ function VehicleSort:toggleParkState(selectedIndex)
 	VehicleSort:dp(string.format('realId {%d} - parked {%s}', realId, tostring(parked)), 'VehicleSort:toggleParkState');
 end
 
+--TODO Config ueberarbeiten
 function VehicleSort:saveConfig()
-  
-  VehicleSort.saveFile = createXMLFile('VehicleSort.saveFile', VehicleSort.xmlFilename, VehicleSort.key);
-  setXMLString(VehicleSort.saveFile, VehicleSort.key .. VehicleSort.xmlAttrMapId, g_currentMission.missionInfo.mapId);
-  for i = 1, #VehicleSort.config do
-    if i == 9 then
-      setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1], tostring(VehicleSort.config[i][2]));
-    elseif i == 10 then
-      setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1], string.format('%.1f', VehicleSort.config[i][2]));
-    else
-      setXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '#' .. VehicleSort.config[i][1], VehicleSort.config[i][2]);
-    end
-  end
-  saveXMLFile(VehicleSort.saveFile);
+	VehicleSort.saveFile = createXMLFile('VehicleSort.saveFile', VehicleSort.xmlFilename, VehicleSort.keyCon);
+	for i = 1, #VehicleSort.config do
+		if i == 9 then
+			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), tostring(VehicleSort.config[i][2]));
+		elseif i == 10 then
+			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), string.format('%.1f', VehicleSort.config[i][2]));
+		else
+			setXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), VehicleSort.config[i][2]);
+		end
+	end
+	saveXMLFile(VehicleSort.saveFile);
 
-  print("VehicleSort saved your custom order");
+  print("VehicleSort config saved");
 end
 
 --
