@@ -864,7 +864,9 @@ end
 
 -- ToDo
 function VehicleSort:isHired(realId)
-	return g_currentMission.vehicles[realId].spec_aiVehicle.isActive;
+	if g_currentMission.vehicles[realId].spec_aiVehicle ~= nil then
+		return g_currentMission.vehicles[realId].spec_aiVehicle.isActive;
+	end
 end
 
 function VehicleSort:keyEvent(unicode, sym, modifier, isDown)	
