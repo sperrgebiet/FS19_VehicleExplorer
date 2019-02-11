@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="40">
 	<author>Dschonny, Slivicon, sperrgebiet</author>
-	<version>0.0.0.1</version>
+	<version>1.0.0.0</version>
 	<title>VehicleSort Alpha</title>
 	<description>
 			Blah
@@ -11,6 +11,7 @@
 
 	<extraSourceFiles>
 		<sourceFile filename="RegisterSpecialization.lua" />
+		<sourceFile filename="VehicleSort.lua" />
 	</extraSourceFiles>
 
 	<registerSpecializations>
@@ -59,6 +60,10 @@
     </inputBinding>	
 	
 	<l10n>
+		<text name="vs_title">
+			<de>Fahrzeugliste</de>
+			<en>VehicleSort</en>
+		</text>
 		<text name="input_vsToggleList">
 			<de>VehicleSort: Fahrzeugliste anzeigen</de>
 			<en>VehicleSort: Show vehicle list</en>
@@ -154,7 +159,11 @@
 		<text name="showSteerableImplements">
 			<de>Steuerbare Werkzeuge anzeigenn</de>
 			<en>Show steerable implements</en>
-		</text>		
+		</text>
+		<text name="showImplements">
+			<de>Angehängte Geräte anzeigenn</de>
+			<en>Show attached implements</en>
+		</text>			
 		<text name="vs_on">
 			<de>An</de>
 			<en>On</en>
@@ -176,19 +185,16 @@
 			<en>Implement</en>
 		</text>
 		<text name="hired">
-			<de>Helfer</de>
-			<en>Helper</en>
+			<de>H</de>
+			<en>H</en>
 		</text>
 		<text name="courseplay">
-			<de>CoursePlay 6</de>
-			<en>CoursePlay 6</en>
+			<de>CP</de>
+			<en>CP</en>
 		</text>
 		<text name="followme">
-			<de>FollowMe</de>
-			<en>FollowMe</en>
+			<de>FM</de>
+			<en>FM</en>
 		</text>
 	</l10n>
-	<extraSourceFiles>
-		<sourceFile filename="VehicleSort.lua" />
-	</extraSourceFiles>
 </modDesc>
