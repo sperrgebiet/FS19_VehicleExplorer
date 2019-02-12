@@ -8,7 +8,7 @@ VehicleSort.Version = "1.0.0.0";
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
 
-print(string.format('VehicleSort v%s - DebugMode %s)', VehicleSort.version, tostring(VehicleSort.debug)));
+print(string.format('VehicleSort v%s - DebugMode %s)', VehicleSort.Version, tostring(VehicleSort.debug)));
 
 VehicleSort.bgTransDef = 0.8;
 VehicleSort.txtSizeDef = 2;
@@ -26,7 +26,8 @@ VehicleSort.config = {
   {'bgTrans', VehicleSort.bgTransDef},
   {'showSteerableImplements', true},
   {'showImplements', true},
-  {'showHelp', true}
+  {'showHelp', true},
+  {'saveStatus', true}
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -93,7 +94,7 @@ function VehicleSort:onPostLoad(savegame)
 
 	if savegame ~= nil then
 		local xmlFile = savegame.xmlFile;
-		local key = savegame.key..".VehicleSort";
+		local key = savegame.key..".vehicleSort";
 		
 		local orderId = getXMLInt(xmlFile, key.."#UserOrder");
 		if orderId ~= nil then
@@ -185,7 +186,6 @@ function VehicleSort:removeActionEvents()
 end
 
 function VehicleSort.registerEventListeners(vehicleType)
---	local functionNames = {	"onLoad", "onPostLoad", "onDraw", "saveToXMLFile", "onRegisterActionEvents" };
 	local functionNames = {	"onLoad", "onPostLoad", "saveToXMLFile" };
 	
 	for _, functionName in ipairs(functionNames) do
@@ -193,10 +193,25 @@ function VehicleSort.registerEventListeners(vehicleType)
 	end
 end
 
-function VehicleSort:mouseEvent(posX, posY, isDown, isUp, button)
+function VehicleSort:keyEvent(unicode, sym, modifier, isDown)
 end
 
-function VehicleSort:keyEvent(unicode, sym, modifier, isDown)
+function VehicleSort:mouseEvent(posX, posY, isDown, isUp, button)
+	if (VehicleSort.showConfig or VehicleSort.showSteerables) and ( isDown and button == Input.MOUSE_BUTTON_LEFT) then
+		VehicleSort.action_vsChangeVehicle();
+	end
+
+	if (VehicleSort.showConfig or VehicleSort.showSteerables) and ( isDown and button == Input.MOUSE_BUTTON_RIGHT) then
+		VehicleSort.action_vsLockListItem();
+	end
+
+	if (VehicleSort.showConfig or VehicleSort.showSteerables) and ( isDown and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_WHEEL_UP)) then
+		VehicleSort.action_vsMoveCursorUp();
+	end
+	
+	if (VehicleSort.showConfig or VehicleSort.showSteerables) and ( isDown and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_WHEEL_DOWN)) then
+		VehicleSort.action_vsMoveCursorDown();
+	end	
 end
 
 function VehicleSort:saveToXMLFile(xmlFile, key)
@@ -242,10 +257,6 @@ function VehicleSort:delete()
 end
 
 function VehicleSort:deleteMap()
-	if VehicleSort.isInitialized then
-		delete(VehicleSort.bg);
-	end
-	VehicleSort:reset();
 end
 
 -- Functions for actionEvents/inputBindings
@@ -971,9 +982,6 @@ function VehicleSort:loadConfig()
 	end
 end
 
-function VehicleSort:mouseEvent(posX, posY, isDown, isUp, button)
-end
-
 function VehicleSort:moveDown(moveSpeed)
 	if moveSpeed == nil then
 		moveSpeed = 1;
@@ -1037,11 +1045,13 @@ end
 
 function VehicleSort:SyncSorted()
 	for k, v in ipairs(VehicleSort.Sorted) do
-		if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
-			if g_currentMission.vehicles[v]['spec_vehicleSort']['id'] ~= g_currentMission.vehicles[v]['id'] then
-				g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = nil;
-			else
-				g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
+		if g_currentMission.vehicles[v] ~= nil then
+			if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
+				if g_currentMission.vehicles[v]['spec_vehicleSort']['id'] ~= g_currentMission.vehicles[v]['id'] then
+					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = nil;
+				else
+					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
+				end
 			end
 		end
 	end
@@ -1114,15 +1124,15 @@ function VehicleSort:getStoreImageByConf(confFile)
 	end
 end
 
-function VehicleSort.setToolById(self, superFunc, toolId, noEventSend) --credit: Xentro, GameExtension
+
+--
+-- Extends default game functions
+-- This is required to block the camera zoom & handtool selection while drawlist or drawconfig is open
+--
+function VehicleSort.onInputCycleHandTool(self, superFunc, _, _, direction)
 	if not VehicleSort.showSteerables and not VehicleSort.showConfig then
-		superFunc(self, toolId, noEventSend);
-	else
-		superFunc(self, 0, true); --do not switch to chainsaws while VehicleSort is displayed
+		superFunc(self, _, _, direction);
 	end
-end
-if g_dedicatedServerInfo == nil then -- function only needed by players, as this relates to choosing chainsaws while VehicleSort is displayed
-	--Player.setToolById = Utils.overwrittenFunction(Player.setToolById, VehicleSort.setToolById);
 end
 
 function VehicleSort.zoomSmoothly(self, superFunc, offset)
@@ -1130,6 +1140,7 @@ function VehicleSort.zoomSmoothly(self, superFunc, offset)
 		superFunc(self, offset);
 	end
 end
-if g_dedicatedServerInfo == nil then -- function only needed by players, as this relates to camera zooming while scrolling through vehicle list with mouse wheel
+if g_dedicatedServerInfo == nil then
   VehicleCamera.zoomSmoothly = Utils.overwrittenFunction(VehicleCamera.zoomSmoothly, VehicleSort.zoomSmoothly);
+  Player.onInputCycleHandTool = Utils.overwrittenFunction(Player.onInputCycleHandTool, VehicleSort.onInputCycleHandTool);
 end

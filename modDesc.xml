@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="40">
-	<author>Dschonny, Slivicon, sperrgebiet</author>
+<modDesc descVersion="42">
+	<author>sperrgebiet</author>
 	<version>1.0.0.0</version>
-	<title>VehicleSort Alpha</title>
+	<title>Vehicle Sort</title>
 	<description>
-			Blah
+			Dschonny, Slivicon
 	</description>
 	<iconFilename>icon.dds</iconFilename>
 	<multiplayer supported="false" />
 
 	<extraSourceFiles>
 		<sourceFile filename="RegisterSpecialization.lua" />
-		<sourceFile filename="VehicleSort.lua" />
 	</extraSourceFiles>
 
-	<registerSpecializations>
+	<registerSpecializations debugPriority="0">
 		<registerSpecialization name="vehicleSort" className="VehicleSort" filename="VehicleSort.lua" searchedSpecializations="Enterable"/>
+		<registerSpecialization name="vehicleStatus" className="VehicleStatus" filename="VehicleStatus.lua" searchedSpecializations="Motorized TurnOnVehicle Lights"/>
 	</registerSpecializations>	
 
 	<actions>
@@ -31,38 +31,38 @@
 	</actions>
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_0" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_0" index="1" />
 		</actionBinding>
 		<actionBinding action="vsLockListItem">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorUp">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_8" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_8" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorDown">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_2" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_2" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorUpFast">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_1" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_1" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorDownFast">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_2" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_2" index="1" />
 		</actionBinding>
 		<actionBinding action="vsChangeVehicle">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_enter" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_enter" index="1" />
 		</actionBinding>
 		<actionBinding action="vsShowConfig">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_minus" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_minus" index="1" />
 		</actionBinding>		
 		<actionBinding action="vsTogglePark">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_plus" axisComponent="+" neutralInput="0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_plus" index="1" />
 		</actionBinding>
     </inputBinding>	
 	
 	<l10n>
 		<text name="vs_title">
 			<de>Fahrzeugliste</de>
-			<en>VehicleSort</en>
+			<en>Vehicle List</en>
 		</text>
 		<text name="input_vsToggleList">
 			<de>VehicleSort: Fahrzeugliste anzeigen</de>
@@ -163,6 +163,10 @@
 		<text name="showImplements">
 			<de>Angehängte Geräte anzeigenn</de>
 			<en>Show attached implements</en>
+		</text>
+		<text name="saveStatus">
+			<de>Fahrzeugstatus speichern (gestartet, eingeschaltet, Licht)</de>
+			<en>Save vehicle status (started, turned on, lights)</en>
 		</text>			
 		<text name="vs_on">
 			<de>An</de>
