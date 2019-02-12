@@ -3,7 +3,7 @@ $dstPath = "F:\FarmingSimulator2019\mods-dev\FS19_VehicleSort"
 $dstFilename = "FS19_VehicleSort.zip"
 $tmpPath = Join-Path $env:TMP "TmpZip"
 
-$ignorelist = get-content .\.gitignore
+$ignorelist = get-content (Join-Path $srcPath ".gitignore")
 $ignorelist += "/New-ModZip.ps1"
 
 
@@ -27,6 +27,6 @@ foreach($f in $allFiles)
     }
 }
 
-Compress-Archive -Path $tmpPath -DestinationPath (Join-Path $dstPath $dstFilename)
+Compress-Archive -Path (Join-Path $tmpPath "\*") -DestinationPath (Join-Path $dstPath $dstFilename)
 
 Remove-Item -Path $tmpPath -Recurse -Force
