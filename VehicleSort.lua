@@ -940,10 +940,6 @@ function VehicleSort:isHired(realId)
 	end
 end
 
-function VehicleSort:keyEvent(unicode, sym, modifier, isDown)	
-end
-
-
 function VehicleSort:loadConfig()
 	if fileExists(VehicleSort.xmlFilename) then
 		VehicleSort.saveFile = loadXMLFile('VehicleSort.loadFile', VehicleSort.xmlFilename);
@@ -1117,7 +1113,8 @@ function VehicleSort:getStoreImageByConf(confFile)
 	local storeItem = g_storeManager.xmlFilenameToItem[string.lower(confFile)];
 	if storeItem ~= nil then
 		local imgFileName = storeItem.imageFilename;
-		if imgFileName == 'data/vehicles/train/locomotive01/store_locomotive01.png' or imgFileName == 'data/vehicles/train/locomotive04/store_locomotive04.png' then
+		--if imgFileName == 'data/vehicles/train/locomotive01/store_locomotive01.png' or imgFileName == 'data/vehicles/train/locomotive04/store_locomotive04.png' then
+		if string.find(imgFileName, 'locomotive') then
 			imgFileName = VehicleSort.ModDirectory .. 'img/train.dds';
 		end
 		return imgFileName;
