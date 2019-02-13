@@ -53,16 +53,61 @@ end
 
 function VehicleStatus:saveToXMLFile(xmlFile, key)
 	if VehicleSort.config[14][2] then
-		if self.spec_motorized ~= nil and self.getIsMotorStarted then
-			setXMLBool(xmlFile, key .. '#isMotorStarted', self:getIsMotorStarted());
+		if VehicleStatus:getIsMotorStarted(self) then
+			setXMLBool(xmlFile, key .. '#isMotorStarted', VehicleStatus:getIsMotorStarted(self));
 		end
 		
-		if self.spec_turnOnVehicle ~= nil and self.getIsTurnedOn then
-			setXMLBool(xmlFile, key .. '#isTurnedOn', self:getIsTurnedOn());
+		if VehicleStatus:getIsTurnedOn(self) then
+			setXMLBool(xmlFile, key .. '#isTurnedOn', VehicleStatus:getIsTurnedOn(self));
 		end
 		
-		if self.spec_lights ~= nil and self.getLightsTypesMask then
+		if VehicleStatus:getIsLightTurnedOn(self) then
 			setXMLInt(xmlFile, key .. '#lightsMask', self:getLightsTypesMask());
+		end
+	end
+end
+
+function VehicleStatus:getIsMotorStarted(vehObj)
+	if vehObj.spec_motorized ~= nil and vehObj.getIsMotorStarted then
+		return vehObj:getIsMotorStarted();
+	end
+end
+
+function VehicleStatus:getIsTurnedOn(vehObj)
+	if vehObj.spec_turnOnVehicle ~= nil and vehObj.getIsTurnedOn then
+		return vehObj:getIsTurnedOn()
+	end
+end
+
+function VehicleStatus:getIsLightTurnedOn(vehObj)
+	if vehObj.spec_lights ~= nil and vehObj.getLightsTypesMask then
+		if vehObj:getLightsTypesMask() > 0 then
+			return true;
+		else
+			return false;
+		end
+	end
+end
+
+function VehicleStatus:getSpeedStr(vehObj)
+	if vehObj.getLastSpeed ~= nil then
+		return tostring(math.floor(vehObj:getLastSpeed())) .. " " .. "km/h";		--TODO: Change to the current measuring unit
+	end
+end
+
+function VehicleStatus:RepairVehicleWithImplements(realId)
+	veh = g_currentMission.vehicles[realId];
+	if veh ~= nil then
+		if veh.repairVehicle ~= nil then
+			veh:repairVehicle(true);
+			
+			local implements = VehicleSort:getVehImplements(realId);
+			for i = 1, #implements do
+				local imp = implements[i];
+				if imp ~= nil and imp.object ~= nil and imp.object.repairVehicle ~= nil then
+					imp.object:repairVehicle(true);
+				end
+			end
 		end
 	end
 end
