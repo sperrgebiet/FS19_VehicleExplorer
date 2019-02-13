@@ -50,6 +50,9 @@ Feedback, this readme and additional information incl. source code can be find a
 * Sometimes selling or resetting a vehicle is causing a flickering of the vehicle list. I've already an idea why, just have to look more into it.
 As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
 
+### Incompatible Mods
+* SpeedControl (to be fixed)
+
 ## Default Keybinding
 KeyPad 0 -> Show/hide vehicle list
 KeyPad Minus -> Show/hide config menu 
@@ -77,7 +80,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.1 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.0.2 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -135,6 +138,9 @@ Besides that it has a couple of additional functionality. See below.
 * Manchmal verursacht das verkaufen oder zurücksetzen eines Fahrzeuges ein flackern der Fahrzeugliste. Ich hab auch schon eine Idee warum, muss mich nur mehr damit beschäftigen.
 Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
 
+### Inkompatible Mods
+* SpeedControl (to be fixed)
+
 ## Standard Tastenbelegung
 KeyPad 0 -> Anzeigen/verstecken der Fahrzeugliste
 KeyPad Minus -> Anzeigen/verstecken des Konfigurationsmenüs
@@ -161,4 +167,4 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Latest Version
-0.9.0.1 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.0.2 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.

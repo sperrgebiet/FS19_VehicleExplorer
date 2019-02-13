@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.1";
+VehicleSort.Version = "0.9.0.2";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -12,6 +12,7 @@ print(string.format('VehicleSort v%s - DebugMode %s)', VehicleSort.Version, tost
 
 VehicleSort.bgTransDef = 0.8;
 VehicleSort.txtSizeDef = 2;
+VehicleSort.infoYStart = 1;
 
 VehicleSort.config = {
   {'showTrain', true},
@@ -29,7 +30,8 @@ VehicleSort.config = {
   {'showHelp', true},
   {'saveStatus', true},
   {'showImg', true},
-  {'showInfo', true}
+  {'showInfo', true},
+  {'infoStart', VehicleSort.infoYStart}
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -297,7 +299,7 @@ function VehicleSort:action_vsLockListItem(actionName, keyStatus, arg3, arg4, ar
 			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 3 then
 				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 1;
 			end
-		elseif VehicleSort.selectedConfigIndex == 10 then
+		elseif VehicleSort.selectedConfigIndex == 10 or VehicleSort.selectedConfigIndex == 17 then
 			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = VehicleSort.config[VehicleSort.selectedConfigIndex][2] + 0.1;
 			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 1 then
 				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 0.0;
@@ -405,7 +407,7 @@ function VehicleSort:drawConfig()
     local state = VehicleSort.config[i][2];
     if i == 9 then
       state = string.format('%d', state);
-    elseif i == 10 then
+    elseif i == 10 or i == 17 then		--bgTransparency and VehicleSort.infoYStart
       state = string.format('%.1f', state);
     elseif state then
       state = txtOn;
@@ -433,6 +435,13 @@ function VehicleSort:drawConfig()
     end
   end
   setTextColor(unpack(VehicleSort.tColor.standard));
+  
+  --Show the last selected vehicle for info/image position
+  if VehicleSort.selectedConfigIndex == 17 then
+	VehicleSort:drawInfobox(VehicleSort.Sorted[VehicleSort.selectedIndex]);
+	VehicleSort:drawStoreImage(VehicleSort.Sorted[VehicleSort.selectedIndex]);
+  end
+  
 end
 
 function VehicleSort:drawList()
@@ -985,15 +994,19 @@ function VehicleSort:loadConfig()
 					end
 					VehicleSort.config[i][2] = int;
 					VehicleSort:dp(string.format('txtSize value set to [%d]', int), 'VehicleSort:loadConfig');
-				elseif i == 10 then
+				elseif i == 10 or i == 17 then
 					local flt = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to float
 					if tonumber(flt) == nil or tonumber(flt) <= 0 or tonumber(flt) > 1 then
-						flt = VehicleSort.bgTransDef;
+						if i == 10 then
+							flt = VehicleSort.bgTransDef;
+						elseif i == 17 then
+							flt = VehicleSort.infoYStart;
+						end
 					else
 						flt = tonumber(string.format('%.1f', tonumber(flt)));
 					end
 					VehicleSort.config[i][2] = flt;
-					VehicleSort:dp(string.format('bgTrans value set to [%f]', flt), 'VehicleSort:loadConfig');
+					VehicleSort:dp(string.format('%s value set to [%f]',tostring(VehicleSort.config[i][1]), flt), 'VehicleSort:loadConfig');
 				else
 					local b = getXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
 					if b ~= nil then
@@ -1097,7 +1110,7 @@ function VehicleSort:saveConfig()
 	for i = 1, #VehicleSort.config do
 		if i == 9 then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), tostring(VehicleSort.config[i][2]));
-		elseif i == 10 then
+		elseif i == 10 or i == 17 then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), string.format('%.1f', VehicleSort.config[i][2]));
 		else
 			setXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), VehicleSort.config[i][2]);
@@ -1117,7 +1130,7 @@ function VehicleSort:drawStoreImage(realId)
 	if storeImage > 0 then
 		local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
 		local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
-		local imgY = 1 - storeImgY;
+		local imgY = VehicleSort.config[17][2] - storeImgY;
 		renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 		
 		if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
@@ -1128,7 +1141,7 @@ function VehicleSort:drawStoreImage(realId)
 					local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
 					local storeImage = createImageOverlay(imgFileName);
 					if storeImage > 0 then
-						local imgY = 1 - (storeImgY * (i + 1) );
+						local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
 						renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 					end
 				end
@@ -1163,7 +1176,7 @@ function VehicleSort:drawInfobox(realId)
 			imgWidth = 0.01;
 		end
 		local infoX = 0.5 - VehicleSort.bgW / 2 - imgWidth;
-		local infoY = 1 - txtSize - (VehicleSort.tPos.spacing * 8);
+		local infoY = VehicleSort.config[17][2] - txtSize - (VehicleSort.tPos.spacing * 8);
 		local txtY = infoY - VehicleSort.tPos.spacing;
 		local txtWidth = getTextWidth(txtSize, "Info");
 		
@@ -1193,7 +1206,22 @@ function VehicleSort:getInfoTexts(realId)
 		local line = "";
 		
 		if (veh.getIsCourseplayDriving ~= nil and veh:getIsCourseplayDriving()) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_course .. ": " .. veh.cp.currentCourseName;
+			local courseName = "";
+			if veh.cp.currentCourseName ~= nil then
+				courseName = veh.cp.currentCourseName;
+			elseif veh.cp.mapHotspot.fullViewName ~= nil then
+				local str = tostring(veh.cp.mapHotspot.fullViewName);
+				local t = {}
+				for s in str:gmatch("[^\r\n]+") do
+					table.insert(t, s)
+				end
+				if string.len(tostring(t[3])) > 1 then
+					courseName = tostring(t[3]);
+				end
+			else
+				courseName = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_courseunknown
+			end
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_course .. ": " .. courseName;
 			table.insert(texts, line);
 		end
 		

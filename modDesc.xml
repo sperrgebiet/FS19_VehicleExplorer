@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.1</version>
+	<version>0.9.0.2</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -197,6 +197,10 @@
 			<de>Infobox anzeigen</de>
 			<en>Show infobox</en>
 		</text>			
+		<text name="infoStart">
+			<de>Infobox/Bild vertikal verschieben</de>
+			<en>Move Infobox/image vertically</en>
+		</text>					
 		<text name="vs_on">
 			<de>An</de>
 			<en>On</en>
@@ -237,6 +241,10 @@
 			<de>CP Kurs</de>
 			<en>CP Course</en>
 		</text>
+		<text name="cp_courseunknown">
+			<de>Temporärer Kurs</de>
+			<en>Temporary course</en>
+		</text>		
 		<text name="wear">
 			<de>Abnutzung</de>
 			<en>Wear</en>
