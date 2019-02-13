@@ -41,6 +41,7 @@
 * Chaining for implements
   * For now just the directly attached implements get respected. This means for repair and the info box just a e.g. trailer is recognized, but not a trailer which is attached to another trailer
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
+* A wrong value for horse power is displayed for trains
 
 ## Default Keybinding
 KeyPad 0 -> Show/hide vehicle list
@@ -63,8 +64,8 @@ Quite frankly, I've no idea about the MP code needed and also no possibility to 
 
 ## Credits
 Primarily to Dschonny & Slivicon. At least those are the names which were mentioned in the FS17 VehicleSort I used as a foundation. But the majority of code has changed anyways.
-Also Kudos to the guys and gals from CoursePlay, VehicleInspector, VehicleFruitHud, EnhancedVehicle and many more for some inspiration and ideas
-
+Also Kudos to the guys and gals from CoursePlay, VehicleInspector, VehicleFruitHud, EnhancedVehicle and many more for some inspiration and ideas.
+Additionally Ifko[nator] for the RegisterSpecialization script.
 
 -----
 
@@ -111,6 +112,7 @@ Also Kudos to the guys and gals from CoursePlay, VehicleInspector, VehicleFruitH
 * Verkettung von Geräten/Anhängern
   * Nur die direkt angehängten Geräte/Anhänger werden berücksichtig. Beim reparieren z.b. wird nur der Anhäng des Traktors berücksichtigt, jedoch nicht ein Anhänger der am Anhänger hängt.
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
+* Bei Zügen wird die Leistung/PS falsch berechnet
 
 ## Standard Tastenbelegung
 KeyPad 0 -> Anzeigen/verstecken der Fahrzeugliste
@@ -134,3 +136,4 @@ Ehrlich gesagt habe ich keine Ahnung was für MP Code notwendig wäre und auch k
 ## Credits
 Primär an Dschonny & Slivicon. Zumindest waren das die Namen die in der LS17 VehicleSort Version genannt wurden welche als Basis diente. Aber der Grossteil des codes hat sich sowieso verändert.
 Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFruitHud, EnhancedVehicle und vielen anderen für Inspirationen und Ideen.
+Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
