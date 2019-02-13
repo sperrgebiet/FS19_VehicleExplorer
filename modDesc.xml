@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>1.0.0.0</version>
-	<title>Vehicle Sort</title>
+	<version>0.9.0.0</version>
+	<title>Vehicle Explorer</title>
 	<description>
-			Dschonny, Slivicon
+	<en>
+		This is a revamp of the good old VehicleSort from FS17.
+		
+		For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
+		Besides that it has a couple of additional functionality. See below.
+		
+		More Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+	</en>
+	<de>
+		Dies ist eine Reinkarnation von VehicleSort aus LS17
+		Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zeigt eine Liste welche dann selbst nach eigenen Wünschen sortiert werden kann.
+		
+		Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+	</de>
 	</description>
 	<iconFilename>icon.dds</iconFilename>
 	<multiplayer supported="false" />
@@ -28,6 +41,7 @@
 		<action name="vsChangeVehicle" axisType="HALF" />
 		<action name="vsShowConfig" axisType="HALF" />
 		<action name="vsTogglePark" axisType="HALF" />
+		<action name="vsRepair" axisType="HALF" />
 	</actions>
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
@@ -57,6 +71,9 @@
 		<actionBinding action="vsTogglePark">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_plus" index="1" />
 		</actionBinding>
+		<actionBinding action="vsRepair">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_r" index="1" />
+		</actionBinding>		
     </inputBinding>	
 	
 	<l10n>
@@ -65,41 +82,45 @@
 			<en>Vehicle List</en>
 		</text>
 		<text name="input_vsToggleList">
-			<de>VehicleSort: Fahrzeugliste anzeigen</de>
-			<en>VehicleSort: Show vehicle list</en>
+			<de>VeEx: Fahrzeugliste anzeigen</de>
+			<en>VeEx: Show vehicle list</en>
 		</text>
 		<text name="input_vsLockListItem">
-			<de>VehicleSort: Listeneintrag auswählen</de>
-			<en>VehicleSort: Select list entry</en>
+			<de>VeEx: Listeneintrag auswählen</de>
+			<en>VeEx: Select list entry</en>
 		</text>
 		<text name="input_vsMoveCursorUp">
-			<de>VehicleSort: Auswahl hoch</de>
-			<en>VehicleSort: Move cursor up</en>
+			<de>VeEx: Auswahl hoch</de>
+			<en>VeEx: Move cursor up</en>
 		</text>
 		<text name="input_vsMoveCursorDown">
-			<de>VehicleSort: Auswahl runter</de>
-			<en>VehicleSort: Move cursor down</en>
+			<de>VeEx: Auswahl runter</de>
+			<en>VeEx: Move cursor down</en>
 		</text>
 		<text name="input_vsMoveCursorUpFast">
-			<de>VehicleSort: Auswahl schnell hoch</de>
-			<en>VehicleSort: Move cursor up fast</en>
+			<de>VeEx: Auswahl schnell hoch</de>
+			<en>VeEx: Move cursor up fast</en>
 		</text>		
 		<text name="input_vsMoveCursorDownFast">
-			<de>VehicleSort: Auswahl schnell runter</de>
-			<en>VehicleSort: Move cursor down fast</en>
+			<de>VeEx: Auswahl schnell runter</de>
+			<en>VeEx: Move cursor down fast</en>
 		</text>	
 		<text name="input_vsChangeVehicle">
-			<de>VehicleSort: Ins Fahrzeug wechseln</de>
-			<en>VehicleSort: Enter selected vehicle</en>
+			<de>VeEx: Ins Fahrzeug wechseln</de>
+			<en>VeEx: Enter selected vehicle</en>
 		</text>
 		<text name="input_vsShowConfig">
-			<de>VehicleSort: Konfiguration anzeigen</de>
-			<en>VehicleSort: Show configuration</en>
+			<de>VeEx: Konfiguration anzeigen</de>
+			<en>VeEx: Show configuration</en>
 		</text>
 		<text name="input_vsTogglePark">
-			<de>VehicleSort: Fahrzeug parken/entparken</de>
-			<en>VehicleSort: Toggle vehicle parking</en>
-		</text>	
+			<de>VeEx: Fahrzeug parken/entparken</de>
+			<en>VeEx: Toggle vehicle parking</en>
+		</text>
+		<text name="input_vsRepair">
+			<de>VeEx: Fahrzeug inkl. Geräte reparieren</de>
+			<en>VeEx: Repair vehicles incl. implements</en>
+		</text>			
 		<text name="configHeadline">
 			<de>VehicleSort-Konfiguration</de>
 			<en>VehicleSort Configuration</en>
@@ -167,6 +188,14 @@
 		<text name="saveStatus">
 			<de>Fahrzeugstatus speichern (gestartet, eingeschaltet, Licht)</de>
 			<en>Save vehicle status (started, turned on, lights)</en>
+		</text>
+		<text name="showImg">
+			<de>Bilder anzeigen</de>
+			<en>Show images</en>
+		</text>		
+		<text name="showInfo">
+			<de>Infobox anzeigen</de>
+			<en>Show infobox</en>
 		</text>			
 		<text name="vs_on">
 			<de>An</de>
@@ -200,5 +229,37 @@
 			<de>FM</de>
 			<en>FM</en>
 		</text>
+		<text name="helper">
+			<de>Helfer</de>
+			<en>Helper</en>
+		</text>		
+		<text name="cp_course">
+			<de>CP Kurs</de>
+			<en>CP Course</en>
+		</text>
+		<text name="wear">
+			<de>Abnutzung</de>
+			<en>Wear</en>
+		</text>
+		<text name="motor">
+			<de>Motor</de>
+			<en>Engine</en>
+		</text>		
+		<text name="turnedOn">
+			<de>Gestartet</de>
+			<en>Started</en>
+		</text>
+		<text name="lights">
+			<de>Lichter</de>
+			<en>Lights</en>
+		</text>
+		<text name="speed">
+			<de>Geschwindigkeit</de>
+			<en>Speed</en>
+		</text>
+		<text name="fillLevel">
+			<de>Füllstand</de>
+			<en>Filllevel</en>
+		</text>			
 	</l10n>
 </modDesc>
