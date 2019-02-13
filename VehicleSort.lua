@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.0";
+VehicleSort.Version = "0.9.0.1";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -869,6 +869,8 @@ function VehicleSort:getControllerName(realId)
 	if not VehicleSort:isHired(realId) then
 		if g_currentMission.vehicles[realId].getControllerName ~= nil then
 			return g_currentMission.vehicles[realId]:getControllerName();
+		else
+			return "Unknown Controller";
 		end
 	end
 end
@@ -1118,7 +1120,7 @@ function VehicleSort:drawStoreImage(realId)
 		local imgY = 1 - storeImgY;
 		renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 		
-		if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= VehicleSort.ModDirectory .. 'img/train.dds') then
+		if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
 			local impList = g_currentMission.vehicles[realId]:getAttachedImplements();
 			for i = 1, 5 do
 				local imp = impList[i];
@@ -1141,7 +1143,8 @@ function VehicleSort:getStoreImageByConf(confFile)
 		local imgFileName = storeItem.imageFilename;
 		--if imgFileName == 'data/vehicles/train/locomotive01/store_locomotive01.png' or imgFileName == 'data/vehicles/train/locomotive04/store_locomotive04.png' then
 		if string.find(imgFileName, 'locomotive') then
-			imgFileName = VehicleSort.ModDirectory .. 'img/train.dds';
+			--imgFileName = Utils.getFilename('img/train.png', VehicleSort.ModDirectory);
+			imgFileName = "data/store/store_empty.png";
 		end
 		return imgFileName;
 	end
@@ -1195,7 +1198,12 @@ function VehicleSort:getInfoTexts(realId)
 		end
 		
 		if VehicleSort:isHired(realId) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.helper .. ": " .. VehicleSort:getControllerName(realId);
+			if veh.getCurrentHelper ~= nil and veh:getCurrentHelper() ~= nil then
+				--TODO: g_i18n:getText("ui_helper")
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.helper .. ": " .. veh:getCurrentHelper().name;
+			else
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.helper .. ": Unknown Helper";
+			end
 			table.insert(texts, line);
 		end		
 

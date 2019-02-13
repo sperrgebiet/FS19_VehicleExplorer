@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.0</version>
+	<version>0.9.0.1</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -178,7 +178,7 @@
 			<en>Text size</en>
 		</text>
 		<text name="showSteerableImplements">
-			<de>Steuerbare Werkzeuge anzeigenn</de>
+			<de>Steuerbare Werkzeuge anzeigen</de>
 			<en>Show steerable implements</en>
 		</text>
 		<text name="showImplements">
@@ -186,8 +186,8 @@
 			<en>Show attached implements</en>
 		</text>
 		<text name="saveStatus">
-			<de>Fahrzeugstatus speichern (gestartet, eingeschaltet, Licht)</de>
-			<en>Save vehicle status (started, turned on, lights)</en>
+			<de>Fahrzeugstatus speichern</de>
+			<en>Save vehicle status</en>
 		</text>
 		<text name="showImg">
 			<de>Bilder anzeigen</de>

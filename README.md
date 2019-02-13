@@ -1,4 +1,4 @@
-# Vehicle Explorer for FS19 aka VeEx19
+# VehicleExplorer for FS19 aka VeEx19
 **This is a revamp of the good old VehicleSort from FS17**
 
 For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
@@ -47,6 +47,8 @@ Feedback, this readme and additional information incl. source code can be find a
   * For now just the directly attached implements get respected. This means for repair and the info box just a e.g. trailer is recognized, but not a trailer which is attached to another trailer
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
 * A wrong value for horse power is displayed for trains
+* Sometimes selling or resetting a vehicle is causing a flickering of the vehicle list. I've already an idea why, just have to look more into it.
+As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
 
 ## Default Keybinding
 KeyPad 0 -> Show/hide vehicle list
@@ -75,7 +77,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.0 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.0.1 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -130,6 +132,8 @@ Besides that it has a couple of additional functionality. See below.
   * Nur die direkt angehängten Geräte/Anhänger werden berücksichtig. Beim reparieren z.b. wird nur der Anhäng des Traktors berücksichtigt, jedoch nicht ein Anhänger der am Anhänger hängt.
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
 * Bei Zügen wird die Leistung/PS falsch berechnet
+* Manchmal verursacht das verkaufen oder zurücksetzen eines Fahrzeuges ein flackern der Fahrzeugliste. Ich hab auch schon eine Idee warum, muss mich nur mehr damit beschäftigen.
+Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
 
 ## Standard Tastenbelegung
 KeyPad 0 -> Anzeigen/verstecken der Fahrzeugliste
@@ -157,4 +161,4 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Latest Version
-0.9.0.0 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.0.1 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
