@@ -6,6 +6,9 @@ Besides that it has a couple of additional functionality. See below.
 
 Feedback, this readme and additional information incl. source code can be find at: https://github.com/sperrgebiet/FS19_VehicleExplorer
 
+**Please download the latest version directly from GitHub**
+[Latest version](https://github.com/sperrgebiet/FS19_VehicleExplorer/blob/master/FS19_VehicleExplorer.zip)
+
 ### Features
 * List of all steerable vehicles (Specialization: Enterable)
 * Set a customer order for your vehicles
@@ -92,8 +95,8 @@ Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zei
 
 Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sich unter: https://github.com/sperrgebiet/FS19_VehicleExplorer
 
-For beginners: Vehicle Explorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
-Besides that it has a couple of additional functionality. See below.
+**Bitte lade die letzte Version direkt von bei GitHub herunter**
+[Letzte Version](https://github.com/sperrgebiet/FS19_VehicleExplorer/blob/master/FS19_VehicleExplorer.zip)
 
 ### Funktionen
 * Liste aller steuerbaren Fahrzeuge (Specialization: Enterable)
@@ -153,9 +156,9 @@ KeyPad 2 -> Runter in der Liste/Konfiguration
 2 -> Schnell runter in der Liste/Konfiguration
 LAlt + R -> Repariere Fahrzeug inkl. Anbaugeräte
 
-Mouse Left: Enter vehicle
-Mouse Right:  Select item/change values in config
-Mouse Wheel: List up/down
+Linke Maustaste: Ins Fahrzeug wechseln
+Rechte Maustaste:  Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern
+Mausrad: Liste rauf/runterscrollen
 
 ## Beachte, dass die jetzige Version kein Multiplayer unterstützt!
 Ehrlich gesagt habe ich keine Ahnung was für MP Code notwendig wäre und auch keine Möglichkeit es zu testen. Vielleicht funktioniert es einfach nur in de moddesc.xml von false auf true zu wechseln.
@@ -166,5 +169,5 @@ Primär an Dschonny & Slivicon. Zumindest waren das die Namen die in der LS17 Ve
 Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFruitHud, EnhancedVehicle und vielen anderen für Inspirationen und Ideen.
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
-## Latest Version
+## Letzte Version
 0.9.0.2 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
