@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 ﻿$srcPath = "F:\FarmingSimulator2019\mods-dev\FS19_VehicleSort"
 $dstPath = "F:\FarmingSimulator2019\mods-dev\FS19_VehicleSort"
 $dstFilename = "FS19_VehicleSort.zip"
+=======
+﻿$srcPath = "F:\FarmingSimulator2019\mods-dev\FS19_VehicleExplorer"
+$dstPath = "F:\FarmingSimulator2019\mods-dev\FS19_VehicleExplorer"
+$dstFilename = "FS19_VehicleExplorer.zip"
+>>>>>>> dev
 $tmpPath = Join-Path $env:TMP "TmpZip"
 
 $ignorelist = get-content (Join-Path $srcPath ".gitignore")
