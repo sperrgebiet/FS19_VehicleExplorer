@@ -280,6 +280,10 @@
 		<text name="fillLevel">
 			<de>Füllstand</de>
 			<en>Filllevel</en>
+		</text>
+		<text name="warningNoVehicles">
+			<de>Es gibt keine Fahrzeuge zum Anzeigen. Kauf welche, oder ändere die Einstellungen im Konfigurationsmenü um nicht alle raus zu filtern.</de>
+			<en>There are no vehicles to show. Please buy some, or change the settings in the config menu so that not everything gets filter out.</en>
 		</text>			
 	</l10n>
 </modDesc>

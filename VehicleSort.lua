@@ -55,6 +55,7 @@ VehicleSort.xmlAttrId = '#vsid';
 VehicleSort.xmlAttrOrder = '#vsorder';
 VehicleSort.xmlAttrParked = '#vsparked';
 VehicleSort.Sorted = {};
+VehicleSort.HiddenCount = 0;
 
 addModEventListener(VehicleSort);
 
@@ -249,18 +250,6 @@ function VehicleSort:draw()
 		else
 		  VehicleSort:drawList();
 		end
-		if VehicleSort.debug then
-		  local t = {};
-		  table.insert(t, string.format('bgX [%f]', VehicleSort.bgX));
-		  table.insert(t, string.format('bgY [%f]', VehicleSort.bgY));
-		  table.insert(t, string.format('bgW [%f]', VehicleSort.bgW));
-		  table.insert(t, string.format('maxTxtW [%f]', VehicleSort.maxTxtW));
-		  for k, v in ipairs(t) do
-			VehicleSort.dbgY = VehicleSort.dbgY - VehicleSort.tPos.size - VehicleSort.tPos.spacing;
-			renderText(VehicleSort.dbgX, VehicleSort.dbgY, VehicleSort.tPos.size, v);
-		  end
-		  VehicleSort.dbgY = dbgY;
-		end
 	end
 	
 end
@@ -431,10 +420,6 @@ function VehicleSort:drawConfig()
   for k, v in ipairs(texts) do
     setTextColor(unpack(v[4]))
     renderText(v[1], v[2], v[3], tostring(v[5]));
-    if VehicleSort.debug and v[4] == VehicleSort.tColor.selected then
-      VehicleSort.dbgY = VehicleSort.dbgY - VehicleSort.tPos.size - VehicleSort.tPos.spacing;
-      renderText(VehicleSort.dbgX, VehicleSort.dbgY, VehicleSort.tPos.size, string.format('selected textWidth [%f] colWidth [%f]', getTextWidth(v[3], tostring(v[5])), VehicleSort.tPos.columnWidth));
-    end
   end
   setTextColor(unpack(VehicleSort.tColor.standard));
   
@@ -448,6 +433,12 @@ end
 
 function VehicleSort:drawList()
   VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
+   
+   if VehicleSort.HiddenCount == #VehicleSort.Sorted then
+		g_currentMission:showBlinkingWarning(g_i18n.modEnvironments[VehicleSort.ModName].texts.warningNoVehicles, 8000);
+		VehicleSort.showSteerables = false;
+		return false;
+   end
    
   --VehicleSort:dp(vehList, 'drawList', 'vehList');
   
@@ -586,16 +577,6 @@ function VehicleSort:drawList()
 		local storColNum = v[1];
 		--VehicleSort:dp(storColNum, 'drawList', 'storcolNum');
 		renderText(colX[storColNum], v[2], v[3], tostring(v[6])); -- x, y, size, txt
-
-		if VehicleSort.debug and v[5] == VehicleSort.tColor.selected then
-			VehicleSort.dbgY = VehicleSort.dbgY - VehicleSort.tPos.size - VehicleSort.tPos.spacing;
-			renderText(VehicleSort.dbgX, VehicleSort.dbgY, VehicleSort.tPos.size, string.format('selected textWidth [%f] colWidth [%f]', getTextWidth(v[3], v[6]), VehicleSort.tPos.columnWidth));
-
-			--local testX = 0.75;
-			--local testY = 0.75;
-			--local testS = 0.013;
-			--renderText(testX, testY, testS, string.format('X {%f} | Y {%f} | S {%f}', testX, testY, testS));
-		end
 	end
 
 	setTextBold(false);
@@ -780,6 +761,7 @@ function VehicleSort:getOrderedVehicles()
 	local ordered = {};
 	local unordered = {};
 	local orderedToOrder = {};
+	VehicleSort.HiddenCount = 0;
 	local vehList = VehicleSort:getVehicles();
   
 	for _, veh in pairs(vehList) do
@@ -787,6 +769,11 @@ function VehicleSort:getOrderedVehicles()
 			table.insert(orderedToOrder, {orderId=veh.spec_vehicleSort.orderId, realId=veh.spec_vehicleSort.realId} );
 		else
 			table.insert(unordered, veh.spec_vehicleSort.realId);
+		end
+		
+		-- Keep track of hidden items, so that we're not showing an empty list
+		if VehicleSort:isHidden(veh.spec_vehicleSort.realId) then
+			VehicleSort.HiddenCount = VehicleSort.HiddenCount + 1;
 		end
 	end
 	
@@ -868,11 +855,38 @@ function VehicleSort:getTextSize()
 end
 
 function VehicleSort:getHorsePower(realId)
-	local veh = g_currentMission.vehicles[realId];
-	if veh.spec_motorized ~= nil then
-		local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque;
-		local maxRpm = veh.spec_motorized.motor.maxRpm;
-		return math.ceil(maxMotorTorque / 0.0044);
+	if VehicleSort:isTrain(realId) then
+		--VehicleSort:dp(string.format('isTrain -> realId {%s}', tostring(realId)), 'getHorsePower');
+		--return VehicleSort:getHorsePowerFromStore(realId);
+	else
+		local veh = g_currentMission.vehicles[realId];
+		if veh.spec_motorized ~= nil then
+			local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque;
+			local maxRpm = veh.spec_motorized.motor.maxRpm;
+			return math.ceil(maxMotorTorque / 0.0044);
+		end
+	end
+end
+
+
+--
+-- For some reason the g_storemanager behaves funny for trains and never returns a table. so skip this for now
+--
+function VehicleSort:getHorsePowerFromStore(realId)
+	VehicleSort:dp(string.format('realId {%s}', tostring(realId)));
+	local confFile = string.lower(g_currentMission.vehicles[realId]['configFileName']);
+	--local storeItem = g_storeManager:getItemByXMLFilename(confFile);
+	storeItem = g_storeManager.xmlFilenameToItem[confFile:lower()];
+	VehicleSort:dp(storeItem);
+	if storeItem ~= nil then
+		if storeItem.configurations ~= nil then
+			VehicleSort:dp(storeItem.configurations);
+			if storeItem.configurations.motor ~= nil then
+				if storeItem.configurations.motor.power ~= nil then
+					return storeItem.configurations.motor.power;
+				end
+			end
+		end
 	end
 end
 
@@ -945,8 +959,7 @@ function VehicleSort:initVS()
 end
 
 function VehicleSort:isCrane(realId)
-	-- No idea if this part still works, need a station crane first
-	return  g_currentMission.vehicles[realId]['stationCraneId'] ~= nil;
+	return g_currentMission.vehicles[realId]['typeName'] == 'crane';
 end
 
 function VehicleSort:isHidden(realId)
@@ -1124,50 +1137,52 @@ function VehicleSort:saveConfig()
 end
 
 function VehicleSort:drawStoreImage(realId)
-	local imgFileName = VehicleSort:getStoreImageByConf(g_currentMission.vehicles[realId]['configFileName']);
-	--VehicleSort:dp(string.format('configFileName {%s}', configFileName));
-	--VehicleSort:dp(storeItem, 'drawStoreImage');
+	if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
+		local imgFileName = VehicleSort:getStoreImageByConf(g_currentMission.vehicles[realId]['configFileName']);
+		--VehicleSort:dp(string.format('configFileName {%s}', configFileName));
+		--VehicleSort:dp(storeItem, 'drawStoreImage');
 
-	local storeImage = createImageOverlay(imgFileName);
-	if storeImage > 0 then
-		local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
-		local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
-		local imgY = VehicleSort.config[17][2] - storeImgY;
+		local storeImage = createImageOverlay(imgFileName);
+		if storeImage > 0 then
+			local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
+			local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
+			local imgY = VehicleSort.config[17][2] - storeImgY;
 
-		
-		-- Background rendering for the images, based on the saved configvalue
-		if VehicleSort.config[19][2] then
-			local bgW = storeImgX;
-			local bgH = storeImgY;
-			local bgX = imgX + (bgW / 2);
-			local bgY = imgY;
-			VehicleSort:renderBg(bgX, bgY, bgW, bgH);
-		end
-		-- Must be rendered after the background, otherwise it's covered by it
-		renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
-		
-		if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
-			local impList = g_currentMission.vehicles[realId]:getAttachedImplements();
-			for i = 1, 5 do
-				local imp = impList[i];
-				if imp ~= nil and imp.object ~= nil then
-					local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
-					local storeImage = createImageOverlay(imgFileName);
-					if storeImage > 0 then
-						local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
-						
-						
-						-- Background rendering for the images, based on the saved configvalue
-						if VehicleSort.config[19][2] then
-							local bgW = storeImgX;
-							local bgH = storeImgY;
-							local bgX = imgX + (bgW / 2);
-							local bgY = imgY;
-							VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+			
+			-- Background rendering for the images, based on the saved configvalue
+			if VehicleSort.config[19][2] then
+				local bgW = storeImgX;
+				local bgH = storeImgY;
+				local bgX = imgX + (bgW / 2);
+				local bgY = imgY;
+				VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+			end
+			-- Must be rendered after the background, otherwise it's covered by it
+			renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
+			
+			if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
+				local impList = g_currentMission.vehicles[realId]:getAttachedImplements();
+				for i = 1, 5 do
+					local imp = impList[i];
+					if imp ~= nil and imp.object ~= nil then
+						local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
+						local storeImage = createImageOverlay(imgFileName);
+						if storeImage > 0 then
+							local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
+							
+							
+							-- Background rendering for the images, based on the saved configvalue
+							if VehicleSort.config[19][2] then
+								local bgW = storeImgX;
+								local bgH = storeImgY;
+								local bgX = imgX + (bgW / 2);
+								local bgY = imgY;
+								VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+							end
+							-- Must be rendered after the background, otherwise it's covered by it
+							
+							renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 						end
-						-- Must be rendered after the background, otherwise it's covered by it
-						
-						renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 					end
 				end
 			end
@@ -1201,8 +1216,8 @@ function VehicleSort:drawInfobox(realId)
 			imgWidth = 0.01;
 		end
 		local infoX = 0.5 - VehicleSort.bgW / 2 - imgWidth - VehicleSort.tPos.padSides;
-		local infoY = VehicleSort.config[17][2] - txtSize - (VehicleSort.tPos.spacing * 8);
-		local txtY = infoY - VehicleSort.tPos.spacing;
+		local infoY = VehicleSort.config[17][2];
+		local txtY = infoY - VehicleSort.tPos.padHeight - txtSize - VehicleSort.tPos.spacing;
 		local txtWidth = getTextWidth(txtSize, "Info");
 		
 		local texts = {};
@@ -1218,9 +1233,10 @@ function VehicleSort:drawInfobox(realId)
 		-- Background rendering for the infobox, based on the saved configvalue
 		if VehicleSort.config[18][2] then
 			local bgW = txtWidth + (VehicleSort.tPos.padSides * 2);
-			local bgH = (txtSize * #textTable) + (VehicleSort.tPos.spacing * #textTable);
+			-- We have to compensate for the last txtY change in the loop
+			local bgH = (txtSize * (#textTable + 1)) + (VehicleSort.tPos.spacing * (#textTable + 1)) + (VehicleSort.tPos.padHeight * 1);
 			local bgX = infoX - (bgW / 2) + VehicleSort.tPos.padSides;
-			local bgY = txtY + VehicleSort.tPos.spacing;
+			local bgY = txtY;
 			VehicleSort:renderBg(bgX, bgY, bgW, bgH);
 		end
 	end
@@ -1232,6 +1248,8 @@ function VehicleSort:getInfoTexts(realId)
 	if veh ~= nil then
 		local texts = {};
 		local line = "";
+		
+		local doSpacing = false;
 		
 		if (veh.getIsCourseplayDriving ~= nil and veh:getIsCourseplayDriving()) then
 			local courseName = "";
@@ -1251,6 +1269,7 @@ function VehicleSort:getInfoTexts(realId)
 			end
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_course .. ": " .. courseName;
 			table.insert(texts, line);
+			doSpacing = true;
 		end
 		
 		if VehicleSort:isHired(realId) then
@@ -1261,10 +1280,16 @@ function VehicleSort:getInfoTexts(realId)
 				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.helper .. ": Unknown Helper";
 			end
 			table.insert(texts, line);
+			if not doSpacing then
+				doSpacing = true;
+			end
 		end		
 
-		-- Some spacing
-		table.insert(texts, " ");		
+		-- Some spacing, but just if we actually had some data so far
+		if doSpacing then
+			table.insert(texts, " ");
+			doSpacing = false;
+		end
 		
 		-- Get vehicle wear
 		if veh.getWearTotalAmount ~= nil then
@@ -1277,27 +1302,39 @@ function VehicleSort:getInfoTexts(realId)
 					table.insert(texts, v);
 				end
 			end
+			doSpacing = true;
 		end
 		
-		-- Some spacing
-		table.insert(texts, " ");	
-		
+		-- Some spacing, but just if we actually had some data so far
+		if doSpacing then
+			table.insert(texts, " ");
+			doSpacing = false;
+		end
+
 		-- Get vehicle filllevel
-		
 		if string.len(VehicleSort:getFillDisplay(veh, true)) > 1 then
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. ":" .. VehicleSort:getFillDisplay(veh, true);
 			table.insert(texts, line);
+			doSpacing = false;
 		end
 		
-		local impFill = VehicleSort:getVehImplementsFillInfobox(realId);
-		if #impFill > 0 then
-			for _, v in pairs(impFill) do
-				table.insert(texts, v);
+		if not VehicleSort:isCrane(realId) then
+			local impFill = VehicleSort:getVehImplementsFillInfobox(realId);
+			if #impFill > 0 then
+				for _, v in pairs(impFill) do
+					table.insert(texts, v);
+				end
+				if not doSpacing then
+					doSpacing = true;
+				end
 			end
 		end
-		
-		-- Some spacing
-		table.insert(texts, " ");
+
+		-- Some spacing, but just if we actually had some data so far
+		if doSpacing then
+			table.insert(texts, " ");
+			doSpacing = false;
+		end
 		
 		-- Speed
 		line = g_i18n.modEnvironments[VehicleSort.ModName].texts.speed .. ": " .. VehicleStatus:getSpeedStr(veh);
@@ -1324,8 +1361,6 @@ function VehicleSort:getInfoTexts(realId)
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
 		end
 		table.insert(texts, line);
-		
-		-- Is on Field?
 		
 		return texts;
 	end
@@ -1364,7 +1399,7 @@ function VehicleSort:getVehImplementsFillInfobox(realId)
 		end
 	end
 
-	return texts;	
+	return texts;
 end
 
 function VehicleSort:isActionAllowed()
