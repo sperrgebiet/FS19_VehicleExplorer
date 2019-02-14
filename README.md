@@ -54,7 +54,8 @@ Feedback, this readme and additional information incl. source code can be find a
 As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
 
 ### Incompatible Mods
-* SpeedControl (to be fixed)
+* SpeedControl
+  * Actually both work fine side by side. There is just a keybinding overlap. So you've to set new keybindings through the game menu for Key 1, Key 2, Key NumPad Plus, Key NumPad Minus
 
 ## Default Keybinding
 KeyPad 0 -> Show/hide vehicle list
@@ -142,7 +143,8 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
 
 ### Inkompatible Mods
-* SpeedControl (to be fixed)
+* SpeedControl
+  * Beide funktionieren einwandfrei nebeneinander. Es existiert nur eine Doppelbelegung der Tastaturbelegung. Im Spielmenü setze einfach neue Tasten für Taste 1, Taste 2, Taste NumPad Plus, Taste NumPad Minus
 
 ## Standard Tastenbelegung
 KeyPad 0 -> Anzeigen/verstecken der Fahrzeugliste
