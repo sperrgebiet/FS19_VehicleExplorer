@@ -3,7 +3,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.0.0";
+VehicleStatus.Version = "0.9.0.5";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -43,10 +43,30 @@ function VehicleStatus:onPostLoad(savegame)
 			end
 		end
 		
-		if self.spec_lights ~= nil then
+		if self.spec_lights ~= nil and self.spec_enterable ~= nil then
 			local lightsMask = Utils.getNoNil(getXMLInt(savegame.xmlFile, savegame.key .. ".vehicleStatus#lightsMask"), 0);
 			VehicleSort:dp(string.format('lightsMask: {%s} for {%s} | savegame.key: {%s}', tostring(lightsMask), self.configFileName, savegame.key .. ".vehicleStatus#lightsMask"), 'VehicleStatus:onPostLoad');
-			self:setLightsTypesMask(lightsMask);
+			if lightsMask > 0 then
+				self:setLightsTypesMask(lightsMask, true);
+			end
+
+			local beaconsOn = Utils.getNoNil(getXMLBool(savegame.xmlFile, savegame.key .. ".vehicleStatus#beaconsOn"), false);
+			VehicleSort:dp(string.format('beaconsOn: {%s} for {%s} | savegame.key: {%s}', tostring(beaconsOn), self.configFileName, savegame.key .. ".vehicleStatus#beaconsOn"), 'VehicleStatus:onPostLoad');
+			if beaconsOn then
+				self:setBeaconLightsVisibility(beaconsOn, true);
+			end
+
+			local turnLightsState = Utils.getNoNil(getXMLInt(savegame.xmlFile, savegame.key .. ".vehicleStatus#turnLightsState"), 0);
+			VehicleSort:dp(string.format('turnLightsState: {%s} for {%s} | savegame.key: {%s}', tostring(turnLightsState), self.configFileName, savegame.key .. ".vehicleStatus#turnLightsState"), 'VehicleStatus:onPostLoad');
+			if turnLightsState > 0 then
+				self:setTurnLightState(turnLightsState, true);
+			end
+			
+			local brakeLightsOn = Utils.getNoNil(getXMLBool(savegame.xmlFile, savegame.key .. ".vehicleStatus#brakeLightsOn"), false);
+			VehicleSort:dp(string.format('brakeLightsOn: {%s} for {%s} | savegame.key: {%s}', tostring(brakeLightsOn), self.configFileName, savegame.key .. ".vehicleStatus#brakeLightsOn"), 'VehicleStatus:onPostLoad');
+			if brakeLightsOn then
+				self:setBrakeLightsVisibility(brakeLightsOn, true);
+			end
 		end		
 	end
 end
@@ -64,28 +84,61 @@ function VehicleStatus:saveToXMLFile(xmlFile, key)
 		if VehicleStatus:getIsLightTurnedOn(self) then
 			setXMLInt(xmlFile, key .. '#lightsMask', self:getLightsTypesMask());
 		end
+
+		if VehicleStatus:getBeaconLightsVisibility(self) then
+			setXMLBool(xmlFile, key .. '#beaconsOn', VehicleStatus:getBeaconLightsVisibility(self));
+		end
+
+		if VehicleStatus:getTurnLightState(self) > 0 then
+			setXMLInt(xmlFile, key .. '#turnLightsState', VehicleStatus:getTurnLightState(self));
+		end
+
+		if VehicleStatus:getIsBrakeLightsOn(self) then
+			setXMLBool(xmlFile, key .. '#brakeLightsOn', VehicleStatus:getIsBrakeLightsOn(self));
+		end	
+		
 	end
 end
 
 function VehicleStatus:getIsMotorStarted(vehObj)
-	if vehObj.spec_motorized ~= nil and vehObj.getIsMotorStarted then
+	if vehObj.spec_motorized ~= nil and vehObj.getIsMotorStarted ~= nil then
 		return vehObj:getIsMotorStarted();
 	end
 end
 
 function VehicleStatus:getIsTurnedOn(vehObj)
-	if vehObj.spec_turnOnVehicle ~= nil and vehObj.getIsTurnedOn then
+	if vehObj.spec_turnOnVehicle ~= nil and vehObj.getIsTurnedOn ~= nil then
 		return vehObj:getIsTurnedOn()
 	end
 end
 
 function VehicleStatus:getIsLightTurnedOn(vehObj)
-	if vehObj.spec_lights ~= nil and vehObj.getLightsTypesMask then
+	if vehObj.spec_lights ~= nil and vehObj.getLightsTypesMask ~= nil then
 		if vehObj:getLightsTypesMask() > 0 then
 			return true;
 		else
 			return false;
 		end
+	end
+end
+
+function VehicleStatus:getBeaconLightsVisibility(vehObj)
+	if vehObj.spec_lights ~= nil and vehObj.getBeaconLightsVisibility ~= nil then
+		return vehObj:getBeaconLightsVisibility()
+	end
+end
+
+function VehicleStatus:getTurnLightState(vehObj)
+	if vehObj.spec_lights ~= nil and vehObj.getTurnLightState ~= nil then
+		return vehObj:getTurnLightState()
+	else
+		return 0;
+	end
+end
+
+function VehicleStatus:getIsBrakeLightsOn(vehObj)
+	if vehObj.spec_lights ~= nil and vehObj.spec_lights.brakeLightsVisibility ~= nil then
+		return vehObj.spec_lights.brakeLightsVisibility;
 	end
 end
 
@@ -97,15 +150,17 @@ end
 
 function VehicleStatus:RepairVehicleWithImplements(realId)
 	veh = g_currentMission.vehicles[realId];
+	VehicleSort:dp(string.format('realId {%s} for configFileName {%s}', realId, veh.configFileName), 'VehicleStatus:RepairVehicleWithImplements');
 	if veh ~= nil then
 		if veh.repairVehicle ~= nil then
 			veh:repairVehicle(true);
-			
+			VehicleSort:dp(string.format('Repaired vehicle realId {%s} - configFileName {%s}', tostring(realId), veh.configFileName), 'VehicleStatus:RepairVehicleWithImplements');
 			local implements = VehicleSort:getVehImplements(realId);
 			for i = 1, #implements do
 				local imp = implements[i];
 				if imp ~= nil and imp.object ~= nil and imp.object.repairVehicle ~= nil then
 					imp.object:repairVehicle(true);
+					VehicleSort:dp(string.format('Repaired implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:RepairVehicleWithImplements');
 				end
 			end
 		end

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.3</version>
+	<version>0.9.0.5</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -49,35 +49,36 @@
 	</actions>
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_0" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_v" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_X1" axisComponent="+" neutralInput="0" index="3"/>
 		</actionBinding>
 		<actionBinding action="vsLockListItem">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_5" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_5" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorUp">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_8" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_8" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorDown">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_2" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_2" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorUpFast">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_1" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_1" index="1" />
 		</actionBinding>
 		<actionBinding action="vsMoveCursorDownFast">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_2" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_2" index="1" />
 		</actionBinding>
 		<actionBinding action="vsChangeVehicle">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_enter" index="1" />
 		</actionBinding>
 		<actionBinding action="vsShowConfig">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_minus" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_minus" index="1" />
 		</actionBinding>		
 		<actionBinding action="vsTogglePark">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_KP_plus" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_p" index="1" />
 		</actionBinding>
 		<actionBinding action="vsRepair">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_r" index="1" />
-		</actionBinding>		
+		</actionBinding>				
     </inputBinding>	
 	
 	<l10n>
@@ -124,7 +125,7 @@
 		<text name="input_vsRepair">
 			<de>VeEx: Fahrzeug inkl. Geräte reparieren</de>
 			<en>VeEx: Repair vehicles incl. implements</en>
-		</text>			
+		</text>
 		<text name="configHeadline">
 			<de>VehicleSort-Konfiguration</de>
 			<en>VehicleSort Configuration</en>
@@ -257,9 +258,9 @@
 			<de>Temporärer Kurs</de>
 			<en>Temporary course</en>
 		</text>		
-		<text name="wear">
-			<de>Abnutzung</de>
-			<en>Wear</en>
+		<text name="damage">
+			<de>Schaden</de>
+			<en>Damage</en>
 		</text>
 		<text name="motor">
 			<de>Motor</de>

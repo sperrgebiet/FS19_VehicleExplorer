@@ -54,19 +54,20 @@ Feedback, this readme and additional information incl. source code can be find a
 As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
 
 ### Incompatible Mods
-* SpeedControl
-  * Actually both work fine side by side. There is just a keybinding overlap. So you've to set new keybindings through the game menu for Key 1, Key 2, Key NumPad Plus, Key NumPad Minus
+* ~~SpeedControl~~
+  * ~~Actually both work fine side by side. There is just a keybinding overlap. So you've to set new keybindings through the game menu for Key 1, Key 2, Key NumPad Plus, Key NumPad Minus~~
+  * Changed the default keybinding. So there is no overlap anymore.
 
 ## Default Keybinding
-KeyPad 0 -> Show/hide vehicle list
-KeyPad Minus -> Show/hide config menu 
+LAlt + v -> Show/hide vehicle list
+LAlt + KeyPad Minus -> Show/hide config menu 
 KeyPad Enter -> Enter vehicle
-KeyPad Plus -> Toggle parking
-KeyPad 5 -> Select item (for moving the vehicle) or to change values in the config
-KeyPad 8 -> Move up in the list/config
-KeyPad 2 -> Move down in the list/config
-1 -> Move up fast in the list/config
-2 -> Move down fast in the list/config
+LAlt + p -> Toggle parking
+LAlt + KeyPad 5 -> Select item (for moving the vehicle) or to change values in the config
+LAlt + KeyPad 8 -> Move up in the list/config
+LAlt + KeyPad 2 -> Move down in the list/config
+LAlt + 1 -> Move up fast in the list/config
+LAlt + 2 -> Move down fast in the list/config
 LAlt + R -> Repair vehicle incl. implements
 
 Mouse Left: Enter vehicle
@@ -84,7 +85,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.2 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.0.5 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -143,19 +144,20 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
 
 ### Inkompatible Mods
-* SpeedControl
-  * Beide funktionieren einwandfrei nebeneinander. Es existiert nur eine Doppelbelegung der Tastaturbelegung. Im Spielmenü setze einfach neue Tasten für Taste 1, Taste 2, Taste NumPad Plus, Taste NumPad Minus
+* ~~SpeedControl~~
+  * ~~Beide funktionieren einwandfrei nebeneinander. Es existiert nur eine Doppelbelegung der Tastaturbelegung. Im Spielmenü setze einfach neue Tasten für Taste 1, Taste 2, Taste NumPad Plus, Taste NumPad Minus~~
+  * Habe die Standard Tastenbelegung verändert. Somit gibt es keinen Konflikt mehr.  
 
 ## Standard Tastenbelegung
-KeyPad 0 -> Anzeigen/verstecken der Fahrzeugliste
-KeyPad Minus -> Anzeigen/verstecken des Konfigurationsmenüs
-KeyPad Enter -> Ins Fahrzeug wechseln
-KeyPad Plus -> Fahrzeug parken/ausparken
-KeyPad 5 -> Fahrzeug auswählen (zum Verschieben) und ändern eines Wertes in der Konfiguration
-KeyPad 8 -> Rauf in der Liste/Konfiguration
-KeyPad 2 -> Runter in der Liste/Konfiguration
-1 -> Schnell rauf in der Liste/Konfiguration
-2 -> Schnell runter in der Liste/Konfiguration
+LAlt + v -> Anzeigen/verstecken der Fahrzeugliste
+LAlt + KeyPad Minus -> Anzeigen/verstecken des Konfigurationsmenüs
+LAlt + KeyPad Enter -> Ins Fahrzeug wechseln
+LAlt + p -> Fahrzeug parken/ausparken
+LAlt + KeyPad 5 -> Fahrzeug auswählen (zum Verschieben) und ändern eines Wertes in der Konfiguration
+LAlt + KeyPad 8 -> Rauf in der Liste/Konfiguration
+LAlt + KeyPad 2 -> Runter in der Liste/Konfiguration
+LAlt + 1 -> Schnell rauf in der Liste/Konfiguration
+LAlt + 2 -> Schnell runter in der Liste/Konfiguration
 LAlt + R -> Repariere Fahrzeug inkl. Anbaugeräte
 
 Linke Maustaste: Ins Fahrzeug wechseln
@@ -172,7 +174,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.0.2 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.0.5 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

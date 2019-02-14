@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.3";
+VehicleSort.Version = "0.9.0.5";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -187,7 +187,7 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
         table.insert(VehicleSort.eventName, eventName);
 		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
     end
-
+	
 end
 
 function VehicleSort:removeActionEvents()
@@ -304,7 +304,11 @@ end
 function VehicleSort:action_vsMoveCursorUp(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsMoveCursorUp fires", "action_vsMoveCursorUp");
 	if VehicleSort.showSteerables then
-		VehicleSort:moveUp(1);
+		if Input.isKeyPressed(KEY_lalt) then
+			VehicleSort:moveUp(3);
+		else
+			VehicleSort:moveUp(1);
+		end
 	elseif VehicleSort.showConfig then
 		VehicleSort:moveConfigUp();
 	end
@@ -361,9 +365,9 @@ function VehicleSort:action_vsTogglePark(actionName, keyStatus, arg3, arg4, arg5
 end
 
 function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
-	VehicleSort:dp("action_vsRepair fires", "action_vsRepair");
+	VehicleSort:dp(string.format('action_vsRepair fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsRepair");
 	if VehicleSort.showSteerables then
-		VehicleStatus:RepairVehicleWithImplements(VehicleSort.selectedIndex);
+		VehicleStatus:RepairVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
 	end
 end
 
@@ -1292,13 +1296,13 @@ function VehicleSort:getInfoTexts(realId)
 		end
 		
 		-- Get vehicle wear
-		if veh.getWearTotalAmount ~= nil then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.wear .. ": " .. VehicleSort:calcPercentage(veh:getWearTotalAmount(), 1) .. " %";
+		if veh.getVehicleDamage ~= nil then
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. ": " .. VehicleSort:calcPercentage(veh:getVehicleDamage(), 1) .. " %";
 			table.insert(texts, line);
 
-			local impWear = VehicleSort:getVehImplementsWear(realId);
-			if #impWear > 0 then
-				for _, v in pairs(impWear) do
+			local impDamage = VehicleSort:getVehImplementsDamage(realId);
+			if #impDamage > 0 then
+				for _, v in pairs(impDamage) do
 					table.insert(texts, v);
 				end
 			end
@@ -1366,7 +1370,7 @@ function VehicleSort:getInfoTexts(realId)
 	end
 end
 
-function VehicleSort:getVehImplementsWear(realId)
+function VehicleSort:getVehImplementsDamage(realId)
 	local texts = {};
 	local line = "";
 
@@ -1375,8 +1379,8 @@ function VehicleSort:getVehImplementsWear(realId)
 	for i = 1, #implements do
 		local imp = implements[i];
 		
-		if (imp ~= nil and imp.object ~= nil and imp.object.getWearTotalAmount ~= nil) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.wear .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getWearTotalAmount(), 1) .. " %";
+		if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
 			table.insert(texts, line);
 		end
 	end
