@@ -173,3 +173,15 @@ Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
 0.9.0.2 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+
+
+# Screenshots
+![fsscreen1](https://user-images.githubusercontent.com/20586786/52771954-986b1580-3037-11e9-8e0a-470cdd3c3855.png)
+![fsscreen2](https://user-images.githubusercontent.com/20586786/52771955-986b1580-3037-11e9-9880-8c9cb681538d.png)
+![fsscreen3](https://user-images.githubusercontent.com/20586786/52771956-986b1580-3037-11e9-999a-7a1c52a57298.png)
+![fsscreen4](https://user-images.githubusercontent.com/20586786/52771957-986b1580-3037-11e9-9b32-f98a17d1ef75.png)
+![fsscreen5](https://user-images.githubusercontent.com/20586786/52771958-9903ac00-3037-11e9-8083-a22a3c1f8468.png)
+![fsscreen6](https://user-images.githubusercontent.com/20586786/52771959-9903ac00-3037-11e9-9d49-59c586aa82dd.png)
+![fsscreen7](https://user-images.githubusercontent.com/20586786/52771960-9903ac00-3037-11e9-8afc-284196ea6c9a.png)
+![fsscreen8](https://user-images.githubusercontent.com/20586786/52771961-9903ac00-3037-11e9-876c-3bb01aa0cd06.png)
+![fsscreen9](https://user-images.githubusercontent.com/20586786/52771962-999c4280-3037-11e9-81b1-a6bb0b2fc38d.png)
