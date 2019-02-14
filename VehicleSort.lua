@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.2";
+VehicleSort.Version = "0.9.0.3";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -15,23 +15,25 @@ VehicleSort.txtSizeDef = 2;
 VehicleSort.infoYStart = 1;
 
 VehicleSort.config = {
-  {'showTrain', true},
-  {'showCrane', false},
-  {'showBrand', false},
-  {'showHorsepower', true},
-  {'showNames', true},
-  {'showFillLevels', true},
-  {'showPercentages', true},
-  {'showEmpty', false},
-  {'txtSize', VehicleSort.txtSizeDef},
-  {'bgTrans', VehicleSort.bgTransDef},
-  {'showSteerableImplements', true},
-  {'showImplements', true},
-  {'showHelp', true},
-  {'saveStatus', true},
-  {'showImg', true},
-  {'showInfo', true},
-  {'infoStart', VehicleSort.infoYStart}
+  {'showTrain', true},								-- 1
+  {'showCrane', false},                             -- 2
+  {'showBrand', false},                             -- 3
+  {'showHorsepower', true},                         -- 4
+  {'showNames', true},                              -- 5
+  {'showFillLevels', true},                         -- 6
+  {'showPercentages', true},                        -- 7
+  {'showEmpty', false},                             -- 8
+  {'txtSize', VehicleSort.txtSizeDef},              -- 9
+  {'bgTrans', VehicleSort.bgTransDef},              -- 10
+  {'showSteerableImplements', true},                -- 11
+  {'showImplements', true},                         -- 12
+  {'showHelp', true},                               -- 13
+  {'saveStatus', true},                             -- 14
+  {'showImg', true},                                -- 15
+  {'showInfo', true},                               -- 16
+  {'infoStart', VehicleSort.infoYStart},            -- 17
+  {'infoBg', true},                                 -- 18
+  {'imageBg', true}                                 -- 19
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -299,7 +301,7 @@ function VehicleSort:action_vsLockListItem(actionName, keyStatus, arg3, arg4, ar
 			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 3 then
 				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 1;
 			end
-		elseif VehicleSort.selectedConfigIndex == 10 or VehicleSort.selectedConfigIndex == 17 then
+		elseif VehicleSort:contains({10, 17}, VehicleSort.selectedConfigIndex) then
 			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = VehicleSort.config[VehicleSort.selectedConfigIndex][2] + 0.1;
 			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 1 then
 				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 0.0;
@@ -436,8 +438,8 @@ function VehicleSort:drawConfig()
   end
   setTextColor(unpack(VehicleSort.tColor.standard));
   
-  --Show the last selected vehicle for info/image position
-  if VehicleSort.selectedConfigIndex == 17 then
+  --Show the last selected vehicle for info/image position & BG option
+  if VehicleSort:contains({17, 18, 19}, VehicleSort.selectedConfigIndex) then
 	VehicleSort:drawInfobox(VehicleSort.Sorted[VehicleSort.selectedIndex]);
 	VehicleSort:drawStoreImage(VehicleSort.Sorted[VehicleSort.selectedIndex]);
   end
@@ -1131,6 +1133,17 @@ function VehicleSort:drawStoreImage(realId)
 		local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
 		local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
 		local imgY = VehicleSort.config[17][2] - storeImgY;
+
+		
+		-- Background rendering for the images, based on the saved configvalue
+		if VehicleSort.config[19][2] then
+			local bgW = storeImgX;
+			local bgH = storeImgY;
+			local bgX = imgX + (bgW / 2);
+			local bgY = imgY;
+			VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+		end
+		-- Must be rendered after the background, otherwise it's covered by it
 		renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 		
 		if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
@@ -1142,6 +1155,18 @@ function VehicleSort:drawStoreImage(realId)
 					local storeImage = createImageOverlay(imgFileName);
 					if storeImage > 0 then
 						local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
+						
+						
+						-- Background rendering for the images, based on the saved configvalue
+						if VehicleSort.config[19][2] then
+							local bgW = storeImgX;
+							local bgH = storeImgY;
+							local bgX = imgX + (bgW / 2);
+							local bgY = imgY;
+							VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+						end
+						-- Must be rendered after the background, otherwise it's covered by it
+						
 						renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 					end
 				end
@@ -1172,10 +1197,10 @@ function VehicleSort:drawInfobox(realId)
 		setTextColor(unpack(VehicleSort.tColor.standard));
 		local txtSize = VehicleSort.tPos.sizeSmall;
 		local imgWidth, _ = getNormalizedScreenValues(128,128);
-		if not VehicleSort.config[15][2] then				-- If there is no icture we can move more right
+		if not VehicleSort.config[15][2] then				-- If there is no picture we can move more right
 			imgWidth = 0.01;
 		end
-		local infoX = 0.5 - VehicleSort.bgW / 2 - imgWidth;
+		local infoX = 0.5 - VehicleSort.bgW / 2 - imgWidth - VehicleSort.tPos.padSides;
 		local infoY = VehicleSort.config[17][2] - txtSize - (VehicleSort.tPos.spacing * 8);
 		local txtY = infoY - VehicleSort.tPos.spacing;
 		local txtWidth = getTextWidth(txtSize, "Info");
@@ -1190,11 +1215,14 @@ function VehicleSort:drawInfobox(realId)
 		
 		setTextAlignment(VehicleSort.tPos.alignmentL);		
 		
-		local bgW = txtWidth;
-		local bgH = (txtSize * #textTable) + (VehicleSort.tPos.spacing * #textTable);
-		local bgX = infoX - bgW;
-		local bgY = infoY;
-		--VehicleSort:renderBg(bgX, bgY, bgW, bgH); --Lets skip the background for now
+		-- Background rendering for the infobox, based on the saved configvalue
+		if VehicleSort.config[18][2] then
+			local bgW = txtWidth + (VehicleSort.tPos.padSides * 2);
+			local bgH = (txtSize * #textTable) + (VehicleSort.tPos.spacing * #textTable);
+			local bgX = infoX - (bgW / 2) + VehicleSort.tPos.padSides;
+			local bgY = txtY + VehicleSort.tPos.spacing;
+			VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+		end
 	end
 end
 
@@ -1345,6 +1373,15 @@ function VehicleSort:isActionAllowed()
 	elseif VehicleSort.showConfig or VehicleSort.showSteerables then
 		return true;
 	end
+end
+
+function VehicleSort:contains(haystack, needle)
+	for _, value in pairs(haystack) do
+		if value == needle then
+			return true;
+		end
+	end
+	return false;
 end
 
 --
