@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.5</version>
+	<version>0.9.0.6</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -46,6 +46,8 @@
 		<action name="vsShowConfig" axisType="HALF" />
 		<action name="vsTogglePark" axisType="HALF" />
 		<action name="vsRepair" axisType="HALF" />
+		<action name="vsTab" axisType="HALF" />
+		<action name="vsTabBack" axisType="HALF" />
 	</actions>
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
@@ -78,7 +80,13 @@
 		</actionBinding>
 		<actionBinding action="vsRepair">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_r" index="1" />
-		</actionBinding>				
+		</actionBinding>
+		<actionBinding action="vsTab">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_tab" index="1" />
+		</actionBinding>
+		<actionBinding action="vsTabBack">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_tab" index="1" />
+		</actionBinding>			
     </inputBinding>	
 	
 	<l10n>
@@ -126,6 +134,14 @@
 			<de>VeEx: Fahrzeug inkl. Geräte reparieren</de>
 			<en>VeEx: Repair vehicles incl. implements</en>
 		</text>
+		<text name="input_vsTab">
+			<de>VeEx: Zum nächsten Fahrzeug wechseln</de>
+			<en>VeEx: Switch to next vehicle</en>
+		</text>
+		<text name="input_vsTabBack">
+			<de>VeEx: Zum vorigen Fahrzeug wechseln</de>
+			<en>VeEx: Switch to previous vehicle</en>
+		</text>			
 		<text name="configHeadline">
 			<de>VehicleSort-Konfiguration</de>
 			<en>VehicleSort Configuration</en>
@@ -285,6 +301,22 @@
 		<text name="warningNoVehicles">
 			<de>Es gibt keine Fahrzeuge zum Anzeigen. Kauf welche, oder ändere die Einstellungen im Konfigurationsmenü um nicht alle raus zu filtern.</de>
 			<en>There are no vehicles to show. Please buy some, or change the settings in the config menu so that not everything gets filter out.</en>
-		</text>			
+		</text>
+		<text name="listAlignment">
+			<de>Textausrichtung Liste</de>
+			<en>List text alignment</en>
+		</text>		
+		<text name="left">
+			<de>L</de>
+			<en>L</en>
+		</text>
+		<text name="right">
+			<de>R</de>
+			<en>R</en>
+		</text>
+		<text name="center">
+			<de>Z</de>
+			<en>C</en>
+		</text>		
 	</l10n>
 </modDesc>
