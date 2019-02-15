@@ -56,6 +56,7 @@ VehicleSort.xmlAttrOrder = '#vsorder';
 VehicleSort.xmlAttrParked = '#vsparked';
 VehicleSort.Sorted = {};
 VehicleSort.HiddenCount = 0;
+VehicleSort.dirtyState = false;						-- Used to check if we have to sync the order with g_currentMission.vehicles
 
 addModEventListener(VehicleSort);
 
@@ -91,6 +92,10 @@ function VehicleSort:loadMap(name)
 	print("--- loading VehicleSort V".. VehicleSort.Version .. " | ModName " .. VehicleSort.ModName .. " ---");
 	VehicleSort:initVS();
 	VehicleSort:loadConfig();
+	
+	-- TODO This doesn't work
+	--InputBinding:removeActionEventsByActionName(g_inputBinding.events, 'SWITCH_VEHICLE');
+	--InputBinding:removeActionEventsByActionName(g_inputBinding.events, 'SWITCH_VEHICLE_BACK');
 end
 
 function VehicleSort:onLoad(savegame)
@@ -114,6 +119,11 @@ function VehicleSort:onPostLoad(savegame)
 			if orderId ~= nil then
 				specVS.orderId = orderId;
 			end
+		end
+		
+		local isParked = Utils.getNoNil(getXMLBool(xmlFile, key.."#isParked"), false);
+		if isParked then
+			self:setIsTabbable(false);
 		end
 		
 		--Check to avoid issues after a vehicle reset
@@ -188,14 +198,18 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
     end
 	
-end
-
-function VehicleSort:removeActionEvents()
-	VehicleSort.eventName = {};
-	if VehicleSort.debug then
-		print("--- VehicleSort Debug ... VehicleSort:removeActionEventsPlayer(VehicleSort.eventName)");
-		DebugUtil.printTableRecursively(VehicleSort.eventName,"----",0,1)
-	end
+	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTab',self, VehicleSort.action_vsTab ,false ,true ,false ,true)
+	if result then
+        table.insert(VehicleSort.eventName, eventName);
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
+    end
+	
+	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTabBack',self, VehicleSort.action_vsTabBack ,false ,true ,false ,true)
+	if result then
+        table.insert(VehicleSort.eventName, eventName);
+		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
+    end
+	
 end
 
 function VehicleSort.registerEventListeners(vehicleType)
@@ -233,6 +247,10 @@ function VehicleSort:saveToXMLFile(xmlFile, key)
 		if self.spec_vehicleSort.orderId ~= nil then
 			setXMLInt(xmlFile, key.."#UserOrder", self.spec_vehicleSort.orderId);
 		end
+		
+		if VehicleSort:isParked(self.spec_vehicleSort.realId) then
+			setXMLBool(xmlFile, key.."#isParked", true);
+		end
 	end
 end
 
@@ -267,6 +285,12 @@ function VehicleSort:action_vsToggleList(actionName, keyStatus, arg3, arg4, arg5
 	if VehicleSort.showSteerables and not VehicleSort.showConfig then
 		VehicleSort.showSteerables = false;
 		VehicleSort.selectedLock = false;
+		
+		-- When dirtyState is true it means there was a resort going on, hence we save the ordered list back to g_currentMission.vehicles to have a proper 'tab'-order
+		if VehicleSort.dirtyState then
+			-- I don't like to alter g_currentMission.vehicles, as I have no idea what other mods do with it, and actually it doesn't help with the tab order anyways
+			-- VehicleSort:SyncSortedWithGame();
+		end
 	else
 		VehicleSort.showSteerables = true;
 		if VehicleSort.showConfig then
@@ -371,6 +395,16 @@ function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
 	end
 end
 
+function VehicleSort:action_vsTab(actionName, keyStatus, arg3, arg4, arg5)
+	VehicleSort:dp(string.format('action_vsTab fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsTab");
+	VehicleSort:tabVehicle();
+end
+
+function VehicleSort:action_vsTabBack(actionName, keyStatus, arg3, arg4, arg5)
+	VehicleSort:dp(string.format('action_vsTabBack fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsTabBack");
+	VehicleSort:tabVehicle(true);
+end
+
 --
 -- VehicleSort specific functions
 --
@@ -439,7 +473,7 @@ function VehicleSort:drawList()
   VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
    
    if VehicleSort.HiddenCount == #VehicleSort.Sorted then
-		g_currentMission:showBlinkingWarning(g_i18n.modEnvironments[VehicleSort.ModName].texts.warningNoVehicles, 8000);
+		VehicleSort:showNoVehicles();
 		VehicleSort.showSteerables = false;
 		return false;
    end
@@ -1097,6 +1131,7 @@ function VehicleSort:reSort(old, new)
 	table.remove(VehicleSort.Sorted, old);
 	table.insert(VehicleSort.Sorted, new, u);
 	VehicleSort:SyncSorted();
+	VehicleSort.dirtyState = true;
 end
 
 function VehicleSort:SyncSorted()
@@ -1107,9 +1142,50 @@ function VehicleSort:SyncSorted()
 					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = nil;
 				else
 					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
+					g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
 				end
 			end
+		else
+			-- When there is o vehicle, we can actually drop that entry
+			table.remove(VehicleSort.Sorted, k);
 		end
+	end
+end
+
+function VehicleSort:SyncSortedWithGame()
+	local allVeh = {}	
+	local newOrder = {};
+	local newSorted = {};
+
+	for _, v in ipairs(g_currentMission.vehicles) do
+		table.insert(allVeh, v);
+	end
+	
+	for k, v in ipairs(VehicleSort.Sorted) do
+		VehicleSort:dp(string.format('Sorted Index {%d}, realId {%d}, Vehicle {%s}', k, v, g_currentMission.vehicles[v]['configFileName']), 'SyncSortedWithGame');
+		
+		local newVeh = g_currentMission.vehicles[v];
+		newVeh.spec_vehicleSort.orderId = k;
+		newVeh.spec_vehicleSort.realId = k;
+		table.insert(newOrder, newVeh);
+		table.insert(newSorted, k);
+	end
+	-- Add the unsorted vehicles like trailers, implements etc.
+	for k, _ in pairs(allVeh) do
+		if allVeh[k]['spec_vehicleSort'] == nil then
+			table.insert(newOrder, allVeh[k]);
+		end
+	end
+
+	VehicleSort:dp(string.format('#newOrder {%d} - #g_currentMission.vehicles {%d}', #newOrder, #g_currentMission.vehicles), 'SyncSortedWithGame');
+	if #newOrder == #g_currentMission.vehicles then
+		VehicleSort.Sorted = newSorted;
+		g_currentMission.vehicles = newOrder;
+		-- Update tab order
+		--g_inputBinding.events['SWITCH_VEHICLE'].targetObject.loadVehiclesById = newOrder;
+		--g_inputBinding.events['SWITCH_VEHICLE_BACK'].targetObject.loadVehiclesById = newOrder;
+		
+		VehicleSort:dp('Write back of orderd vehicles to g_currentMission.vehicles');
 	end
 end
 
@@ -1414,6 +1490,10 @@ function VehicleSort:isActionAllowed()
 	end
 end
 
+function VehicleSort:showNoVehicles()
+	g_currentMission:showBlinkingWarning(g_i18n.modEnvironments[VehicleSort.ModName].texts.warningNoVehicles, 8000);
+end
+
 function VehicleSort:contains(haystack, needle)
 	for _, value in pairs(haystack) do
 		if value == needle then
@@ -1421,6 +1501,56 @@ function VehicleSort:contains(haystack, needle)
 		end
 	end
 	return false;
+end
+
+function VehicleSort:tabVehicle(backwards)
+	if #VehicleSort.Sorted == 0 then
+		VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
+	end
+	
+	if g_currentMission.controlledVehicle == nil then
+		conId = nil;
+		nextId = 1;
+	else
+		conId = g_currentMission.controlledVehicle.spec_vehicleSort.orderId
+
+		VehicleSort:getNextInTabList(conId, backwards);
+	end
+	
+	VehicleSort:dp(string.format('conId {%s} - nextId {%d}', tostring(conId), nextId), 'tabVehicle');
+
+	-- We need the loop to check which vehicle we can actually enter
+	local run = 1;
+	while g_currentMission.vehicles[(VehicleSort.Sorted[nextId])]:getIsControlled() or VehicleSort:isParked(VehicleSort.Sorted[nextId]) do
+
+		VehicleSort:getNextInTabList(nextId, backwards)
+
+		if run == #VehicleSort.Sorted then
+			VehicleSort.showNoVehicles();
+			return false;
+		end
+		run = run + 1;
+	end
+	realVeh = g_currentMission.vehicles[VehicleSort.Sorted[nextId]];
+	g_currentMission:requestToEnterVehicle(realVeh);
+	
+end
+
+function VehicleSort:getNextInTabList(orderId, backwards)
+	if backwards then
+		if orderId == 1 then
+			nextId = #VehicleSort.Sorted;
+		else
+			nextId = orderId - 1;
+		end			
+	else
+		if orderId == #VehicleSort.Sorted then
+			nextId = 1;
+		else
+			nextId = orderId + 1;
+		end
+	end
+	return nextId;
 end
 
 --

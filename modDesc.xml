@@ -46,6 +46,8 @@
 		<action name="vsShowConfig" axisType="HALF" />
 		<action name="vsTogglePark" axisType="HALF" />
 		<action name="vsRepair" axisType="HALF" />
+		<action name="vsTab" axisType="HALF" />
+		<action name="vsTabBack" axisType="HALF" />
 	</actions>
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
@@ -78,7 +80,13 @@
 		</actionBinding>
 		<actionBinding action="vsRepair">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_r" index="1" />
-		</actionBinding>				
+		</actionBinding>
+		<actionBinding action="vsTab">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_tab" index="1" />
+		</actionBinding>
+		<actionBinding action="vsTabBack">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_tab" index="1" />
+		</actionBinding>			
     </inputBinding>	
 	
 	<l10n>
@@ -126,6 +134,14 @@
 			<de>VeEx: Fahrzeug inkl. Geräte reparieren</de>
 			<en>VeEx: Repair vehicles incl. implements</en>
 		</text>
+		<text name="input_vsTab">
+			<de>VeEx: Zum nächsten Fahrzeug wechseln</de>
+			<en>VeEx: Switch to next vehicle</en>
+		</text>
+		<text name="input_vsTabBack">
+			<de>VeEx: Zum vorherigen Fahrzeug wechseln</de>
+			<en>VeEx: Switch to previous vehicle</en>
+		</text>			
 		<text name="configHeadline">
 			<de>VehicleSort-Konfiguration</de>
 			<en>VehicleSort Configuration</en>
