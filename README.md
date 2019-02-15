@@ -69,6 +69,11 @@ LAlt + KeyPad 2 -> Move down in the list/config
 LAlt + 1 -> Move up fast in the list/config
 LAlt + 2 -> Move down fast in the list/config
 LAlt + R -> Repair vehicle incl. implements
+Tab -> Next vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)
+Shift + Tab -> Previous vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)
+
+**_ If you want to use the 'sorted tabbing', make sure you drop the default key binding in the game menu. I didn't find a way to overwrite the default vehicle switching, and I think
+it's better to let you, the user, this choice anyways. _**
 
 Mouse Left: Enter vehicle
 Mouse Right:  Select item/change values in config
@@ -85,7 +90,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.5 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.0.6 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -159,6 +164,11 @@ LAlt + KeyPad 2 -> Runter in der Liste/Konfiguration
 LAlt + 1 -> Schnell rauf in der Liste/Konfiguration
 LAlt + 2 -> Schnell runter in der Liste/Konfiguration
 LAlt + R -> Repariere Fahrzeug inkl. Anbaugeräte
+Tab -> Nächstes Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird
+Shift + Tab -> Vorheriges Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird
+
+**_ Wenn du das 'sortierte Tabbing' zum Wechseln der Fahrzeuge verwenden möchtest musst du die Standard Tastenbelegung dafür in den Spieleinstellungen verwerfen. Ich habe keine
+Möglichkeit gefunden dies zu überschreiben, und finde auch das es besser ist diese Wahl dir, dem User, zu überlassen. _**
 
 Linke Maustaste: Ins Fahrzeug wechseln
 Rechte Maustaste:  Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern
@@ -174,7 +184,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.0.5 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.0.6 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

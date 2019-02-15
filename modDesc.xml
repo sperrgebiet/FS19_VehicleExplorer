@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.5</version>
+	<version>0.9.0.6</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -85,7 +85,7 @@
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_tab" index="1" />
 		</actionBinding>
 		<actionBinding action="vsTabBack">
-			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_tab" index="1" />
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_tab" index="1" />
 		</actionBinding>			
     </inputBinding>	
 	
@@ -139,7 +139,7 @@
 			<en>VeEx: Switch to next vehicle</en>
 		</text>
 		<text name="input_vsTabBack">
-			<de>VeEx: Zum vorherigen Fahrzeug wechseln</de>
+			<de>VeEx: Zum vorigen Fahrzeug wechseln</de>
 			<en>VeEx: Switch to previous vehicle</en>
 		</text>			
 		<text name="configHeadline">
@@ -301,6 +301,22 @@
 		<text name="warningNoVehicles">
 			<de>Es gibt keine Fahrzeuge zum Anzeigen. Kauf welche, oder ändere die Einstellungen im Konfigurationsmenü um nicht alle raus zu filtern.</de>
 			<en>There are no vehicles to show. Please buy some, or change the settings in the config menu so that not everything gets filter out.</en>
-		</text>			
+		</text>
+		<text name="listAlignment">
+			<de>Textausrichtung Liste</de>
+			<en>List text alignment</en>
+		</text>		
+		<text name="left">
+			<de>L</de>
+			<en>L</en>
+		</text>
+		<text name="right">
+			<de>R</de>
+			<en>R</en>
+		</text>
+		<text name="center">
+			<de>Z</de>
+			<en>C</en>
+		</text>		
 	</l10n>
 </modDesc>

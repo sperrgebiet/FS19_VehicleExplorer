@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.5";
+VehicleSort.Version = "0.9.0.6";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -13,6 +13,7 @@ print(string.format('VehicleSort v%s - DebugMode %s)', VehicleSort.Version, tost
 VehicleSort.bgTransDef = 0.8;
 VehicleSort.txtSizeDef = 2;
 VehicleSort.infoYStart = 1;
+VehicleSort.listAlignment = 2;						-- 1 = Left, 2 = Center, 3 = Right)
 
 VehicleSort.config = {
   {'showTrain', true},								-- 1
@@ -33,7 +34,8 @@ VehicleSort.config = {
   {'showInfo', true},                               -- 16
   {'infoStart', VehicleSort.infoYStart},            -- 17
   {'infoBg', true},                                 -- 18
-  {'imageBg', true}                                 -- 19
+  {'imageBg', true},                                -- 19
+  {'listAlignment', VehicleSort.listAlignment}      -- 20 (
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -309,7 +311,7 @@ function VehicleSort:action_vsLockListItem(actionName, keyStatus, arg3, arg4, ar
 			VehicleSort.selectedLock = false;
 		end
 	elseif VehicleSort.showConfig then
-		if VehicleSort.selectedConfigIndex == 9 then
+		if VehicleSort:contains({9, 20}, VehicleSort.selectedConfigIndex) then
 			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = VehicleSort.config[VehicleSort.selectedConfigIndex][2] + 1;
 			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 3 then
 				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 1;
@@ -438,6 +440,14 @@ function VehicleSort:drawConfig()
       state = string.format('%d', state);
     elseif i == 10 or i == 17 then		--bgTransparency and VehicleSort.infoYStart
       state = string.format('%.1f', state);
+	elseif i == 20 then 			-- List text alignment
+		if state == 1 then
+			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.left;
+		elseif state == 2 then
+			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.center;
+		elseif state == 3 then
+			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.right;
+		end
     elseif state then
       state = txtOn;
     else
@@ -481,27 +491,40 @@ function VehicleSort:drawList()
   --VehicleSort:dp(vehList, 'drawList', 'vehList');
   
   local cnt = #VehicleSort.Sorted;
-  if cnt == 0 then
-    return;
-  end
-  setTextBold(true); -- for width checks, to compensate for increased width when the line is bold
-  local yPos = VehicleSort.tPos.y;
-  local bgPosY = yPos;
-  setTextAlignment(VehicleSort.tPos.alignmentC);
-  local size = VehicleSort.getTextSize();
-  --local y = yPos + size + VehicleSort.tPos.spacing + VehicleSort.tPos.yOffset;
-  local y = VehicleSort.tPos.y;
-  local txt = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_title;
-  local texts = {};
-  local bold = false;
-  local minBgW = 0;
-  VehicleSort.bgY = y - VehicleSort.tPos.spacing;
-  VehicleSort.bgW = getTextWidth(size, txt) + VehicleSort.tPos.padSides;		--Background width will be dynamically adjusted later on. Just a value to get started with
-  --VehicleSort.bgW = 0.25;
+	if cnt == 0 then
+		return;
+	end
+	setTextBold(true); -- for width checks, to compensate for increased width when the line is bold
+ 
+	local yPos = VehicleSort.tPos.y;
+	local bgPosY = yPos; 
+	local size = VehicleSort.getTextSize();
+	--local y = yPos + size + VehicleSort.tPos.spacing + VehicleSort.tPos.yOffset;
+	local y = VehicleSort.tPos.y;
+	local txt = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_title;
+	local texts = {};
+	local bold = false;
+	local minBgW = 0;
+	VehicleSort.bgY = y - VehicleSort.tPos.spacing;
+	VehicleSort.bgW = getTextWidth(size, txt) + VehicleSort.tPos.padSides;		--Background width will be dynamically adjusted later on. Just a value to get started with
+	--VehicleSort.bgW = 0.25;
   
-  local headingY = VehicleSort.tPos.y + size + (VehicleSort.tPos.padHeight * 6);
-  table.insert(texts, {0, headingY, size + VehicleSort.tPos.sizeIncr, bold, VehicleSort.tColor.standard, txt}); --heading
+	-- We render the heading seperately to have it centered, despite the user config for the list
+	local headingY = VehicleSort.tPos.y + size + (VehicleSort.tPos.padHeight * 6);
   
+	setTextAlignment(VehicleSort.tPos.alignmentC);
+	setTextColor(unpack(VehicleSort.tColor.standard));
+	renderText(VehicleSort.tPos.x, headingY, size + VehicleSort.tPos.sizeIncr, tostring(txt)); -- x, y, size, txt
+
+	-- Now set the list alignment based on the config
+	if VehicleSort.config[20][2] == 1 then
+		setTextAlignment(VehicleSort.tPos.alignmentL);
+	elseif VehicleSort.config[20][2] == 3 then
+		setTextAlignment(VehicleSort.tPos.alignmentR);
+	else
+		setTextAlignment(VehicleSort.tPos.alignmentC);
+	end
+ 
   --Just used to figure out if we'll have multiple columns, hence we've to loop through the amount of vehicles to get the total height of the table
   local chk = yPos + size + VehicleSort.tPos.spacing;
 
@@ -591,18 +614,26 @@ function VehicleSort:drawList()
 
 	--We've to calculate our X based on each column.
 	local tblColWidth = VehicleSort.bgW / colNum;
+	
+	local tPosXAligned = VehicleSort.tPos.x;
+	if VehicleSort.config[20][2] == 1 then
+		tPosXAligned = VehicleSort.tPos.x - (tblColWidth / 2) + VehicleSort.tPos.padSides;
+	elseif VehicleSort.config[20][2] == 3 then
+		tPosXAligned = VehicleSort.tPos.x + (tblColWidth / 2) - VehicleSort.tPos.padSides;
+	end
+	
 	local colX = {};
-	colX[0] = VehicleSort.tPos.x;
+	colX[0] = tPosXAligned;
 	if colNum == 2 then
-		colX[1] = VehicleSort.tPos.x - (tblColWidth / 2);
-		colX[2] = VehicleSort.tPos.x + (tblColWidth / 2);
+		colX[1] = tPosXAligned - (tblColWidth / 2);
+		colX[2] = tPosXAligned + (tblColWidth / 2);
 	elseif colNum == 3 then
-		colX[1] = VehicleSort.tPos.x - tblColWidth;
-		colX[2] = VehicleSort.tPos.x;
-		colX[3] = VehicleSort.tPos.x + tblColWidth;
+		colX[1] = tPosXAligned - tblColWidth;
+		colX[2] = tPosXAligned;
+		colX[3] = tPosXAligned + tblColWidth;
 	else
 		--We just support 3 columsn. So this case is primarily for one column and as a 'catch all' which won't work but I don't care for now
-		colX[1] = VehicleSort.tPos.x;
+		colX[1] = tPosXAligned;
 	end	
 	
 	--VehicleSort:dp(colX, 'drawList');
@@ -1020,7 +1051,9 @@ function VehicleSort:isControlled(realId)
 end
 
 function VehicleSort:isParked(realId)
-	return not g_currentMission.vehicles[realId]:getIsTabbable();
+	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].getIsTabbable ~= nil then
+		return not g_currentMission.vehicles[realId]:getIsTabbable();
+	end
 end
 
 -- ToDo
@@ -1060,6 +1093,15 @@ function VehicleSort:loadConfig()
 					end
 					VehicleSort.config[i][2] = flt;
 					VehicleSort:dp(string.format('%s value set to [%f]',tostring(VehicleSort.config[i][1]), flt), 'VehicleSort:loadConfig');
+				elseif i == 20 then
+					local int = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
+					if tonumber(int) == nil or tonumber(int) <= 0 or tonumber(int) > 3 then
+						int = VehicleSort.listAlignment;
+					else
+						int = math.floor(tonumber(int));
+					end
+					VehicleSort.config[i][2] = int;
+					VehicleSort:dp(string.format('listAlignment value set to [%d]', int), 'VehicleSort:loadConfig');
 				else
 					local b = getXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
 					if b ~= nil then
@@ -1203,7 +1245,7 @@ end
 function VehicleSort:saveConfig()
 	VehicleSort.saveFile = createXMLFile('VehicleSort.saveFile', VehicleSort.xmlFilename, VehicleSort.keyCon);
 	for i = 1, #VehicleSort.config do
-		if i == 9 then
+		if i == 9 or i == 20 then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), tostring(VehicleSort.config[i][2]));
 		elseif i == 10 or i == 17 then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), string.format('%.1f', VehicleSort.config[i][2]));
