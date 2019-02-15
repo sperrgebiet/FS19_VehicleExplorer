@@ -41,11 +41,12 @@ VehicleSort.config = {
 VehicleSort.tColor = {}; -- text colours
 VehicleSort.tColor.isParked 	= {0.5, 0.5, 0.5, 0.7};   -- grey
 VehicleSort.tColor.locked 		= {1.0, 0.0, 0.0, 1.0};   -- red
-VehicleSort.tColor.selected 	= {1.0, 0.5, 0.0, 1.0}; -- orange
+VehicleSort.tColor.selected 	= {0.8879, 0.1878, 0.0037, 1.0}; -- orange
 VehicleSort.tColor.standard 	= {1.0, 1.0, 1.0, 1.0}; -- white
 VehicleSort.tColor.hired 		= {0.0, 0.5, 1.0, 1.0}; 	-- blue
 VehicleSort.tColor.followme 	= {0.92, 0.31, 0.69, 1.0}; 	-- light pink
 VehicleSort.tColor.self  		= {0.0, 1.0, 0.0, 1.0}; -- green
+VehicleSort.tColor.motorOn		= {0.9301, 0.7605, 0.0232, 1.0}; -- yellow
 
 VehicleSort.keyCon = 'VeExConfig';
 VehicleSort.selectedConfigIndex = 1;
@@ -92,6 +93,8 @@ end
 
 function VehicleSort:loadMap(name)
 	print("--- loading VehicleSort V".. VehicleSort.Version .. " | ModName " .. VehicleSort.ModName .. " ---");
+	FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, VehicleSort.RegisterActionEvents);
+	
 	VehicleSort:initVS();
 	VehicleSort:loadConfig();
 	
@@ -101,7 +104,6 @@ function VehicleSort:loadMap(name)
 end
 
 function VehicleSort:onLoad(savegame)
-	FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, VehicleSort.RegisterActionEvents);
 end
 
 function VehicleSort:onPostLoad(savegame)
@@ -768,9 +770,9 @@ function VehicleSort:getFullVehicleName(realId)
 	--	nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
 	elseif VehicleSort:isControlled(realId) then
 		local con = VehicleSort:getControllerName(realId);
-			if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
-				nam = nam .. string.format(fmt, con);
-			end
+		if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
+			nam = nam .. string.format(fmt, con);
+		end
 	end
 
 
@@ -888,18 +890,20 @@ end
 
 function VehicleSort:getTextColor(ind, realId)
 	--VehicleSort:dp(veh, 'getTextColor');
-  if ind == VehicleSort.selectedIndex then
-    if VehicleSort.selectedLock then
-      return VehicleSort.tColor.locked;
-    else
-      return VehicleSort.tColor.selected;
-    end
-  elseif VehicleSort:isParked(realId) then
-    return VehicleSort.tColor.isParked;
-  elseif VehicleSort:isControlled(realId) then
-	return VehicleSort.tColor.self
-  elseif VehicleSort:isHired(realId) then
-	return VehicleSort.tColor.hired
+	if ind == VehicleSort.selectedIndex then
+		if VehicleSort.selectedLock then
+			return VehicleSort.tColor.locked;
+		else
+			return VehicleSort.tColor.selected;
+		end
+	elseif VehicleSort:isParked(realId) then
+		return VehicleSort.tColor.isParked;
+	elseif VehicleSort:isControlled(realId) then
+		return VehicleSort.tColor.self;
+	elseif VehicleSort:isHired(realId) then
+		return VehicleSort.tColor.hired;
+	elseif VehicleStatus:getIsMotorStarted(g_currentMission.vehicles[realId]) then
+		return VehicleSort.tColor.motorOn;
 -- FollowMe is not out there yet
 --  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
 --	return VehicleSort.tColor.followme
