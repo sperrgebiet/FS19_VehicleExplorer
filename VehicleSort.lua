@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.6";
+VehicleSort.Version = "0.9.0.7";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -678,7 +678,11 @@ end
 
 function VehicleSort:getVehImplements(realId)
 	if g_currentMission.vehicles[realId].getAttachedImplements ~= nil then
-		return g_currentMission.vehicles[realId]:getAttachedImplements();
+		if #g_currentMission.vehicles[realId]:getAttachedImplements() > 0 then
+			return g_currentMission.vehicles[realId]:getAttachedImplements();
+		else
+			return nil;
+		end
 	else
 		return nil;
 	end
@@ -796,7 +800,8 @@ function VehicleSort:getFullVehicleName(realId)
 
 	table.insert(ret, nam .. VehicleSort:getFillDisplay(g_currentMission.vehicles[realId]));
 
-	if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) and VehicleSort.config[12][2] then
+	--if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) and VehicleSort.config[12][2] then
+	if VehicleSort:getVehImplements(realId) ~= nil and VehicleSort.config[12][2] then
 		local implements = VehicleSort:getVehImplements(realId);
 		local imp = implements[1];
 		--VehicleSort:dp(imp, 'VehicleSort:getFullVehicleName', 'getAttachedImplements');
@@ -1422,13 +1427,15 @@ function VehicleSort:getInfoTexts(realId)
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. ": " .. VehicleSort:calcPercentage(veh:getVehicleDamage(), 1) .. " %";
 			table.insert(texts, line);
 
-			local impDamage = VehicleSort:getVehImplementsDamage(realId);
-			if #impDamage > 0 then
-				for _, v in pairs(impDamage) do
-					table.insert(texts, v);
+			if VehicleSort:getVehImplements(realId) ~= nil then
+				local impDamage = VehicleSort:getVehImplementsDamage(realId);
+				if #impDamage > 0 then
+					for _, v in pairs(impDamage) do
+						table.insert(texts, v);
+					end
 				end
+				doSpacing = true;
 			end
-			doSpacing = true;
 		end
 		
 		-- Some spacing, but just if we actually had some data so far
@@ -1444,7 +1451,7 @@ function VehicleSort:getInfoTexts(realId)
 			doSpacing = false;
 		end
 		
-		if not VehicleSort:isCrane(realId) then
+		if VehicleSort:getVehImplements(realId) ~= nil then
 			local impFill = VehicleSort:getVehImplementsFillInfobox(realId);
 			if #impFill > 0 then
 				for _, v in pairs(impFill) do
@@ -1497,17 +1504,21 @@ function VehicleSort:getVehImplementsDamage(realId)
 	local line = "";
 
 	local implements = VehicleSort:getVehImplements(realId);
+	if implements ~= nil then
 	
-	for i = 1, #implements do
-		local imp = implements[i];
-		
-		if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
-			table.insert(texts, line);
+		for i = 1, #implements do
+			local imp = implements[i];
+			
+			if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
+				table.insert(texts, line);
+			end
 		end
+		
+		return texts;
+	else
+		return nil;
 	end
-
-	return texts;
 end
 
 function VehicleSort:getVehImplementsFillInfobox(realId)
@@ -1515,13 +1526,14 @@ function VehicleSort:getVehImplementsFillInfobox(realId)
 	local line = "";
 
 	local implements = VehicleSort:getVehImplements(realId);
-	
-	for i = 1, #implements do
-		local imp = implements[i];
-		
-		if imp ~= nil and imp.object ~= nil and (string.len(VehicleSort:getFillDisplay(imp.object)) > 1) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:getFillDisplay(imp.object, true);
-			table.insert(texts, line);
+	if implements ~= nil then
+		for i = 1, #implements do
+			local imp = implements[i];
+			
+			if imp ~= nil and imp.object ~= nil and (string.len(VehicleSort:getFillDisplay(imp.object)) > 1) then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:getFillDisplay(imp.object, true);
+				table.insert(texts, line);
+			end
 		end
 	end
 

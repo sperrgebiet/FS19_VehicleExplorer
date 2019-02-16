@@ -79,6 +79,18 @@ Mouse Left: Enter vehicle
 Mouse Right:  Select item/change values in config
 Mouse Wheel: List up/down
 
+## Meaning of colors used
+|Color|Meaning|
+|:---:|---|
+|White|Standard|
+|Green|Current player is controlling vehicle|
+|Orange|Vehicle selected|
+|Red|Vehicle locked (necessary to move it up/down in the list)|
+|Grey|Vehicle is parked|
+|Blue|Vehicle is controlled by AI (Helper or Courseplay)|
+|Light Pink|Vehicle is controlled by FollowMe (not yet available)|
+|Yellow|Engine is running|
+
 ## Note that the current version does NOT support multiplayer!
 Quite frankly, I've no idea about the MP code needed and also no possibility to test it. Actually I think it shouldn't be a big deal, and maybe it already works by just changing
 the MP setting in the moddesc.xml from false to true. I assume just the parking possibility has an impact to MP.
@@ -90,7 +102,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.6 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.0.7 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -174,6 +186,18 @@ Linke Maustaste: Ins Fahrzeug wechseln
 Rechte Maustaste:  Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern
 Mausrad: Liste rauf/runterscrollen
 
+## Bedeutung der verwendeten Farben
+|Farbe|Bedeutung|
+|:---:|---|
+|Weiss|Standard|
+|Grün|Derzeitiger Spieler kontrolliert das Fahrzeug|
+|Orange|Fahrzeug ist ausgewählt|
+|Rot|Fahrzeug ist "gesperrt", notwendig um es in der Liste rauf/runter zu schieben|
+|Grau|Fahrzeug ist geparkt|
+|Blau|Fahrzeug wird von der KI kontrolliert (Helfer oder CoursePlay)|
+|Helles Pink|Fahrzeug wird von FollowMe kontrolliert (noch nicht verfügbar)|
+|Gelb|Motor is ein|
+
 ## Beachte, dass die jetzige Version kein Multiplayer unterstützt!
 Ehrlich gesagt habe ich keine Ahnung was für MP Code notwendig wäre und auch keine Möglichkeit es zu testen. Vielleicht funktioniert es einfach nur in de moddesc.xml von false auf true zu wechseln.
 Ich glaube nur das parken von Fahrzeugen sollte einen Einfluss auf MP haben.
@@ -184,7 +208,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.0.6 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.0.7 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots
