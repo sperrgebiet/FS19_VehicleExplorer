@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.7";
+VehicleSort.Version = "0.9.0.8";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -35,7 +35,9 @@ VehicleSort.config = {
   {'infoStart', VehicleSort.infoYStart},            -- 17
   {'infoBg', true},                                 -- 18
   {'imageBg', true},                                -- 19
-  {'listAlignment', VehicleSort.listAlignment}      -- 20 (
+  {'listAlignment', VehicleSort.listAlignment},     -- 20
+  {'cleanOnRepair', true},                          -- 21
+  {'integrateTardis', true},                        -- 22
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -395,7 +397,18 @@ end
 function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp(string.format('action_vsRepair fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsRepair");
 	if VehicleSort.showSteerables then
+	
+		local infoText = "";
 		VehicleStatus:RepairVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
+		infoText = g_i18n.modEnvironments[VehicleSort.ModName].texts.RepairDone;
+		
+		if VehicleSort.config[21][2] then
+			VehicleStatus:CleanVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
+			infoText = g_i18n.modEnvironments[VehicleSort.ModName].texts.RepairCleaningDone;
+		end
+		
+		g_currentMission:showBlinkingWarning(infoText, 2000);
+		
 	end
 end
 
@@ -679,7 +692,17 @@ end
 function VehicleSort:getVehImplements(realId)
 	if g_currentMission.vehicles[realId].getAttachedImplements ~= nil then
 		if #g_currentMission.vehicles[realId]:getAttachedImplements() > 0 then
-			return g_currentMission.vehicles[realId]:getAttachedImplements();
+			local allImp = {}
+			-- Credits to Tardis from FS17
+			local function addAllAttached(obj)
+				for _, imp in pairs(obj:getAttachedImplements()) do
+					addAllAttached(imp.object);
+					table.insert(allImp, imp);
+				end
+			end
+                
+            addAllAttached(g_currentMission.vehicles[realId]);
+			return allImp;
 		else
 			return nil;
 		end
@@ -746,7 +769,9 @@ function VehicleSort:getFillDisplay(obj, infoBox)
 		
 		if VehicleSort.config[8][2] or f > 0 then -- Empty should be shown or is not empty
 			if c > 0 then -- Capacity more than zero
-				if VehicleSort.config[7][2] then -- Display as percentage
+				if infoBox then  -- show more details in the infobox
+					ret = string.format('%d/%d (%d %%) %s', math.floor(f), c, VehicleSort:calcPercentage(f, c), t);
+				elseif VehicleSort.config[7][2] then -- Display as percentage
 					ret = string.format(' (%d %%) %s', VehicleSort:calcPercentage(f, c), t);
 				else -- Display as amount of total capacity
 					ret = string.format(' (%d/%d) %s', math.floor(f), c, t);
@@ -806,7 +831,7 @@ function VehicleSort:getFullVehicleName(realId)
 		local imp = implements[1];
 		--VehicleSort:dp(imp, 'VehicleSort:getFullVehicleName', 'getAttachedImplements');
 		if (imp ~= nil and imp.object ~= nil) then
-			table.insert(ret, string.format('%s %s%s ', g_i18n.modEnvironments[VehicleSort.ModName].texts.with, VehicleSort:getAttachment(imp.object), VehicleSort:getFillDisplay(imp.object)));
+			table.insert(ret, string.format(' %s %s%s ', g_i18n.modEnvironments[VehicleSort.ModName].texts.with, VehicleSort:getAttachment(imp.object), VehicleSort:getFillDisplay(imp.object)));
 			imp = implements[2];
 			if (imp ~= nil and imp.object ~= nil) then -- second attachment
 				table.insert(ret, string.format('& %s%s ', VehicleSort:getAttachment(imp.object), VehicleSort:getFillDisplay(imp.object)));
@@ -1291,9 +1316,9 @@ function VehicleSort:drawStoreImage(realId)
 			-- Must be rendered after the background, otherwise it's covered by it
 			renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 			
-			if (g_currentMission.vehicles[realId].getAttachedImplements ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
-				local impList = g_currentMission.vehicles[realId]:getAttachedImplements();
-				for i = 1, 5 do
+			if (VehicleSort:getVehImplements(realId) ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
+				local impList = VehicleSort:getVehImplements(realId);
+				for i = 1, 8 do			-- Limit to 8 implements, guess it's just too much otherwise, and should be enough anyways
 					local imp = impList[i];
 					if imp ~= nil and imp.object ~= nil then
 						local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
@@ -1428,7 +1453,7 @@ function VehicleSort:getInfoTexts(realId)
 			table.insert(texts, line);
 
 			if VehicleSort:getVehImplements(realId) ~= nil then
-				local impDamage = VehicleSort:getVehImplementsDamage(realId);
+				local impDamage = VehicleStatus:getVehImplementsDamage(realId);
 				if #impDamage > 0 then
 					for _, v in pairs(impDamage) do
 						table.insert(texts, v);
@@ -1436,7 +1461,32 @@ function VehicleSort:getInfoTexts(realId)
 				end
 				doSpacing = true;
 			end
+			doSpacing = true;
 		end
+		
+		-- Some spacing, but just if we actually had some data so far
+		if doSpacing then
+			table.insert(texts, " ");
+			doSpacing = false;
+		end
+		
+		-- Get vehicle Dirt
+		local dirtPerc = VehicleStatus:getDirtPercForObject(g_currentMission.vehicles[realId]);
+		if dirtPerc ~= nil then
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. ": " .. dirtPerc .. " %";
+			table.insert(texts, line);		
+			doSpacing = true;			
+		end
+		
+		if VehicleSort:getVehImplements(realId) ~= nil then		
+			local impDirt = VehicleStatus:getVehImplementsDirt(realId);
+			if #impDirt > 0 then
+				for _, v in pairs(impDirt) do
+					table.insert(texts, v);
+				end
+			end
+			doSpacing = true;
+		end		
 		
 		-- Some spacing, but just if we actually had some data so far
 		if doSpacing then
@@ -1499,27 +1549,7 @@ function VehicleSort:getInfoTexts(realId)
 	end
 end
 
-function VehicleSort:getVehImplementsDamage(realId)
-	local texts = {};
-	local line = "";
 
-	local implements = VehicleSort:getVehImplements(realId);
-	if implements ~= nil then
-	
-		for i = 1, #implements do
-			local imp = implements[i];
-			
-			if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
-				table.insert(texts, line);
-			end
-		end
-		
-		return texts;
-	else
-		return nil;
-	end
-end
 
 function VehicleSort:getVehImplementsFillInfobox(realId)
 	local texts = {};
@@ -1562,7 +1592,11 @@ function VehicleSort:contains(haystack, needle)
 end
 
 function VehicleSort:tabVehicle(backwards)
-	if #VehicleSort.Sorted == 0 then
+	-- TBD Not sure yet if it's a good idea to get a ordered List for every tab. Will see if this has any negative
+	-- performance impact. If so, I'll just drop it again and define it as 'by design'. Opening/closing the vehList shouldn't be a big deal
+	-- especially as it's just an issue when new vehicles get bought/sold
+	--if #VehicleSort.Sorted == 0 then
+	if #VehicleSort.Sorted == 0 or #VehicleSort.Sorted ~= #VehicleSort:getOrderedVehicles() then
 		VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
 	end
 	

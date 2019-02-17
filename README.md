@@ -17,6 +17,7 @@ Feedback, this readme and additional information incl. source code can be find a
   * This is meant literally, see known issues ;)
 * Park your vehicles, so that a switch of vehicles via Tab ignores them
 * Repair vehicles and its implements
+* Let your vehicle and implements get cleaned on a repair from your friendly VeEx staff ;)
 * Displaying a store image next to the list
 * Info box with additional informations
 * Motor on/off, turned on/off (for e.g. harvester) and light status is saved and restored
@@ -33,10 +34,14 @@ Feedback, this readme and additional information incl. source code can be find a
   * Show/hide implements in the list
   * Show/hide store images
   * Show/hide infobox
+  * Move infobox up/down
+  * Show/hide a background for the infobox/store image
   * Change text size
+  * Change text alignment
   * Change list background transparency
   * Enable/disable saving of the additional vehicle status (motor, turnedOn, lights)
   * Show/hide keybindings in the game F1 help menu (needs a game restart to take affect)
+  * Clean vehicle & implements on a repair
 
 ### Known issues
 * Although you can change all the keyboard bindings, the mouse actions are hardcoded for now
@@ -125,6 +130,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Dies meine ich wortwörtlich, siehe Bekannte Probleme ;)
 * Parke die Fahrzeuge, sodass sie von einem Fahrzeugwechsel via Tab ignoriert werden
 * Reparatur von Fahrzeugen und angehängten Geräten
+* Waschen von Fahrzeugen und Anbaugeräten nach einer Reparatur durch das freundliche VeEx Personal
 * Anzeige eines Shop-Bildes neben der Fahrzeugliste
 * Info Box neben der Fahrzeugliste mit weiteren Details
 * Motor ein/aus, Gerätefunktionen ein/aus (für z.B. Drescher) und Licht-Status werden gespeichert und beim laden wieder hergestellt
@@ -140,10 +146,14 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Anzeigen/verstecken von Anbaugeräten/Hängern in der Liste
   * Anzeigen/verstecken Shop Bild
   * Anzeigen/verstecken der Infobox
+  * Rauf/runter verschieben der Infobox
+  * Anzeigen/verstecken eines Hintergrundes für die Infobox/Shop Bild
   * Ändern der Schriftgröße
+  * Textausrichtung ändern
   * Ändern der Hintergrundtransparenz
   * Aktivieren/deaktivieren des speicherns der zusätzlichen Fahrzeugstati (motor, turnedOn, lights)
   * Anzeigen/verstecken der Tastenbelegung im F1 Hilfemenü (benötigt einen Neustart des Spiels)
+  * Aktivieren/deaktivieren des automatischen waschen von Fahrzeuge und Anbaugeräte beim Reparieren
 
 ### Bekannte Probleme
 * Wenn man auch die Tastaturbelegung verändern kann, so sind die Mausaktionen im Moment nicht veränderbar

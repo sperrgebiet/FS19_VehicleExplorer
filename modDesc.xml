@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.7</version>
+	<version>0.9.0.8</version>
 	<title>Vehicle Explorer</title>
 	<description>
 	<en>
@@ -374,6 +374,32 @@
 			<de>Z</de>
 			<en>C</en>
 			<es>Centro</es>
-		</text>		
+		</text>
+		<text name="dirt">
+			<de>Verschmutzung</de>
+			<en>Dirt</en>
+			<es>Polución</es>
+		</text>
+		<text name="cleanOnRepair">
+			<de>Bei Reparatur waschen</de>
+			<en>Clean on repair</en>
+			<es>Lavar en reparación</es>
+		</text>
+		<text name="RepairDone">
+			<de>Reparatur durchgeführt</de>
+			<en>Repair done</en>
+			<es>Reparación realizada</es>
+		</text>
+		<text name="RepairCleaningDone">
+			<de>Fahrzeug repariert & gewaschen</de>
+			<en>Repair & cleaning done</en>
+			<es>Reparación y limpieza realizada</es>
+		</text>
+		<text name="integrateTardis">
+			<de>Tardis Integration</de>
+			<en>Tardis integration</en>
+			<es>Tardis integración</es>
+		</text>
+		
 	</l10n>
 </modDesc>

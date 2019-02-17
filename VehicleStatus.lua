@@ -3,7 +3,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.0.7";
+VehicleStatus.Version = "0.9.0.8";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -156,13 +156,111 @@ function VehicleStatus:RepairVehicleWithImplements(realId)
 			veh:repairVehicle(true);
 			VehicleSort:dp(string.format('Repaired vehicle realId {%s} - configFileName {%s}', tostring(realId), veh.configFileName), 'VehicleStatus:RepairVehicleWithImplements');
 			local implements = VehicleSort:getVehImplements(realId);
-			for i = 1, #implements do
-				local imp = implements[i];
-				if imp ~= nil and imp.object ~= nil and imp.object.repairVehicle ~= nil then
-					imp.object:repairVehicle(true);
-					VehicleSort:dp(string.format('Repaired implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:RepairVehicleWithImplements');
+			if implements ~= nil then
+				for i = 1, #implements do
+					local imp = implements[i];
+					if imp ~= nil and imp.object ~= nil and imp.object.repairVehicle ~= nil then
+						imp.object:repairVehicle(true);
+						VehicleSort:dp(string.format('Repaired implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:RepairVehicleWithImplements');
+					end
 				end
 			end
 		end
+	end
+end
+
+
+function VehicleStatus:CleanVehicleWithImplements(realId)
+	veh = g_currentMission.vehicles[realId];
+	VehicleSort:dp(string.format('realId {%s} for configFileName {%s}', realId, veh.configFileName), 'VehicleStatus:CleanVehicleWithImplements');
+	if veh ~= nil then
+		if veh.spec_washable ~= nil then
+			VehicleStatus:setDirtOnObject(veh, 0)
+			VehicleSort:dp(string.format('Cleaned vehicle realId {%s} - configFileName {%s}', tostring(realId), veh.configFileName), 'VehicleStatus:CleanVehicleWithImplements');
+			local implements = VehicleSort:getVehImplements(realId);
+			if implements ~= nil then
+				for i = 1, #implements do
+					local imp = implements[i];
+					if imp ~= nil and imp.object ~= nil and imp.object.spec_washable ~= nil then
+						VehicleStatus:setDirtOnObject(imp.object, 0)
+						VehicleSort:dp(string.format('Cleaned implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:CleanVehicleWithImplements');
+					end
+				end
+			end
+		end
+	end
+end
+
+function VehicleStatus:getVehImplementsDamage(realId)
+	local texts = {};
+	local line = "";
+
+	local implements = VehicleSort:getVehImplements(realId);
+	if implements ~= nil then
+	
+		for i = 1, #implements do
+			local imp = implements[i];
+			
+			if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
+				table.insert(texts, line);
+			end
+		end
+		
+		return texts;
+	else
+		return nil;
+	end
+end
+
+function VehicleStatus:getDirtPercForObject(obj)
+	if obj ~= nil then
+		if obj.spec_washable ~= nil then
+			local nodeCount = 0;
+			local dirtAmount = 0;
+			for _, node in pairs(obj.spec_washable.washableNodes) do
+				dirtAmount = dirtAmount + node.dirtAmount;
+				nodeCount = nodeCount + 1;
+			end
+			-- Total dirt should be combined dirt / nodecount
+			return VehicleSort:calcPercentage(dirtAmount / nodeCount, 1);
+		else
+			return nil;
+		end
+	else
+		return nil;
+	end
+end
+
+function VehicleStatus:getVehImplementsDirt(realId)
+	local texts = {};
+	local line = "";
+
+	local implements = VehicleSort:getVehImplements(realId);
+	if implements ~= nil then
+	
+		for i = 1, #implements do
+			local imp = implements[i];
+			
+			if (imp ~= nil and imp.object ~= nil and VehicleStatus:getDirtPercForObject(imp.object) ~= nil) then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
+				table.insert(texts, line);
+			end
+		end
+		
+		return texts;
+	else
+		return nil;
+	end
+end
+
+function VehicleStatus:setDirtOnObject(obj, dirt)
+	if obj.spec_washable ~= nil then
+		for _, node in pairs(obj.spec_washable.washableNodes) do
+			Washable:setNodeDirtAmount(node, dirt, force);
+		end
+		return true;
+	else
+		return nil;
 	end
 end
