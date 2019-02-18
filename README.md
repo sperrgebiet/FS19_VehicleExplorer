@@ -42,6 +42,9 @@ Feedback, this readme and additional information incl. source code can be find a
   * Enable/disable saving of the additional vehicle status (motor, turnedOn, lights)
   * Show/hide keybindings in the game F1 help menu (needs a game restart to take affect)
   * Clean vehicle & implements on a repair
+* Tardis integration
+  * TBD - Explanation of Tardis integration
+  
 
 ### Known issues
 * Although you can change all the keyboard bindings, the mouse actions are hardcoded for now
@@ -49,10 +52,8 @@ Feedback, this readme and additional information incl. source code can be find a
   * Right mouse click: Select vehicle (to e.g. move it)
   * Right mouse click: Change value in the config menu
   * Mouse wheel: Selection up/down in list
-* The actual 'tab order' of vehicles is not changed
+* ~~The actual 'tab order' of vehicles is not changed~~ -> Workaround available
 * Metric measuring units are used
-* Chaining for implements
-  * For now just the directly attached implements get respected. This means for repair and the info box just a e.g. trailer is recognized, but not a trailer which is attached to another trailer
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
 * A wrong value for horse power is displayed for trains
 * Sometimes selling or resetting a vehicle is causing a flickering of the vehicle list. I've already an idea why, just have to look more into it.
@@ -154,6 +155,8 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Aktivieren/deaktivieren des speicherns der zusätzlichen Fahrzeugstati (motor, turnedOn, lights)
   * Anzeigen/verstecken der Tastenbelegung im F1 Hilfemenü (benötigt einen Neustart des Spiels)
   * Aktivieren/deaktivieren des automatischen waschen von Fahrzeuge und Anbaugeräte beim Reparieren
+* Tardis Integration
+  * TBD - Explanation of Tardis integration
 
 ### Bekannte Probleme
 * Wenn man auch die Tastaturbelegung verändern kann, so sind die Mausaktionen im Moment nicht veränderbar
@@ -161,10 +164,8 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Rechte Maustaste: Fahrzeug auswählen (zum Verschieben)
   * Rechte Maustaste: Wert im Konfigurationsmenü ändern
   * Mausrad: Rauf/Runter in der Liste
-* Die eigentliche 'Tab-Reihenfolge' des Spiels wird nicht verändert
+* ~~Die eigentliche 'Tab-Reihenfolge' des Spiels wird nicht verändert~~ -> Workaround vorhanden
 * Metrische Masseinheit wird für die Geschwindigkeitsanzeige verwendet
-* Verkettung von Geräten/Anhängern
-  * Nur die direkt angehängten Geräte/Anhänger werden berücksichtig. Beim reparieren z.b. wird nur der Anhäng des Traktors berücksichtigt, jedoch nicht ein Anhänger der am Anhänger hängt.
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
 * Bei Zügen wird die Leistung/PS falsch berechnet
 * Manchmal verursacht das verkaufen oder zurücksetzen eines Fahrzeuges ein flackern der Fahrzeugliste. Ich hab auch schon eine Idee warum, muss mich nur mehr damit beschäftigen.

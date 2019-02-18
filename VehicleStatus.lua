@@ -3,7 +3,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.0.8";
+VehicleStatus.Version = "0.9.0.9";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');

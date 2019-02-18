@@ -3,7 +3,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.8";
+VehicleSort.Version = "0.9.0.9";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -14,30 +14,38 @@ VehicleSort.bgTransDef = 0.8;
 VehicleSort.txtSizeDef = 2;
 VehicleSort.infoYStart = 1;
 VehicleSort.listAlignment = 2;						-- 1 = Left, 2 = Center, 3 = Right)
+VehicleSort.showImgMaxImp = 9;
+VehicleSort.showInfoMaxImpl = 9;
 
-VehicleSort.config = {
-  {'showTrain', true},								-- 1
-  {'showCrane', false},                             -- 2
-  {'showBrand', false},                             -- 3
-  {'showHorsepower', true},                         -- 4
-  {'showNames', true},                              -- 5
-  {'showFillLevels', true},                         -- 6
-  {'showPercentages', true},                        -- 7
-  {'showEmpty', false},                             -- 8
-  {'txtSize', VehicleSort.txtSizeDef},              -- 9
-  {'bgTrans', VehicleSort.bgTransDef},              -- 10
-  {'showSteerableImplements', true},                -- 11
-  {'showImplements', true},                         -- 12
-  {'showHelp', true},                               -- 13
-  {'saveStatus', true},                             -- 14
-  {'showImg', true},                                -- 15
-  {'showInfo', true},                               -- 16
-  {'infoStart', VehicleSort.infoYStart},            -- 17
-  {'infoBg', true},                                 -- 18
-  {'imageBg', true},                                -- 19
-  {'listAlignment', VehicleSort.listAlignment},     -- 20
-  {'cleanOnRepair', true},                          -- 21
-  {'integrateTardis', true},                        -- 22
+-- Integration environment for Tardis
+envTardis = nil;
+
+VehicleSort.config = {											--Id		-Order in configMenu
+  {'showTrain', true, 1},										-- 1		1
+  {'showCrane', false, 2},                             			-- 2		2
+  {'showBrand', false, 3},                             			-- 3		3
+  {'showHorsepower', true, 4},                         			-- 4		4
+  {'showNames', true, 8},                              			-- 5		8
+  {'showFillLevels', true, 5},                         			-- 6		5
+  {'showPercentages', true, 6},                        			-- 7		6
+  {'showEmpty', false, 7},                             			-- 8		7
+  {'txtSize', VehicleSort.txtSizeDef, 15},             			-- 9		15
+  {'bgTrans', VehicleSort.bgTransDef, 16},              		-- 10		16
+  {'showSteerableImplements', true, 10},                		-- 11		10
+  {'showImplements', true, 9},	                         		-- 12		9
+  {'showHelp', true, 25},                               		-- 13		25
+  {'saveStatus', true, 22},                             		-- 14		22
+  {'showImg', true, 11},                                		-- 15		11
+  {'showInfo', true, 13},                               		-- 16		13
+  {'infoStart', VehicleSort.infoYStart, 19},            		-- 17		19
+  {'infoBg', true, 17},                                 		-- 18		17
+  {'imageBg', true, 18},                                		-- 19		18
+  {'listAlignment', VehicleSort.listAlignment, 20},     		-- 20		20
+  {'cleanOnRepair', true, 21},                          		-- 21		21
+  {'integrateTardis', true, 23},                        		-- 22		23
+  {'enterVehonTeleport', true, 24},                     		-- 23		24
+  {'showImgMaxImp', VehicleSort.showImgMaxImp, 12},     		-- 24		12
+  {'showInfoMaxImpl', VehicleSort.showInfoMaxImpl, 14},			-- 25		14
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -52,6 +60,7 @@ VehicleSort.tColor.motorOn		= {0.9301, 0.7605, 0.0232, 1.0}; -- yellow
 
 VehicleSort.keyCon = 'VeExConfig';
 VehicleSort.selectedConfigIndex = 1;
+VehicleSort.selectedRealConfigIndex = 1;
 VehicleSort.selectedIndex = 1;
 VehicleSort.selectedLock = false;
 VehicleSort.showConfig = false;
@@ -61,7 +70,8 @@ VehicleSort.xmlAttrOrder = '#vsorder';
 VehicleSort.xmlAttrParked = '#vsparked';
 VehicleSort.Sorted = {};
 VehicleSort.HiddenCount = 0;
-VehicleSort.dirtyState = false;						-- Used to check if we have to sync the order with g_currentMission.vehicles
+--VehicleSort.dirtyState = false;						-- Used to check if we have to sync the order with g_currentMission.vehicles
+VehicleSort.orderedConfig = {};							-- It's just nicer to have the config list ordered
 
 addModEventListener(VehicleSort);
 
@@ -100,9 +110,15 @@ function VehicleSort:loadMap(name)
 	VehicleSort:initVS();
 	VehicleSort:loadConfig();
 	
-	-- TODO This doesn't work
-	--InputBinding:removeActionEventsByActionName(g_inputBinding.events, 'SWITCH_VEHICLE');
-	--InputBinding:removeActionEventsByActionName(g_inputBinding.events, 'SWITCH_VEHICLE_BACK');
+	-- We'd get an error when we want to access the config menu and teh data is not populated yet. Same as there is some functionality in corner cases where we
+	-- already need a populated Sorted list, hence we're going to pouplate it once here
+	for i = 1, #VehicleSort.config do
+		local val = {i, VehicleSort.config[i]};
+		table.insert(VehicleSort.orderedConfig, val);
+	end
+	table.sort(VehicleSort.orderedConfig, function(a, b) return a[2][3] < b[2][3] end)	
+	
+	VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
 end
 
 function VehicleSort:onLoad(savegame)
@@ -288,6 +304,17 @@ end
 
 function VehicleSort:action_vsToggleList(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("vsToggleList fires", "vsToggleList");
+
+	if envTardis == nil and VehicleSort.config[22][2] then
+		-- Integration with Tardis
+		local TardisName = "FS19_Tardis";
+
+		if g_modIsLoaded[TardisName] then
+			envTardis = getfenv(0)[TardisName];
+			print("VehicleExplorer: Tardis integration available");
+		end
+	end
+		
 	if VehicleSort.showSteerables and not VehicleSort.showConfig then
 		VehicleSort.showSteerables = false;
 		VehicleSort.selectedLock = false;
@@ -315,18 +342,23 @@ function VehicleSort:action_vsLockListItem(actionName, keyStatus, arg3, arg4, ar
 			VehicleSort.selectedLock = false;
 		end
 	elseif VehicleSort.showConfig then
-		if VehicleSort:contains({9, 20}, VehicleSort.selectedConfigIndex) then
-			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = VehicleSort.config[VehicleSort.selectedConfigIndex][2] + 1;
-			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 3 then
-				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 1;
+		if VehicleSort:contains({9, 20}, VehicleSort.selectedRealConfigIndex) then
+			VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] + 1;
+			if VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] > 3 then
+				VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = 1;
 			end
-		elseif VehicleSort:contains({10, 17}, VehicleSort.selectedConfigIndex) then
-			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = VehicleSort.config[VehicleSort.selectedConfigIndex][2] + 0.1;
-			if VehicleSort.config[VehicleSort.selectedConfigIndex][2] > 1 then
-				VehicleSort.config[VehicleSort.selectedConfigIndex][2] = 0.0;
+		elseif VehicleSort:contains({24, 25}, VehicleSort.selectedRealConfigIndex) then
+			VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] + 1;
+			if VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] > 9 then
+				VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = 1;
+			end			
+		elseif VehicleSort:contains({10, 17}, VehicleSort.selectedRealConfigIndex) then
+			VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] + 0.1;
+			if VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] > 1 then
+				VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = 0.0;
 			end
 		else
-			VehicleSort.config[VehicleSort.selectedConfigIndex][2] = not VehicleSort.config[VehicleSort.selectedConfigIndex][2];
+			VehicleSort.config[VehicleSort.selectedRealConfigIndex][2] = not VehicleSort.config[VehicleSort.selectedRealConfigIndex][2];
 		end
 	end
 end
@@ -372,7 +404,17 @@ function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, a
 	if VehicleSort.showSteerables then
 		local realVeh = g_currentMission.vehicles[VehicleSort.Sorted[VehicleSort.selectedIndex]];
 		if not realVeh:getIsControlled() then
-			g_currentMission:requestToEnterVehicle(realVeh);
+
+			VehicleSort:dp(string.format('VehicleSort.wasTeleportAction {%s}', tostring(VehicleSort.wasTeleportAction)));
+			
+			if envTardis == nil or 
+						(envTardis ~= nil and not VehicleSort.wasTeleportAction) or 
+						(envTardis ~= nil and VehicleSort.wasTeleportAction and VehicleSort.config[23][2]) then
+				g_currentMission:requestToEnterVehicle(realVeh);
+				VehicleSort.wasTeleportAction = false;
+			elseif envTardis ~= nil then
+				VehicleSort.wasTeleportAction = false;
+			end
 		end
 	end
 end
@@ -381,9 +423,9 @@ function VehicleSort:action_vsShowConfig(actionName, keyStatus, arg3, arg4, arg5
 	VehicleSort:dp("action_vsShowConfig fires", "action_vsShowConfig");
 	if VehicleSort.showSteerables and not VehicleSort.showConfig then
       VehicleSort.showSteerables = false;
-    end
-    VehicleSort.showConfig = not VehicleSort.showConfig;
-	
+	end
+    
+	VehicleSort.showConfig = not VehicleSort.showConfig;
 	VehicleSort:saveConfig();
 end
 
@@ -431,7 +473,6 @@ function VehicleSort:calcPercentage(curVal, maxVal)
 end
 
 function VehicleSort:drawConfig()
-  local cCount = #VehicleSort.config;
   local xPos = VehicleSort.tPos.x;
   local yPos = VehicleSort.tPos.y;
   setTextAlignment(VehicleSort.tPos.alignmentL);
@@ -444,34 +485,39 @@ function VehicleSort:drawConfig()
   local texts = {};
   VehicleSort.bgW = VehicleSort.tPos.columnWidth + VehicleSort.tPos.padSides + getTextWidth(size, txtOff);
   table.insert(texts, {xPos + VehicleSort.tPos.padSides - (VehicleSort.bgW / 2), headingY, size + VehicleSort.tPos.sizeIncr, VehicleSort.tColor.standard, txt}); --heading
-  for i = 1, cCount do --loop through config values
-    local clr = VehicleSort.tColor.standard;
-    if i == VehicleSort.selectedConfigIndex then
-      clr = VehicleSort.tColor.selected;
-    end
-    local rText = g_i18n.modEnvironments[VehicleSort.ModName].texts[VehicleSort.config[i][1]];
-    local state = VehicleSort.config[i][2];
-    if i == 9 then
-      state = string.format('%d', state);
-    elseif i == 10 or i == 17 then		--bgTransparency and VehicleSort.infoYStart
-      state = string.format('%.1f', state);
-	elseif i == 20 then 			-- List text alignment
-		if state == 1 then
-			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.left;
-		elseif state == 2 then
-			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.center;
-		elseif state == 3 then
-			state = g_i18n.modEnvironments[VehicleSort.ModName].texts.right;
+  
+
+  
+	--VehicleSort:dp(orderedConfig, 'drawConfig');
+  
+	for k, v in ipairs(VehicleSort.orderedConfig) do --loop through config values
+		local clr = VehicleSort.tColor.standard;
+		if k == VehicleSort.selectedConfigIndex then
+		  clr = VehicleSort.tColor.selected;
 		end
-    elseif state then
-      state = txtOn;
-    else
-      state = txtOff;
-    end
-    table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.padSides, yPos, size, clr, rText}); --config definition line
-    table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.columnWidth, yPos, size, clr, state}); --config value
-    yPos = yPos - size - VehicleSort.tPos.spacing;
-  end
+		local rText = g_i18n.modEnvironments[VehicleSort.ModName].texts[VehicleSort.config[v[1]][1]];
+		local state = VehicleSort.config[v[1]][2];
+		if VehicleSort:contains({9, 24, 25}, v[1]) then								--txtSize, showImgMaxImp, showInfoMaxImpl
+			state = string.format('%d', state);
+		elseif VehicleSort:contains({10, 17}, v[1]) then						--bgTransparency, VehicleSort.infoYStart
+			state = string.format('%.1f', state);
+		elseif v[1] == 20 then 			-- List text alignment
+			if state == 1 then
+				state = g_i18n.modEnvironments[VehicleSort.ModName].texts.left;
+			elseif state == 2 then
+				state = g_i18n.modEnvironments[VehicleSort.ModName].texts.center;
+			elseif state == 3 then
+				state = g_i18n.modEnvironments[VehicleSort.ModName].texts.right;
+			end
+		elseif state then
+		  state = txtOn;
+		else
+		  state = txtOff;
+		end
+		table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.padSides, yPos, size, clr, rText}); --config definition line
+		table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.columnWidth, yPos, size, clr, state}); --config value
+		yPos = yPos - size - VehicleSort.tPos.spacing;
+	end
   
   VehicleSort.bgY = yPos;
   VehicleSort.bgH = (y - yPos) + size + VehicleSort.tPos.yOffset + VehicleSort.tPos.padHeight;
@@ -487,7 +533,7 @@ function VehicleSort:drawConfig()
   setTextColor(unpack(VehicleSort.tColor.standard));
   
   --Show the last selected vehicle for info/image position & BG option
-  if VehicleSort:contains({17, 18, 19}, VehicleSort.selectedConfigIndex) then
+  if VehicleSort:contains({17, 18, 19, 24, 25}, VehicleSort.selectedRealConfigIndex) then
 	VehicleSort:drawInfobox(VehicleSort.Sorted[VehicleSort.selectedIndex]);
 	VehicleSort:drawStoreImage(VehicleSort.Sorted[VehicleSort.selectedIndex]);
   end
@@ -1105,8 +1151,8 @@ function VehicleSort:loadConfig()
 
 			VehicleSort:dp('Config file found.', 'VehicleSort:loadConfig');
 			for i = 1, #VehicleSort.config do
-				if i == 9 then
-					local int = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to int
+				if VehicleSort:contains({9, 24, 25},i) then				--txtsize, max implements info & image
+					local int = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
 					if tonumber(int) == nil or tonumber(int) <= 0 or tonumber(int) > 3 then
 						int = VehicleSort.txtSizeDef;
 					else
@@ -1114,8 +1160,8 @@ function VehicleSort:loadConfig()
 					end
 					VehicleSort.config[i][2] = int;
 					VehicleSort:dp(string.format('txtSize value set to [%d]', int), 'VehicleSort:loadConfig');
-				elseif i == 10 or i == 17 then
-					local flt = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]); --a dev version had this as boolean, but then changed to float
+				elseif VehicleSort:contains({10, 17},i) then
+					local flt = getXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. VehicleSort.config[i][1]);
 					if tonumber(flt) == nil or tonumber(flt) <= 0 or tonumber(flt) > 1 then
 						if i == 10 then
 							flt = VehicleSort.bgTransDef;
@@ -1187,6 +1233,7 @@ function VehicleSort:moveConfigDown()
 	if VehicleSort.selectedConfigIndex > #VehicleSort.config then
 		VehicleSort.selectedConfigIndex = 1;
 	end
+	VehicleSort.selectedRealConfigIndex = VehicleSort.orderedConfig[VehicleSort.selectedConfigIndex][1];
 end
 
 function VehicleSort:moveConfigUp()
@@ -1194,6 +1241,7 @@ function VehicleSort:moveConfigUp()
 	if VehicleSort.selectedConfigIndex <= 0 then
 		VehicleSort.selectedConfigIndex = #VehicleSort.config;
 	end
+	VehicleSort.selectedRealConfigIndex = VehicleSort.orderedConfig[VehicleSort.selectedConfigIndex][1];
 end
 
 function VehicleSort:renderBg(x, y, w, h)
@@ -1279,9 +1327,9 @@ end
 function VehicleSort:saveConfig()
 	VehicleSort.saveFile = createXMLFile('VehicleSort.saveFile', VehicleSort.xmlFilename, VehicleSort.keyCon);
 	for i = 1, #VehicleSort.config do
-		if i == 9 or i == 20 then
+		if VehicleSort:contains({9, 20, 24, 25}, i) then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), tostring(VehicleSort.config[i][2]));
-		elseif i == 10 or i == 17 then
+		elseif VehicleSort:contains({10, 17}, i) then
 			setXMLString(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), string.format('%.1f', VehicleSort.config[i][2]));
 		else
 			setXMLBool(VehicleSort.saveFile, VehicleSort.keyCon .. '.' .. tostring(VehicleSort.config[i][1]), VehicleSort.config[i][2]);
@@ -1318,7 +1366,7 @@ function VehicleSort:drawStoreImage(realId)
 			
 			if (VehicleSort:getVehImplements(realId) ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
 				local impList = VehicleSort:getVehImplements(realId);
-				for i = 1, 8 do			-- Limit to 8 implements, guess it's just too much otherwise, and should be enough anyways
+				for i = 1, VehicleSort.config[24][2] do			-- Limit to the configured amount of implements to show
 					local imp = impList[i];
 					if imp ~= nil and imp.object ~= nil then
 						local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
@@ -1455,8 +1503,8 @@ function VehicleSort:getInfoTexts(realId)
 			if VehicleSort:getVehImplements(realId) ~= nil then
 				local impDamage = VehicleStatus:getVehImplementsDamage(realId);
 				if #impDamage > 0 then
-					for _, v in pairs(impDamage) do
-						table.insert(texts, v);
+					for i=1, VehicleSort.config[25][2] do
+						table.insert(texts, impDamage[i]);
 					end
 				end
 				doSpacing = true;
@@ -1481,8 +1529,8 @@ function VehicleSort:getInfoTexts(realId)
 		if VehicleSort:getVehImplements(realId) ~= nil then		
 			local impDirt = VehicleStatus:getVehImplementsDirt(realId);
 			if #impDirt > 0 then
-				for _, v in pairs(impDirt) do
-					table.insert(texts, v);
+				for i=1, VehicleSort.config[25][2] do
+					table.insert(texts, impDirt[i]);
 				end
 			end
 			doSpacing = true;
@@ -1504,8 +1552,8 @@ function VehicleSort:getInfoTexts(realId)
 		if VehicleSort:getVehImplements(realId) ~= nil then
 			local impFill = VehicleSort:getVehImplementsFillInfobox(realId);
 			if #impFill > 0 then
-				for _, v in pairs(impFill) do
-					table.insert(texts, v);
+				for i=1, VehicleSort.config[25][2] do
+					table.insert(texts, impFill[i]);
 				end
 				if not doSpacing then
 					doSpacing = true;

@@ -1,29 +1,31 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.8</version>
+	<version>0.9.0.9</version>
 	<title>Vehicle Explorer</title>
 	<description>
-	<en>
-		<![CDATA[
-		This is a revamp of the good old VehicleSort from FS17.
-		
-		For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
-		Besides that it has a couple of additional functionality. See below.
-		
-		More Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
-		]]>
-	</en>
-	<de>
-		<![CDATA[
-		Dies ist eine Reinkarnation von VehicleSort aus LS17
-		Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zeigt eine Liste welche dann selbst nach eigenen Wünschen sortiert werden kann.
-		
-		Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
-		]]>
-	</de>
+		<en>
+			<![CDATA[
+			This is a revamp of the good old VehicleSort from FS17.
+			
+			For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
+			Besides that it has a couple of additional functionality. See below.
+			
+			More Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+			]]>
+		</en>
+		<de>
+			<![CDATA[
+			Dies ist eine Reinkarnation von VehicleSort aus LS17
+			Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zeigt eine Liste welche dann selbst nach eigenen Wünschen sortiert werden kann.
+			
+			Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+			]]>
+		</de>
 	</description>
+
 	<iconFilename>icon.dds</iconFilename>
+	
 	<multiplayer supported="false" />
 
 	<extraSourceFiles>
@@ -49,6 +51,7 @@
 		<action name="vsTab" axisType="HALF" />
 		<action name="vsTabBack" axisType="HALF" />
 	</actions>
+
 	<inputBinding>	
 		<actionBinding action="vsToggleList">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_v" index="1" />
@@ -88,318 +91,8 @@
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_tab" index="1" />
 		</actionBinding>			
     </inputBinding>	
-	
-	<l10n>
-		<text name="vs_title">
-			<de>Fahrzeugliste</de>
-			<en>Vehicle List</en>
-			<es>Lista Vehiculos</es>
-		</text>
-		<text name="input_vsToggleList">
-			<de>VeEx: Fahrzeugliste anzeigen</de>
-			<en>VeEx: Show vehicle list</en>
-			<es>VeEx: Mostrar Lista Vehiculos</es>
-		</text>
-		<text name="input_vsLockListItem">
-			<de>VeEx: Listeneintrag auswählen</de>
-			<en>VeEx: Select list entry</en>
-			<es>VeEx: Selecionar entrada de lista</es>
-		</text>
-		<text name="input_vsMoveCursorUp">
-			<de>VeEx: Auswahl hoch</de>
-			<en>VeEx: Move cursor up</en>
-			<es>VeEx: Mover cursor arriba</es>
-		</text>
-		<text name="input_vsMoveCursorDown">
-			<de>VeEx: Auswahl runter</de>
-			<en>VeEx: Move cursor down</en>
-			<es>VeEx: Mover cursor abajo</es>
-		</text>
-		<text name="input_vsMoveCursorUpFast">
-			<de>VeEx: Auswahl schnell hoch</de>
-			<en>VeEx: Move cursor up fast</en>
-			<es>VeEx: Mover cursor arriba rápido</es>
-		</text>		
-		<text name="input_vsMoveCursorDownFast">
-			<de>VeEx: Auswahl schnell runter</de>
-			<en>VeEx: Move cursor down fast</en>
-			<es>VeEx: Mover cursor abajo rápido</es>
-		</text>	
-		<text name="input_vsChangeVehicle">
-			<de>VeEx: Ins Fahrzeug wechseln</de>
-			<en>VeEx: Enter selected vehicle</en>
-			<es>VeEx: Entrar en vehículo seleccionado</es>
-		</text>
-		<text name="input_vsShowConfig">
-			<de>VeEx: Konfiguration anzeigen</de>
-			<en>VeEx: Show configuration</en>
-			<es>VeEx: Mostrar configuración</es>
-		</text>
-		<text name="input_vsTogglePark">
-			<de>VeEx: Fahrzeug parken/entparken</de>
-			<en>VeEx: Toggle vehicle parking</en>
-			<es>VeEx: Alternar parking de vehículo</es>
-		</text>
-		<text name="input_vsRepair">
-			<de>VeEx: Fahrzeug inkl. Geräte reparieren</de>
-			<en>VeEx: Repair vehicles incl. implements</en>
-			<es>VeEx: Reparar vehículos incluido implementos</es>
-		</text>
-		<text name="input_vsTab">
-			<de>VeEx: Zum nächsten Fahrzeug wechseln</de>
-			<en>VeEx: Switch to next vehicle</en>
-			<es>VeEx: Cambiar al siguiente vehículo</es>
-		</text>
-		<text name="input_vsTabBack">
-			<de>VeEx: Zum vorigen Fahrzeug wechseln</de>
-			<en>VeEx: Switch to previous vehicle</en>
-			<es>VeEx: Cambiar al vehículo anterior</es>
-		</text>			
-		<text name="configHeadline">
-			<de>VehicleSort-Konfiguration</de>
-			<en>VehicleSort Configuration</en>
-			<es>Configuración Orden de Vehículo</es>
-		</text>
-		<text name="with">
-			<de>mit</de>
-			<en>with</en>
-			<es>con</es>
-		</text>
-		<text name="horsePower">
-			<de>PS</de>
-			<en>HP</en>
-			<es>CV</es>
-		</text>
-		<text name="showTrain">
-			<de>Züge in Fahrzeugliste anzeigen</de>
-			<en>Show trains in vehicle list</en>
-			<es>Mostrar trenes en lista de vehículos</es>
-		</text>
-		<text name="showCrane">
-			<de>Zug-Kräne in Fahrzeugliste anzeigen</de>
-			<en>Show train cranes in vehicle list</en>
-			<es>Mostrar trenes gruas en lista de vehículos</es>
-		</text>
-		<text name="showBrand">
-			<de>Markenname in Fahrzeugliste anzeigen</de>
-			<en>Show brand name in vehicle list</en>
-			<es>Mostrar Marca en lista de vehículos</es>
-		</text>
-		<text name="showHorsepower">
-			<de>PS anzeigen</de>
-			<en>Show horse power</en>
-			<es>Mostrar potencia</es>
-		</text>
-		<text name="showNames">
-			<de>Namen von Spielern in der Fahrzeugliste anzeigen</de>
-			<en>Show names of players in vehicle list</en>
-			<es>Mostrar nombres de jugadores en lista de vehículos</es>
-		</text>
-		<text name="showFillLevels">
-			<de>Füllstandsanzeige in Fahrzeugliste</de>
-			<en>Show fill level in vehicle list</en>
-			<es>Mostrar nivel de llenado en lista de vehículos</es>
-		</text>
-		<text name="showPercentages">
-			<de>Füllstandsanzeige in Prozent</de>
-			<en>Show fill level as percentage</en>
-			<es>Mostrar nivel de llenado en %</es>
-		</text>
-		<text name="showEmpty">
-			<de>Füllstandsanzeige bei leeren Fahrzeugen anzeigen</de>
-			<en>Show fill level of empty vehicles</en>
-			<es>Mostrar capacidad de vehículos vacíos</es>
-		</text>
-		<text name="showHelp">
-			<de>Tastenbelegung anzeigen (erst nach Neustart aktiv)</de>
-			<en>Show input binding (needs restart to take effect)</en>
-			<es>Mostrar tecla de entrada (necesita ser reiniciado para que surta efecto)</es>
-		</text>
-		<text name="bgTrans">
-			<de>Hintergrund Alpha Transparenz</de>
-			<en>Background alpha transparency</en>
-			<es>Fondo transparente</es>
-		</text>
-		<text name="txtSize">
-			<de>Textgröße</de>
-			<en>Text size</en>
-			<es>Tamaño texto</es>
-		</text>
-		<text name="showSteerableImplements">
-			<de>Steuerbare Werkzeuge anzeigen</de>
-			<en>Show steerable implements</en>
-			<es>Mostrar herramientas conducibles</es>
-		</text>
-		<text name="showImplements">
-			<de>Angehängte Geräte anzeigenn</de>
-			<en>Show attached implements</en>
-			<es>Mostrar herramientas enganchables</es>
-		</text>
-		<text name="saveStatus">
-			<de>Fahrzeugstatus speichern</de>
-			<en>Save vehicle status</en>
-			<es>Guardar estado vehículo</es>
-		</text>
-		<text name="showImg">
-			<de>Bilder anzeigen</de>
-			<en>Show images</en>
-			<es>Mostrar imagenes</es>
-		</text>		
-		<text name="showInfo">
-			<de>Infobox anzeigen</de>
-			<en>Show infobox</en>
-			<es>Mostrar caja de información</es>
-		</text>			
-		<text name="infoStart">
-			<de>Infobox/Bild vertikal verschieben</de>
-			<en>Move Infobox/image vertically</en>
-			<es>Mover caja de información/imagen verticalmente</es>
-		</text>			
-		<text name="infoBg">
-			<de>Infobox Hintergrund anzeigen</de>
-			<en>Show Infobox background</en>
-			<es>Mostrar fondo caja de información</es>
-		</text>
-		<text name="imageBg">
-			<de>Bild Hintergrund anzeigen</de>
-			<en>Show image background</en>
-			<es>Mostrar imagen de fondo</es>
-		</text>		
-		<text name="vs_on">
-			<de>An</de>
-			<en>On</en>
-			<es>ON</es>
-		</text>
-		<text name="vs_off">
-			<de>Aus</de>
-			<en>Off</en>
-			<es>OFF</es>
-		</text>
-		<text name="vs_train">
-			<de>Zug</de>
-			<en>Train</en>
-			<es>Tren</es>
-		</text>
-		<text name="vs_crane">
-			<de>Zug-Kran</de>
-			<en>Train crane</en>
-			<es>Tren Grua</es>
-		</text>
-		<text name="vs_implement">
-			<de>Geräte</de>
-			<en>Implement</en>
-			<es>Implemento</es>
-		</text>
-		<text name="hired">
-			<de>H</de>
-			<en>H</en>
-			<es>H</es>
-		</text>
-		<text name="courseplay">
-			<de>CP</de>
-			<en>CP</en>
-			<es>CP</es>
-		</text>
-		<text name="followme">
-			<de>FM</de>
-			<en>FM</en>
-			<es>FM</es>
-		</text>
-		<text name="helper">
-			<de>Helfer</de>
-			<en>Helper</en>
-			<es>Ayudante</es>
-		</text>		
-		<text name="cp_course">
-			<de>CP Kurs</de>
-			<en>CP Course</en>
-			<es>Ruta CP</es>
-		</text>
-		<text name="cp_courseunknown">
-			<de>Temporärer Kurs</de>
-			<en>Temporary course</en>
-			<es>Ruta temporal</es>
-		</text>		
-		<text name="damage">
-			<de>Schaden</de>
-			<en>Damage</en>
-			<es>Daño</es>
-		</text>
-		<text name="motor">
-			<de>Motor</de>
-			<en>Engine</en>
-			<es>Motor</es>
-		</text>		
-		<text name="turnedOn">
-			<de>Gestartet</de>
-			<en>Started</en>
-			<es>Encendido</es>
-		</text>
-		<text name="lights">
-			<de>Lichter</de>
-			<en>Lights</en>
-			<es>Luces</es>
-		</text>
-		<text name="speed">
-			<de>Geschwindigkeit</de>
-			<en>Speed</en>
-			<es>Velocidad</es>
-		</text>
-		<text name="fillLevel">
-			<de>Füllstand</de>
-			<en>Filllevel</en>
-			<es>Nivel llenado</es>
-		</text>
-		<text name="warningNoVehicles">
-			<de>Es gibt keine Fahrzeuge zum Anzeigen. Kauf welche, oder ändere die Einstellungen im Konfigurationsmenü um nicht alle raus zu filtern.</de>
-			<en>There are no vehicles to show. Please buy some, or change the settings in the config menu so that not everything gets filter out.</en>
-			<es>No hay vehículos a mostrar. Por favor compre alguno, o cambie los ajuste en el menú configuración para no filtrarlo todo.</es>
-		</text>
-		<text name="listAlignment">
-			<de>Textausrichtung Liste</de>
-			<en>List text alignment</en>
-			<es>Lista de alineación de texto</es>
-		</text>		
-		<text name="left">
-			<de>L</de>
-			<en>L</en>
-			<es>Izq.</es>
-		</text>
-		<text name="right">
-			<de>R</de>
-			<en>R</en>
-			<es>Der.</es>
-		</text>
-		<text name="center">
-			<de>Z</de>
-			<en>C</en>
-			<es>Centro</es>
-		</text>
-		<text name="dirt">
-			<de>Verschmutzung</de>
-			<en>Dirt</en>
-			<es>Polución</es>
-		</text>
-		<text name="cleanOnRepair">
-			<de>Bei Reparatur waschen</de>
-			<en>Clean on repair</en>
-			<es>Lavar en reparación</es>
-		</text>
-		<text name="RepairDone">
-			<de>Reparatur durchgeführt</de>
-			<en>Repair done</en>
-			<es>Reparación realizada</es>
-		</text>
-		<text name="RepairCleaningDone">
-			<de>Fahrzeug repariert & gewaschen</de>
-			<en>Repair & cleaning done</en>
-			<es>Reparación y limpieza realizada</es>
-		</text>
-		<text name="integrateTardis">
-			<de>Tardis Integration</de>
-			<en>Tardis integration</en>
-			<es>Tardis integración</es>
-		</text>
-		
-	</l10n>
+
+	<!-- "translations/translation_<language>.xml -->
+	<l10n filenamePrefix="translations/translation" />
+
 </modDesc>
