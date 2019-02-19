@@ -37,3 +37,9 @@ if($srcPath.Length -gt 0 -and $dstPath.Length -gt 0)
 
     Remove-Item -Path $tmpPath -Recurse -Force
 }
+
+
+# Install-Module -Name MarkdownToHtml
+Import-Module MarkdownToHtml
+
+ConvertFrom-Markdown -MarkdownContent (Get-Content README.md) | Out-File .\test.html 

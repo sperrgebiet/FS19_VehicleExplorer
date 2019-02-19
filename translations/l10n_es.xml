@@ -29,7 +29,8 @@
 		<text name="bgTrans"								text="Fondo transparente" />
 		<text name="txtSize"								text="Tamaño texto" />
 		<text name="showSteerableImplements"				text="Mostrar herramientas conducibles" />
-		<text name="showImplements"							text="Mostrar herramientas enganchables" />
+		<text name="showImplements"							text="Mostrar herramientas enganchables in lista" />
+		<text name="showImplementsMax"						text="Número de implementos mostrados en la lista" />
 		<text name="saveStatus"								text="Guardar estado vehículo" />
 		<text name="showImg"								text="Mostrar imagenes" />
 		<text name="showInfo"								text="Mostrar caja de información" />

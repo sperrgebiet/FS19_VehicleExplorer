@@ -29,7 +29,8 @@
 		<text name="bgTrans"								text="Background alpha transparency" />
 		<text name="txtSize"								text="Text size" />
 		<text name="showSteerableImplements"				text="Show steerable implements" />
-		<text name="showImplements"							text="Show attached implements" />
+		<text name="showImplements"							text="Show attached implements in list" />
+		<text name="showImplementsMax"						text="Number of implements in list" />
 		<text name="saveStatus"								text="Save vehicle status" />
 		<text name="showImg"								text="Show images" />
 		<text name="showInfo"								text="Show infobox" />

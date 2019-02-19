@@ -1,9 +1,12 @@
-VehicleStatus = {};
+-- VehicleStatus.lua for FS19
+-- Author: sperrgebiet
+-- Please see https://github.com/sperrgebiet/FS19_VehicleExplorer for additional information, credits, issues and everything else
 
+VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.0.9";
+VehicleStatus.Version = "0.9.0.10";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');

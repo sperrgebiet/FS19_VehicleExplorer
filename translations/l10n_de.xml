@@ -29,7 +29,8 @@
 		<text name="bgTrans"								text="Hintergrund Alpha Transparenz" />
 		<text name="txtSize"								text="Textgrösse" />
 		<text name="showSteerableImplements"				text="Steuerbare Werkzeuge anzeigen" />
-		<text name="showImplements"							text="Angehängte Geräte anzeigenn" />
+		<text name="showImplements"							text="Angehängte Geräte in Liste anzeigen" />
+		<text name="showImplementsMax"						text="Anzahl angehängter Geräte in Liste" />
 		<text name="saveStatus"								text="Fahrzeugstatus speichern" />
 		<text name="showImg"								text="Bilder anzeigen" />
 		<text name="showInfo"								text="Infobox anzeigen" />

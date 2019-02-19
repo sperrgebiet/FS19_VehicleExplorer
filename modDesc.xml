@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.0.9</version>
+	<version>0.9.0.10</version>
 	<title>Vehicle Explorer</title>
 	<description>
 		<en>
@@ -23,6 +23,9 @@
 			]]>
 		</de>
 	</description>
+	
+	<!-- "translations/l10n_<language>.xml -->
+	<l10n filenamePrefix="translations/l10n" />	
 
 	<iconFilename>icon.dds</iconFilename>
 	
@@ -91,8 +94,5 @@
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_tab" index="1" />
 		</actionBinding>			
     </inputBinding>	
-
-	<!-- "translations/translation_<language>.xml -->
-	<l10n filenamePrefix="translations/translation" />
 
 </modDesc>
