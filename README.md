@@ -69,25 +69,27 @@ As a workaround you just have to move any vehicle a position up or down, then a 
   * Changed the default keybinding. So there is no overlap anymore.
 
 ## Default Keybinding
-LAlt + v -> Show/hide vehicle list
-LAlt + KeyPad Minus -> Show/hide config menu 
-KeyPad Enter -> Enter vehicle
-LAlt + p -> Toggle parking
-LAlt + KeyPad 5 -> Select item (for moving the vehicle) or to change values in the config
-LAlt + KeyPad 8 -> Move up in the list/config
-LAlt + KeyPad 2 -> Move down in the list/config
-LAlt + 1 -> Move up fast in the list/config
-LAlt + 2 -> Move down fast in the list/config
-LAlt + R -> Repair vehicle incl. implements
-Tab -> Next vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)
-Shift + Tab -> Previous vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)
+|Key Combi|Action|
+|:---:|---|
+|LAlt + v|Show/hide vehicle list|
+|LAlt + KeyPad Minus|Show/hide config menu|
+|KeyPad Enter|Enter vehicle|
+|LAlt + p|Toggle parking|
+|LAlt + KeyPad 5|Select item (for moving the vehicle) or to change values in the config|
+|LAlt + KeyPad 8|Move up in the list/config|
+|LAlt + KeyPad 2|Move down in the list/config|
+|LAlt + 1|Move up fast in the list/config|
+|LAlt + 2|Move down fast in the list/config|
+|LAlt + R|Repair vehicle incl. implements|
+|Tab|Next vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)|
+|Shift + Tab|Previous vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)|
+|Mouse Left|Enter vehicle|
+|Mouse Right|Select item/change values in config|
+|Mouse Wheel|List up/down|
 
 **_ If you want to use the 'sorted tabbing', make sure you drop the default key binding in the game menu. I didn't find a way to overwrite the default vehicle switching, and I think
 it's better to let you, the user, this choice anyways. _**
 
-Mouse Left: Enter vehicle
-Mouse Right:  Select item/change values in config
-Mouse Wheel: List up/down
 
 ## Meaning of colors used
 |Color|Meaning|
@@ -186,25 +188,27 @@ Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position r
   * Habe die Standard Tastenbelegung verändert. Somit gibt es keinen Konflikt mehr.  
 
 ## Standard Tastenbelegung
-LAlt + v -> Anzeigen/verstecken der Fahrzeugliste
-LAlt + KeyPad Minus -> Anzeigen/verstecken des Konfigurationsmenüs
-LAlt + KeyPad Enter -> Ins Fahrzeug wechseln
-LAlt + p -> Fahrzeug parken/ausparken
-LAlt + KeyPad 5 -> Fahrzeug auswählen (zum Verschieben) und ändern eines Wertes in der Konfiguration
-LAlt + KeyPad 8 -> Rauf in der Liste/Konfiguration
-LAlt + KeyPad 2 -> Runter in der Liste/Konfiguration
-LAlt + 1 -> Schnell rauf in der Liste/Konfiguration
-LAlt + 2 -> Schnell runter in der Liste/Konfiguration
-LAlt + R -> Repariere Fahrzeug inkl. Anbaugeräte
-Tab -> Nächstes Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird
-Shift + Tab -> Vorheriges Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird
+|Key Kombi|Aktion|
+|:---:|---|
+|LAlt + v|Anzeigen/verstecken der Fahrzeugliste|
+|LAlt + KeyPad Minus|Anzeigen/verstecken des Konfigurationsmenüs|
+|LAlt + KeyPad Enter|Ins Fahrzeug wechseln|
+|LAlt + p|Fahrzeug parken/ausparken|
+|LAlt + KeyPad 5|Fahrzeug auswählen (zum Verschieben) und ändern eines Wertes in der Konfiguration|
+|LAlt + KeyPad 8|Rauf in der Liste/Konfiguration|
+|LAlt + KeyPad 2|Runter in der Liste/Konfiguration|
+|LAlt + 1|Schnell rauf in der Liste/Konfiguration|
+|LAlt + 2|Schnell runter in der Liste/Konfiguration|
+|LAlt + R|Repariere Fahrzeug inkl. Anbaugeräte|
+|Tab|Nächstes Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird|
+|Shift + Tab|Vorheriges Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird|
+|Linke Maustaste|Ins Fahrzeug wechseln|
+|Rechte Maustaste|Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern|
+|Mausrad|Liste rauf/runterscrollen|
 
 **_ Wenn du das 'sortierte Tabbing' zum Wechseln der Fahrzeuge verwenden möchtest musst du die Standard Tastenbelegung dafür in den Spieleinstellungen verwerfen. Ich habe keine
 Möglichkeit gefunden dies zu überschreiben, und finde auch das es besser ist diese Wahl dir, dem User, zu überlassen. _**
 
-Linke Maustaste: Ins Fahrzeug wechseln
-Rechte Maustaste:  Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern
-Mausrad: Liste rauf/runterscrollen
 
 ## Bedeutung der verwendeten Farben
 |Farbe|Bedeutung|
@@ -232,12 +236,17 @@ Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 
 # Screenshots
-![fsscreen1](https://user-images.githubusercontent.com/20586786/52771954-986b1580-3037-11e9-8e0a-470cdd3c3855.png)
-![fsscreen2](https://user-images.githubusercontent.com/20586786/52771955-986b1580-3037-11e9-9880-8c9cb681538d.png)
-![fsscreen3](https://user-images.githubusercontent.com/20586786/52771956-986b1580-3037-11e9-999a-7a1c52a57298.png)
-![fsscreen4](https://user-images.githubusercontent.com/20586786/52771957-986b1580-3037-11e9-9b32-f98a17d1ef75.png)
-![fsscreen5](https://user-images.githubusercontent.com/20586786/52771958-9903ac00-3037-11e9-8083-a22a3c1f8468.png)
-![fsscreen6](https://user-images.githubusercontent.com/20586786/52771959-9903ac00-3037-11e9-9d49-59c586aa82dd.png)
-![fsscreen7](https://user-images.githubusercontent.com/20586786/52771960-9903ac00-3037-11e9-8afc-284196ea6c9a.png)
-![fsscreen8](https://user-images.githubusercontent.com/20586786/52771961-9903ac00-3037-11e9-876c-3bb01aa0cd06.png)
-![fsscreen9](https://user-images.githubusercontent.com/20586786/52771962-999c4280-3037-11e9-81b1-a6bb0b2fc38d.png)
+Vorstellung von Vehicle Explorer mit Tardis Integration auf YouTube: https://www.youtube.com/watch?v=w2LY9rmA4-g&t=7s
+
+![FS19_VehicleExplorer_1](https://user-images.githubusercontent.com/20586786/53124444-ab13ac00-355b-11e9-8f84-cd976aed7729.png)
+![FS19_VehicleExplorer_2](https://user-images.githubusercontent.com/20586786/53124445-abac4280-355b-11e9-91da-4ed4ab3367ed.png)
+![FS19_VehicleExplorer_3](https://user-images.githubusercontent.com/20586786/53124447-ac44d900-355b-11e9-876f-c2b171ff227f.png)
+![FS19_VehicleExplorer_4](https://user-images.githubusercontent.com/20586786/53124448-ac44d900-355b-11e9-8e9f-a9ba8840c3ff.png)
+![FS19_VehicleExplorer_5](https://user-images.githubusercontent.com/20586786/53124449-acdd6f80-355b-11e9-8cdc-7e6c032097e7.png)
+![FS19_VehicleExplorer_6](https://user-images.githubusercontent.com/20586786/53124450-acdd6f80-355b-11e9-8d57-5f4637bd4e1c.png)
+![FS19_VehicleExplorer_7](https://user-images.githubusercontent.com/20586786/53124451-acdd6f80-355b-11e9-9d4d-f61fe3993dcd.png)
+![FS19_VehicleExplorer_8](https://user-images.githubusercontent.com/20586786/53124452-ad760600-355b-11e9-86ce-41da3ae8a6f0.png)
+![FS19_VehicleExplorer_9](https://user-images.githubusercontent.com/20586786/53124453-ad760600-355b-11e9-8dac-8a25d79b09b0.png)
+![FS19_VehicleExplorer_10](https://user-images.githubusercontent.com/20586786/53124454-ae0e9c80-355b-11e9-80d1-7b363d3434b4.png)
+![FS19_VehicleExplorer_11](https://user-images.githubusercontent.com/20586786/53124455-aea73300-355b-11e9-9db3-ba90bdcd71c3.png)
+
