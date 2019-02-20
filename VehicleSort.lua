@@ -58,7 +58,8 @@ VehicleSort.tColor = {}; -- text colours
 VehicleSort.tColor.isParked 	= {0.5, 0.5, 0.5, 0.7};   -- grey
 VehicleSort.tColor.locked 		= {1.0, 0.0, 0.0, 1.0};   -- red
 VehicleSort.tColor.selected 	= {0.8879, 0.1878, 0.0037, 1.0}; -- orange
-VehicleSort.tColor.standard 	= {1.0, 1.0, 1.0, 1.0}; -- white
+VehicleSort.tColor.standard 	= {0.995, 0.995, 0.995, 1.0}; -- pretty much white
+VehicleSort.tColor.standard2 	= {0.790, 0.620, 0.440, 1.0}; -- eggcolor
 VehicleSort.tColor.hired 		= {0.0, 0.5, 1.0, 1.0}; 	-- blue
 VehicleSort.tColor.followme 	= {0.92, 0.31, 0.69, 1.0}; 	-- light pink
 VehicleSort.tColor.self  		= {0.0, 1.0, 0.0, 1.0}; -- green
@@ -481,20 +482,26 @@ end
 function VehicleSort:drawConfig()
 	local xPos = VehicleSort.tPos.x;
 	local yPos = VehicleSort.tPos.y;
-	setTextAlignment(VehicleSort.tPos.alignmentL);
 	local size = VehicleSort:getTextSize();
-	local y = yPos + size + VehicleSort.tPos.spacing + VehicleSort.tPos.yOffset;
-	local headingY = VehicleSort.tPos.y + size + (VehicleSort.tPos.padHeight * 6);
-	local txt = g_i18n.modEnvironments[VehicleSort.ModName].texts.configHeadline;
+	local y = VehicleSort.tPos.y;
 	local txtOn = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_on;
 	local txtOff = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
 	local texts = {};
-	VehicleSort.bgW = VehicleSort.tPos.columnWidth + VehicleSort.tPos.padSides + getTextWidth(size, txtOff);
-	table.insert(texts, {xPos + VehicleSort.tPos.padSides - (VehicleSort.bgW / 2), headingY, size + VehicleSort.tPos.sizeIncr, VehicleSort.tColor.standard, txt}); --heading
+	VehicleSort.bgW = (VehicleSort.tPos.columnWidth * 2 )+ VehicleSort.tPos.padSides + getTextWidth(size, txtOff);		--For config we can use wider columns
 
+
+		-- We render the heading seperately to have it centered, despite the user config for the list
+	local headingY = VehicleSort.tPos.y + size + (VehicleSort.tPos.padHeight * 6);
+	local txt = g_i18n.modEnvironments[VehicleSort.ModName].texts.configHeadline;
+	setTextAlignment(VehicleSort.tPos.alignmentC);
+	setTextColor(unpack(VehicleSort.tColor.standard));
+	renderText(VehicleSort.tPos.x, headingY, size + VehicleSort.tPos.sizeIncr, tostring(txt)); -- x, y, size, txt
+
+	setTextAlignment(VehicleSort.tPos.alignmentL);
+	
 	--VehicleSort:dp(orderedConfig, 'drawConfig');
-  
-	for k, v in ipairs(VehicleSort.orderedConfig) do --loop through config values
+	-- And now the rest of our config
+	for k, v in ipairs(VehicleSort.orderedConfig) do
 		local clr = VehicleSort.tColor.standard;
 		if k == VehicleSort.selectedConfigIndex then
 		  clr = VehicleSort.tColor.selected;
@@ -519,7 +526,7 @@ function VehicleSort:drawConfig()
 		  state = txtOff;
 		end
 		table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.padSides, yPos, size, clr, rText}); --config definition line
-		table.insert(texts, {xPos - (VehicleSort.bgW / 2) + VehicleSort.tPos.columnWidth, yPos, size, clr, state}); --config value
+		table.insert(texts, {xPos - (VehicleSort.bgW / 2) + (VehicleSort.tPos.columnWidth * 2), yPos, size, clr, state}); --config value
 		yPos = yPos - size - VehicleSort.tPos.spacing;
 	end
   
@@ -557,7 +564,7 @@ function VehicleSort:drawList()
    
   --VehicleSort:dp(vehList, 'drawList', 'vehList');
   
-  local cnt = #VehicleSort.Sorted;
+	local cnt = #VehicleSort.Sorted;
 	if cnt == 0 then
 		return;
 	end
@@ -566,7 +573,6 @@ function VehicleSort:drawList()
 	local yPos = VehicleSort.tPos.y;
 	local bgPosY = yPos; 
 	local size = VehicleSort.getTextSize();
-	--local y = yPos + size + VehicleSort.tPos.spacing + VehicleSort.tPos.yOffset;
 	local y = VehicleSort.tPos.y;
 	local txt = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_title;
 	local texts = {};
@@ -574,7 +580,6 @@ function VehicleSort:drawList()
 	local minBgW = 0;
 	VehicleSort.bgY = y - VehicleSort.tPos.spacing;
 	VehicleSort.bgW = getTextWidth(size, txt) + VehicleSort.tPos.padSides;		--Background width will be dynamically adjusted later on. Just a value to get started with
-	--VehicleSort.bgW = 0.25;
   
 	-- We render the heading seperately to have it centered, despite the user config for the list
 	local headingY = VehicleSort.tPos.y + size + (VehicleSort.tPos.padHeight * 6);
@@ -592,52 +597,61 @@ function VehicleSort:drawList()
 		setTextAlignment(VehicleSort.tPos.alignmentC);
 	end
  
-  --Just used to figure out if we'll have multiple columns, hence we've to loop through the amount of vehicles to get the total height of the table
-  local chk = yPos + size + VehicleSort.tPos.spacing;
-
+	--Just used to figure out if we'll have multiple columns, hence we've to loop through the amount of vehicles to get the total height of the table
+	--This assumes that there is just one line/vehicle. But it's a rough guess though
+	local chk = yPos + size + VehicleSort.tPos.spacing;
+	local chkColNum = 1;
+	
+	--Min distance to the bottom of the screen
+	local minY = ((4 * (size + VehicleSort.tPos.spacing)) + VehicleSort.tPos.padHeight);
+	
 	for i = 1, cnt do --loop through lines to see if there will be multiple columns needed
 		if not VehicleSort:isHidden(VehicleSort.Sorted[i]) then
 			chk = chk - size - VehicleSort.tPos.spacing;
+			if chk < minY then
+				chkColNum = chkColNum + 1;
+				chk = yPos + size + VehicleSort.tPos.spacing;	--For a new colum we've to reset this
+			end
 		end
 	end
 
-	--Min distance to the bottom of the screen
-	local minY = ((4 * (size + VehicleSort.tPos.spacing)) + VehicleSort.tPos.padHeight);
-	local isMultiCol = chk < minY;
 	local colNum = 1;			--For multiple columns this counter gets increased
 	--VehicleSort:dp(string.format('chk {%f} | check for chk {%f} | minY {%f}', chk, size + VehicleSort.tPos.spacing + VehicleSort.tPos.padHeight, minY));
+	--VehicleSort:dp(string.format('minY {%s} - chk {%s} - chkColNum {%s}', minY, chk, chkColNum));
+	
+	-- Calc our maxTxtW based on the expected number of columns.
+	--As we support just three columns we do the calc based on 3. In case we don't show a infobox we can add the space of one additional column
+	local maxTxtW = 0;
+	if VehicleSort.config[16][2] then
+		maxTxtW = (VehicleSort.tPos.columnWidth - VehicleSort.tPos.padSides) * (3 / chkColNum);
+	else
+		maxTxtW = (VehicleSort.tPos.columnWidth - VehicleSort.tPos.padSides) * (3 / chkColNum) + VehicleSort.tPos.columnWidth;
+	end
+	
+	--VehicleSort:dp(string.format('columnWidth {%s} - maxTxtW {%s} - chkColNum {%s}', VehicleSort.tPos.columnWidth, maxTxtW, chkColNum));
 	
 	for i = 1, cnt do
 		local realId = VehicleSort.Sorted[i];
 		if not VehicleSort:isHidden(realId) then
 
 			local clr = VehicleSort:getTextColor(i, realId);
-			local t = VehicleSort:getFullVehicleName(realId);
-			txt = table.concat(t);
-			local w = getTextWidth(size, txt);
-			local lns = {};
-			local ind = #t;
-			local ln = t[ind];
-			while (w >= VehicleSort.maxTxtW) and ind > 0 do -- wrap text wider than the column to additional lines if multi-column
-				if getTextWidth(size, ln) >= VehicleSort.maxTxtW then
-					table.insert(lns, 1, ln);
-					ln = t[ind - 1];
-				else
-					if ind > 1 then
-						if getTextWidth(size, t[ind - 1] .. ln) >= VehicleSort.maxTxtW then
-							table.insert(lns, 1, ln);
-							ln = t[ind - 1];
-						else
-							ln = t[ind - 1] .. ln;
-						end
-					else
-						table.insert(lns, 1, ln);
+			local fullNameTable = VehicleSort:getFullVehicleName(realId);
+			txt = table.concat(fullNameTable);
+
+			-- Check if the line is not longer as our max txtLength, otherwise split it up to multiple lines
+			-- We don't have to care about the MaxNumImplements anymore, as we already consider that in getFullVehicleName
+			local multiLine = {};
+			if getTextWidth(size, txt) > maxTxtW then
+				while #fullNameTable > 0 do
+					local line = ''
+					while (fullNameTable[1] ~= nil) and (getTextWidth(size, line) < maxTxtW) do
+						line = line .. fullNameTable[1];
+						table.remove(fullNameTable, 1);
 					end
+					table.insert(multiLine, line);
 				end
-				table.remove(t, ind);
-				ind = #t;
-				txt = table.concat(t);
-				w = getTextWidth(size, txt);
+				-- Otherwise we add the lines twice
+				txt = '';
 			end
 			
 			bold = VehicleSort:isControlled(realId) and (not g_currentMission.missionDynamicInfo.isMultiplayer or VehicleSort:getControllerName(realId) == g_gameSettings.nickname);
@@ -645,11 +659,14 @@ function VehicleSort:drawList()
 			if string.len(txt) > 0 then
 				table.insert(texts, {colNum, yPos, size, bold, clr, txt});
 				yPos = yPos - size - VehicleSort.tPos.spacing;
+				
+				-- To find our proper background width and the position of the columns we've to keep track of the longest text
+				VehicleSort.bgW = math.max(VehicleSort.bgW, getTextWidth(size, txt) + VehicleSort.tPos.padSides);
 			end
-			-- To find our proper background width and the position of the columns we've to keep track of the longest text
-			VehicleSort.bgW = math.max(VehicleSort.bgW, w + VehicleSort.tPos.padSides);
-			if #lns > 0 then -- add any wrapped lines to the text table
-				for k, v in ipairs(lns) do
+			
+			-- And for multiline entries we've to add multiple entries to our texts table
+			if #multiLine > 0 then
+				for k, v in ipairs(multiLine) do
 					if string.len(v) > 0 then
 						table.insert(texts, {colNum, yPos, size, bold, clr, v});
 						yPos = yPos - size - VehicleSort.tPos.spacing;
@@ -657,6 +674,8 @@ function VehicleSort:drawList()
 					end
 				end
 			end
+		
+			
 			-- We don't want our background go further than necessary
 			bgPosY = math.min(bgPosY, yPos);
 		end
@@ -763,15 +782,34 @@ function VehicleSort:getVehImplements(realId)
 	end
 end
 
-function VehicleSort:getAttachment(obj)
+-- We can't use getFullName for Attachments as that's causing lua callstacks once CP or a helper is used
+-- Hence we build our own full name with the help of the store & brand manager
+function VehicleSort:getAttachmentName(obj)
 	local val = '';
 	if VehicleSort.config[3][2] then
-		val = val .. string.format('%s', obj:getFullName());
+		local brand = VehicleSort:getAttachmentBrand(obj);
+		if brand ~= nil then
+			val = val .. string.format('%s %s', brand, obj:getName());
+		else
+			val = val .. string.format('%s ', obj:getName());
+		end
 	else
 		val = val .. string.format('%s', obj:getName());
 	end
-  
+	--VehicleSort:dp(string.format('val = {%s}', val), getAttachmentName);
 	return val;
+end
+
+function VehicleSort:getAttachmentBrand(obj)
+    local storeItem = g_storeManager:getItemByXMLFilename(obj.configFileName);
+    if storeItem ~= nil then
+        local brand = g_brandManager:getBrandByIndex(storeItem.brandIndex);
+        if brand ~= nil then
+            return brand.title;
+		else
+			return 'Lizard';
+        end
+    end
 end
 
 function VehicleSort:getFillLevel(obj)
@@ -875,10 +913,11 @@ function VehicleSort:getFullVehicleName(realId)
 				if i > 1 then
 					linkWord = "&";
 				end
-				table.insert(ret, string.format('%s %s%s ', linkWord, VehicleSort:getAttachment(imp.object), VehicleSort:getFillDisplay(imp.object)));		
+				table.insert(ret, string.format('%s %s%s ', linkWord, VehicleSort:getAttachmentName(imp.object), VehicleSort:getFillDisplay(imp.object)));		
 			end
 		end
 	end
+
 	return ret;
 end
 
@@ -959,9 +998,9 @@ function VehicleSort:reshuffleVehicles(list)
 	return newList;
 end
 
-function VehicleSort:getTextColor(ind, realId)
+function VehicleSort:getTextColor(index, realId)
 	--VehicleSort:dp(veh, 'getTextColor');
-	if ind == VehicleSort.selectedIndex then
+	if index == VehicleSort.selectedIndex then
 		if VehicleSort.selectedLock then
 			return VehicleSort.tColor.locked;
 		else
@@ -975,12 +1014,17 @@ function VehicleSort:getTextColor(ind, realId)
 		return VehicleSort.tColor.hired;
 	elseif VehicleStatus:getIsMotorStarted(g_currentMission.vehicles[realId]) then
 		return VehicleSort.tColor.motorOn;
--- FollowMe is not out there yet
+--  FollowMe is not out there yet
 --  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
 --	return VehicleSort.tColor.followme
-  else
-    return VehicleSort.tColor.standard;
-  end
+	else
+		-- TBD lets try two different colors
+		if index % 2 == 0 then
+			return VehicleSort.tColor.standard;
+		else
+			return VehicleSort.tColor.standard2;
+		end
+	end
 end
 
 function VehicleSort:getTextSize()
@@ -1064,7 +1108,8 @@ function VehicleSort:initVS()
   VehicleSort.tPos.spacing = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY;  -- Spacing between lines, originally hardcoded 0.005
   VehicleSort.tPos.padHeight = VehicleSort.tPos.spacing;
   VehicleSort.tPos.padSides = VehicleSort.tPos.padHeight;
-  VehicleSort.tPos.columnWidth = (((1 - VehicleSort.tPos.x) / 2) - VehicleSort.tPos.padSides);
+  --VehicleSort.tPos.columnWidth = (((1 - VehicleSort.tPos.x) / 2) );
+  VehicleSort.tPos.columnWidth = 1 / 5;				--Max 3 columns for vehicles, and one left/right for spacing
   VehicleSort.tPos.alignmentL = RenderText.ALIGN_LEFT;  -- Text Alignment
   VehicleSort.tPos.alignmentC = RenderText.ALIGN_CENTER;  -- Text Alignment
   VehicleSort.tPos.alignmentR = RenderText.ALIGN_RIGHT;  -- Text Alignment
@@ -1087,7 +1132,6 @@ function VehicleSort:initVS()
   VehicleSort.xmlFilename = VehicleSort.savePath .. 'VeExConfig.xml';
   VehicleSort.bg = createImageOverlay('dataS2/menu/blank.png'); --credit: Decker_MMIV, VehicleGroupsSwitcher mod
   VehicleSort.bgX = 0.5;
-  VehicleSort.maxTxtW = VehicleSort.tPos.columnWidth - VehicleSort.tPos.padSides;
   
   VehicleSort:dp(string.format('Initialized userPath [%s] saveBasePath [%s] savePath [%s]',
     tostring(VehicleSort.userPath),
@@ -1564,9 +1608,27 @@ function VehicleSort:getInfoTexts(realId)
 			doSpacing = false;
 		end
 		
+		if (not VehicleSort:isTrain(realId)) or (not VehicleSort:isCrane(realId)) then
+			-- Diesel & DEF FillLevel
+			local level, capacity = VehicleStatus:getDieselLevel(realId)
+			if level ~= nil and capacity ~= nil then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.diesel .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.liter;
+				table.insert(texts, line);
+			end
+			
+			local level, capacity = VehicleStatus:getDefLevel(realId)
+			if level ~= nil and capacity ~= nil then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.def .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.liter;
+				table.insert(texts, line);
+			end
+		end
+		
 		-- Speed
 		line = g_i18n.modEnvironments[VehicleSort.ModName].texts.speed .. ": " .. VehicleStatus:getSpeedStr(veh);
 		table.insert(texts, line);
+		
+		-- Some spacing
+		table.insert(texts, " ");
 		
 		-- Motor on/TurnedOn, Lights
 		if VehicleStatus:getIsMotorStarted(veh) then
@@ -1606,7 +1668,7 @@ function VehicleSort:getVehImplementsFillInfobox(realId)
 			local imp = implements[i];
 			
 			if imp ~= nil and imp.object ~= nil and (string.len(VehicleSort:getFillDisplay(imp.object)) > 1) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:getFillDisplay(imp.object, true);
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleSort:getFillDisplay(imp.object, true);
 				table.insert(texts, line);
 			end
 		end
@@ -1643,6 +1705,11 @@ function VehicleSort:tabVehicle(backwards)
 	--if #VehicleSort.Sorted == 0 then
 	if #VehicleSort.Sorted == 0 or #VehicleSort.Sorted ~= #VehicleSort:getOrderedVehicles() then
 		VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
+	end
+	
+	-- Show the warning in case we've still no vehicles
+	if #VehicleSort.Sorted == 0 then
+		VehicleSort:showNoVehicles();
 	end
 	
 	if g_currentMission.controlledVehicle == nil then

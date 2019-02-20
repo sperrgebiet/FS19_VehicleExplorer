@@ -67,5 +67,8 @@
 		<text name="enterVehonTeleport"						text="Ins Fahrzeug wechseln beim Teleportieren" />
 		<text name="showImgMaxImp"							text="Max. Bilder von Anbaugeräten" />
 		<text name="showInfoMaxImpl"						text="Max. Anzahl von Anbaugeräten in Infobox" />
+		<text name="diesel"									text="Diesel" />
+		<text name="def"									text="ADBlue" />	
+		<text name="liter"									text="Liter" />
 	</texts>
 </l10n>

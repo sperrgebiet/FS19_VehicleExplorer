@@ -66,6 +66,9 @@
 		<text name="integrateTardis"						text="Tardis integration" />
 		<text name="enterVehonTeleport"						text="Enter vehicle after teleportation" />
 		<text name="showImgMaxImp"							text="Max. images of implements" />
-		<text name="showInfoMaxImpl"						text="Max. number of implements in infobox" />		
+		<text name="showInfoMaxImpl"						text="Max. number of implements in infobox" />
+		<text name="diesel"									text="Diesel" />
+		<text name="def"									text="DEF" />
+		<text name="liter"									text="Liter" />
 	</texts>
 </l10n>

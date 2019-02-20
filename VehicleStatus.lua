@@ -205,7 +205,7 @@ function VehicleStatus:getVehImplementsDamage(realId)
 			local imp = implements[i];
 			
 			if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
 				table.insert(texts, line);
 			end
 		end
@@ -246,7 +246,7 @@ function VehicleStatus:getVehImplementsDirt(realId)
 			local imp = implements[i];
 			
 			if (imp ~= nil and imp.object ~= nil and VehicleStatus:getDirtPercForObject(imp.object) ~= nil) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. " (" .. string.gsub(VehicleSort:getAttachment(imp.object), "%s$", "") .. "): " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
 				table.insert(texts, line);
 			end
 		end
@@ -263,6 +263,40 @@ function VehicleStatus:setDirtOnObject(obj, dirt)
 			Washable:setNodeDirtAmount(node, dirt, force);
 		end
 		return true;
+	else
+		return nil;
+	end
+end
+
+function VehicleStatus:getDieselLevel(realId)
+	local veh = g_currentMission.vehicles[realId];
+	if veh.getConsumerFillUnitIndex ~= nil and veh.getFillUnitFillLevel ~= nil then
+		local fuelFillType = veh:getConsumerFillUnitIndex(FillType.DIESEL);
+		local level = veh:getFillUnitFillLevel(fuelFillType);
+		local capacity = veh:getFillUnitCapacity(fuelFillType);
+		--VehicleSort:dp(string.format('level {%s} - capacity {%s}', level, capacity), 'getDieselLevel');
+		if level ~= nil and capacity ~= nil then
+			return math.floor(level), math.floor(capacity);
+		else
+			return nil;
+		end
+	else
+		return nil;
+	end
+end
+
+function VehicleStatus:getDefLevel(realId)
+	local veh = g_currentMission.vehicles[realId];
+	if veh.getConsumerFillUnitIndex ~= nil and veh.getFillUnitFillLevel ~= nil then
+		local fuelFillType = veh:getConsumerFillUnitIndex(FillType.DEF);
+		local level = veh:getFillUnitFillLevel(fuelFillType);
+		local capacity = veh:getFillUnitCapacity(fuelFillType);
+		--VehicleSort:dp(string.format('level {%s} - capacity {%s}', level, capacity), 'getDefLevel');
+		if level ~= nil and capacity ~= nil then
+			return math.floor(level), math.floor(capacity);
+		else
+			return nil;
+		end
 	else
 		return nil;
 	end

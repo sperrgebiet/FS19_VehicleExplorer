@@ -67,5 +67,8 @@
 		<text name="enterVehonTeleport"						text="Entrar en el vehículo después de la teletransportación." />
 		<text name="showImgMaxImp"							text="Máximo imagenes de implementos" />
 		<text name="showInfoMaxImpl"						text="Máximo Número de archivos adjuntos en Infobox" />
+		<text name="diesel"									text="Diesel" />
+		<text name="def"									text="DEF" />
+		<text name="liter"									text="Litro" />
 	</texts>
 </l10n>
