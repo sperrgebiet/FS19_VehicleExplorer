@@ -70,5 +70,6 @@
 		<text name="diesel"									text="Diesel" />
 		<text name="def"									text="DEF" />
 		<text name="liter"									text="Liter" />
+		<text name="useTwoColoredList"						text="Use two alternating colors for the vehicle list" />
 	</texts>
 </l10n>

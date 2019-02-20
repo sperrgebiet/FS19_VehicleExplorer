@@ -43,7 +43,10 @@ Feedback, this readme and additional information incl. source code can be find a
   * Show/hide keybindings in the game F1 help menu (needs a game restart to take affect)
   * Clean vehicle & implements on a repair
 * Tardis integration
-  * TBD - Explanation of Tardis integration
+  * With Tardis (https://github.com/sperrgebiet/FS19_Tardis) you can teleport yourself AND your vehicles to any position on the map
+  * With VehicleExplorer & Tardis you can select a vehicle on the list, and teleport that to any location without entering it. You can also configure
+  if you want to enter the vehicle after teleportation or just drop the vehicle to another location
+  * With Tardis Map Hotspots you can again, select a vehicle and quickly teleport that to one of those hotspots
   
 
 ### Known issues
@@ -58,6 +61,7 @@ Feedback, this readme and additional information incl. source code can be find a
 * A wrong value for horse power is displayed for trains
 * Sometimes selling or resetting a vehicle is causing a flickering of the vehicle list. I've already an idea why, just have to look more into it.
 As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
+* If a train is parked, although this state gets saved, on loading a savegame it's not restored. So the train is tabbable.
 
 ### Incompatible Mods
 * ~~SpeedControl~~
@@ -98,8 +102,8 @@ Mouse Wheel: List up/down
 |Yellow|Engine is running|
 
 ## Note that the current version does NOT support multiplayer!
-Quite frankly, I've no idea about the MP code needed and also no possibility to test it. Actually I think it shouldn't be a big deal, and maybe it already works by just changing
-the MP setting in the moddesc.xml from false to true. I assume just the parking possibility has an impact to MP.
+There were reports that VehicleExplorer does work in MP if you simply change the moddesc.xml. Although I assume not everything works then.
+Anyways, I decided to work on a MP version. Just have no idea yet till when it will be available.
 
 ## Credits
 Primarily to Dschonny & Slivicon. At least those are the names which were mentioned in the FS17 VehicleSort I used as a foundation. But the majority of code has changed anyways.
@@ -108,7 +112,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.0.7 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.1.0 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -156,7 +160,11 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Anzeigen/verstecken der Tastenbelegung im F1 Hilfemenü (benötigt einen Neustart des Spiels)
   * Aktivieren/deaktivieren des automatischen waschen von Fahrzeuge und Anbaugeräte beim Reparieren
 * Tardis Integration
-  * TBD - Explanation of Tardis integration
+  * Mit Tardis (https://github.com/sperrgebiet/FS19_Tardis) kannst du dich selbst UND jedes Fahrzeug an jedgliche Position auf der Karte teleportieren
+  * Mit VehicleExplorer & Tardis kannst du einfach ein Fahrzeug auf der Fahrzeugliste markieren, und dieses teleportieren ohne einzusteigen. Man kann konfigurieren ob
+  man nach dem teleportieren einsteigen möchte oder nicht.
+  * Mit Tardis Hotspots kann man einfach und schnell Fahrzeuge an eine vorher definierte Position teleportieren.
+
 
 ### Bekannte Probleme
 * Wenn man auch die Tastaturbelegung verändern kann, so sind die Mausaktionen im Moment nicht veränderbar
@@ -170,6 +178,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 * Bei Zügen wird die Leistung/PS falsch berechnet
 * Manchmal verursacht das verkaufen oder zurücksetzen eines Fahrzeuges ein flackern der Fahrzeugliste. Ich hab auch schon eine Idee warum, muss mich nur mehr damit beschäftigen.
 Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
+* Ist ein Zug geparkt, wird dieser Status zwar gespeichert, beim Laden des Spielstandes wird der Zug jedoch nicht wieder "geparkt".
 
 ### Inkompatible Mods
 * ~~SpeedControl~~
@@ -210,8 +219,8 @@ Mausrad: Liste rauf/runterscrollen
 |Gelb|Motor is ein|
 
 ## Beachte, dass die jetzige Version kein Multiplayer unterstützt!
-Ehrlich gesagt habe ich keine Ahnung was für MP Code notwendig wäre und auch keine Möglichkeit es zu testen. Vielleicht funktioniert es einfach nur in de moddesc.xml von false auf true zu wechseln.
-Ich glaube nur das parken von Fahrzeugen sollte einen Einfluss auf MP haben.
+Es wurde bereits berichtet, dass VehicleExplorer sehr wohl in MP funktioniert wenn man jediglich die moddesc.xml ändert. Ob dies die gesamte Funktionalität betrifft glaube ich nicht.
+Ich habe mich mittlerweile dazu entschlosse auch an einer MP Version zu arbeiten. Bis wann diese fertig ist kann ich jedoch nicht sagen.
 
 ## Credits
 Primär an Dschonny & Slivicon. Zumindest waren das die Namen die in der LS17 VehicleSort Version genannt wurden welche als Basis diente. Aber der Grossteil des codes hat sich sowieso verändert.
@@ -219,7 +228,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.0.7 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.1.0 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

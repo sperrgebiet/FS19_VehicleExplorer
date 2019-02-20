@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.0.10";
+VehicleSort.Version = "0.9.1.0";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -38,28 +38,29 @@ VehicleSort.config = {											--Id		-Order in configMenu
   {'bgTrans', VehicleSort.bgTransDef, 17},              		-- 10		17
   {'showSteerableImplements', true, 11},                		-- 11		11
   {'showImplements', true, 9},	                         		-- 12		9
-  {'showHelp', true, 26},                               		-- 13		26
-  {'saveStatus', true, 23},                             		-- 14		23
+  {'showHelp', true, 27},                               		-- 13		27
+  {'saveStatus', true, 24},                             		-- 14		24
   {'showImg', true, 12},                                		-- 15		12
   {'showInfo', true, 14},                               		-- 16		14
-  {'infoStart', VehicleSort.infoYStart, 20},            		-- 17		20
-  {'infoBg', true, 18},                                 		-- 18		18
-  {'imageBg', true, 19},                                		-- 19		19
-  {'listAlignment', VehicleSort.listAlignment, 21},     		-- 20		21
-  {'cleanOnRepair', true, 22},                          		-- 21		22
-  {'integrateTardis', true, 24},                        		-- 22		24
-  {'enterVehonTeleport', true, 25},                     		-- 23		25
+  {'infoStart', VehicleSort.infoYStart, 21},            		-- 17		21
+  {'infoBg', true, 19},                                 		-- 18		19
+  {'imageBg', true, 20},                                		-- 19		20
+  {'listAlignment', VehicleSort.listAlignment, 22},     		-- 20		22
+  {'cleanOnRepair', true, 23},                          		-- 21		23
+  {'integrateTardis', true, 25},                        		-- 22		25
+  {'enterVehonTeleport', true, 26},                     		-- 23		26
   {'showImgMaxImp', VehicleSort.showImgMaxImp, 13},     		-- 24		13
   {'showInfoMaxImpl', VehicleSort.showInfoMaxImpl, 15},			-- 25		15
   {'showImplementsMax', VehicleSort.showImplementsMax, 10},		-- 26		10
+  {'useTwoColoredList', true, 18},								-- 27		18
 };
 
 VehicleSort.tColor = {}; -- text colours
 VehicleSort.tColor.isParked 	= {0.5, 0.5, 0.5, 0.7};   -- grey
 VehicleSort.tColor.locked 		= {1.0, 0.0, 0.0, 1.0};   -- red
 VehicleSort.tColor.selected 	= {0.8879, 0.1878, 0.0037, 1.0}; -- orange
-VehicleSort.tColor.standard 	= {0.995, 0.995, 0.995, 1.0}; -- pretty much white
-VehicleSort.tColor.standard2 	= {0.790, 0.620, 0.440, 1.0}; -- eggcolor
+VehicleSort.tColor.standard 	= {1.0, 1.0, 1.0, 1.0}; -- white
+VehicleSort.tColor.standard2 	= {0.8228, 0.8388, 0.7304, 1.0}; -- eggcolor
 VehicleSort.tColor.hired 		= {0.0, 0.5, 1.0, 1.0}; 	-- blue
 VehicleSort.tColor.followme 	= {0.92, 0.31, 0.69, 1.0}; 	-- light pink
 VehicleSort.tColor.self  		= {0.0, 1.0, 0.0, 1.0}; -- green
@@ -152,6 +153,7 @@ function VehicleSort:onPostLoad(savegame)
 		
 		local isParked = Utils.getNoNil(getXMLBool(xmlFile, key.."#isParked"), false);
 		if isParked then
+			VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
 			self:setIsTabbable(false);
 		end
 		
@@ -1018,11 +1020,14 @@ function VehicleSort:getTextColor(index, realId)
 --  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
 --	return VehicleSort.tColor.followme
 	else
-		-- TBD lets try two different colors
-		if index % 2 == 0 then
-			return VehicleSort.tColor.standard;
+		if VehicleSort.config[27][2] then						--Alterate the list colors if enabled
+			if index % 2 == 0 then
+				return VehicleSort.tColor.standard;
+			else
+				return VehicleSort.tColor.standard2;
+			end
 		else
-			return VehicleSort.tColor.standard2;
+				return VehicleSort.tColor.standard;
 		end
 	end
 end
