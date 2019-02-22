@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.1.0";
+VehicleSort.Version = "0.9.1.2";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -72,7 +72,7 @@ VehicleSort.selectedRealConfigIndex = 1;
 VehicleSort.selectedIndex = 1;
 VehicleSort.selectedLock = false;
 VehicleSort.showConfig = false;
-VehicleSort.showSteerables = false;
+VehicleSort.showVehicles = false;
 VehicleSort.xmlAttrId = '#vsid';
 VehicleSort.xmlAttrOrder = '#vsorder';
 VehicleSort.xmlAttrParked = '#vsparked';
@@ -84,26 +84,29 @@ VehicleSort.orderedConfig = {};							-- It's just nicer to have the config list
 addModEventListener(VehicleSort);
 
 function VehicleSort:dp(val, fun, msg) -- debug mode, write to log
-  if not VehicleSort.debug then
-    return;
-  end
-  if msg == nil then
-    msg = ' ';
-  else
-    msg = string.format(' msg = [%s] ', tostring(msg));
-  end
-  local pre = 'VehicleSort DEBUG:';
-  if type(val) == 'table' then
-    if #val > 0 then
-      print(string.format('%s BEGIN Printing table data: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
-      DebugUtil.printTableRecursively(val, '.', 0, 3);
-      print(string.format('%s END Printing table data: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
-    else
-      print(string.format('%s Table is empty: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
-    end
-  else
-    print(string.format('%s [%s]%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
-  end
+	if not VehicleSort.debug then
+		return;
+	end
+
+	if msg == nil then
+		msg = ' ';
+	else
+		msg = string.format(' msg = [%s] ', tostring(msg));
+	end
+
+	local pre = 'VehicleSort DEBUG:';
+
+	if type(val) == 'table' then
+		--if #val > 0 then
+			print(string.format('%s BEGIN Printing table data: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
+			DebugUtil.printTableRecursively(val, '.', 0, 3);
+			print(string.format('%s END Printing table data: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
+		--else
+		--	print(string.format('%s Table is empty: (%s)%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
+		--end
+	else
+		print(string.format('%s [%s]%s(function = [%s()])', pre, tostring(val), msg, tostring(fun)));
+	end
 end
 
 
@@ -158,12 +161,24 @@ function VehicleSort:onPostLoad(savegame)
 		end
 		
 		--Check to avoid issues after a vehicle reset
-		if VehicleSort.Sorted[orderId] ~= nil then
-			if g_currentMission.vehicles[VehicleSort.Sorted[orderId]]['id'] ~= self.id then
-				VehicleSort:dp('Sync required after vehicle reset');
-				VehicleSort:SyncSorted();
-			end
-		end
+		--ToDo with the implementation of the onDelete this shouldn't be neceesary anymore
+		--if VehicleSort.Sorted[orderId] ~= nil then
+		--	if g_currentMission.vehicles[VehicleSort.Sorted[orderId]]['id'] ~= self.id then
+		--		VehicleSort:dp('Sync required after vehicle reset');
+		--		VehicleSort:SyncSorted();
+		--	end
+		--end
+	end
+end
+
+function VehicleSort:onDelete()
+	VehicleSort:dp(string.format('Going to remove vehicle realId {%d}, userOrder {%d}', Utils.getNoNil(self.spec_vehicleSort.realId, 0), Utils.getNoNil(self.spec_vehicleSort.orderId, 0)));
+	--VehicleSort:dp(self);
+
+	if self.spec_vehicleSort ~= nil then
+		table.remove(VehicleSort.Sorted, self.spec_vehicleSort.orderId);
+		VehicleSort.Sorted = VehicleSort:reshuffleVehicles(VehicleSort.Sorted);
+		VehicleSort:SyncSorted();
 	end
 end
 
@@ -244,7 +259,7 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 end
 
 function VehicleSort.registerEventListeners(vehicleType)
-	local functionNames = {	"onLoad", "onPostLoad", "saveToXMLFile" };
+	local functionNames = {	"onLoad", "onPostLoad", "saveToXMLFile", "onDelete" };
 	
 	for _, functionName in ipairs(functionNames) do
 		SpecializationUtil.registerEventListener(vehicleType, functionName, VehicleSort);
@@ -287,9 +302,9 @@ end
 
 function VehicleSort:draw()
 	
-	--VehicleSort:dp(string.format('showConfig [%s] & showSteerables [%s]', tostring(VehicleSort.showConfig), tostring(VehicleSort.showSteerables)));
+	--VehicleSort:dp(string.format('showConfig [%s] & showVehicles [%s]', tostring(VehicleSort.showConfig), tostring(VehicleSort.showVehicles)));
   
-	if VehicleSort.showConfig or VehicleSort.showSteerables then
+	if VehicleSort.showConfig or VehicleSort.showVehicles then
 		local dbgY = VehicleSort.dbgY;
 		VehicleSort.bgY = nil;
 		VehicleSort.bgW = nil;
@@ -324,8 +339,8 @@ function VehicleSort:action_vsToggleList(actionName, keyStatus, arg3, arg4, arg5
 		end
 	end
 		
-	if VehicleSort.showSteerables and not VehicleSort.showConfig then
-		VehicleSort.showSteerables = false;
+	if VehicleSort.showVehicles and not VehicleSort.showConfig then
+		VehicleSort.showVehicles = false;
 		VehicleSort.selectedLock = false;
 		
 		-- When dirtyState is true it means there was a resort going on, hence we save the ordered list back to g_currentMission.vehicles to have a proper 'tab'-order
@@ -334,7 +349,7 @@ function VehicleSort:action_vsToggleList(actionName, keyStatus, arg3, arg4, arg5
 			-- VehicleSort:SyncSortedWithGame();
 		end
 	else
-		VehicleSort.showSteerables = true;
+		VehicleSort.showVehicles = true;
 		if VehicleSort.showConfig then
 			VehicleSort.saveConfig();
 		end
@@ -344,7 +359,7 @@ end
 
 function VehicleSort:action_vsLockListItem(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("vsLockListItem fires", "vsLockListItem");
-	if VehicleSort.showSteerables then
+	if VehicleSort.showVehicles then
 		if not VehicleSort.selectedLock and VehicleSort.selectedIndex > 0 then
 			VehicleSort.selectedLock = true;
 		elseif VehicleSort.selectedLock then
@@ -374,7 +389,7 @@ end
 
 function VehicleSort:action_vsMoveCursorUp(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsMoveCursorUp fires", "action_vsMoveCursorUp");
-	if VehicleSort.showSteerables then
+	if VehicleSort.showVehicles then
 		if Input.isKeyPressed(KEY_lalt) then
 			VehicleSort:moveUp(3);
 		else
@@ -387,7 +402,7 @@ end
 
 function VehicleSort:action_vsMoveCursorDown(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsMoveCursorDown fires", "action_vsMoveCursorDown");
-	if VehicleSort.showSteerables then
+	if VehicleSort.showVehicles then
 		VehicleSort:moveDown(1);
 	elseif VehicleSort.showConfig then
 		VehicleSort:moveConfigDown();
@@ -396,21 +411,21 @@ end
 
 function VehicleSort:action_vsMoveCursorUpFast(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsMoveCursorUpFast fires", "action_vsMoveCursorUpFast");
-	if VehicleSort.showSteerables then 
+	if VehicleSort.showVehicles then 
 		VehicleSort:moveUp(3);
 	end	
 end
 
 function VehicleSort:action_vsMoveCursorDownFast(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsMoveCursorDownFast fires", "action_vsMoveCursorDownFast");
-	if VehicleSort.showSteerables then 
+	if VehicleSort.showVehicles then 
 		VehicleSort:moveDown(3);
 	end	
 end
 
 function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsChangeVehicle fires", "action_vsChangeVehicle");
-	if VehicleSort.showSteerables then
+	if VehicleSort.showVehicles then
 		local realVeh = g_currentMission.vehicles[VehicleSort.Sorted[VehicleSort.selectedIndex]];
 		if not realVeh:getIsControlled() then
 
@@ -430,8 +445,8 @@ end
 
 function VehicleSort:action_vsShowConfig(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsShowConfig fires", "action_vsShowConfig");
-	if VehicleSort.showSteerables and not VehicleSort.showConfig then
-      VehicleSort.showSteerables = false;
+	if VehicleSort.showVehicles and not VehicleSort.showConfig then
+      VehicleSort.showVehicles = false;
 	end
     
 	VehicleSort.showConfig = not VehicleSort.showConfig;
@@ -440,14 +455,14 @@ end
 
 function VehicleSort:action_vsTogglePark(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp("action_vsTogglePark fires", "action_vsTogglePark");
-	if VehicleSort.showSteerables then
+	if VehicleSort.showVehicles then
 		VehicleSort:toggleParkState(VehicleSort.selectedIndex);
 	end
 end
 
 function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
-	VehicleSort:dp(string.format('action_vsRepair fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsRepair");
-	if VehicleSort.showSteerables then
+	VehicleSort:dp(string.format('action_vsRepair fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsRepair");
+	if VehicleSort.showVehicles then
 	
 		local infoText = "";
 		VehicleStatus:RepairVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
@@ -464,12 +479,12 @@ function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
 end
 
 function VehicleSort:action_vsTab(actionName, keyStatus, arg3, arg4, arg5)
-	VehicleSort:dp(string.format('action_vsTab fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsTab");
+	VehicleSort:dp(string.format('action_vsTab fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsTab");
 	VehicleSort:tabVehicle();
 end
 
 function VehicleSort:action_vsTabBack(actionName, keyStatus, arg3, arg4, arg5)
-	VehicleSort:dp(string.format('action_vsTabBack fires - VehicleSort.showSteerables {%s}', tostring(VehicleSort.showSteerables)), "action_vsTabBack");
+	VehicleSort:dp(string.format('action_vsTabBack fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsTabBack");
 	VehicleSort:tabVehicle(true);
 end
 
@@ -560,7 +575,7 @@ function VehicleSort:drawList()
    
    if VehicleSort.HiddenCount == #VehicleSort.Sorted then
 		VehicleSort:showNoVehicles();
-		VehicleSort.showSteerables = false;
+		VehicleSort.showVehicles = false;
 		return false;
    end
    
@@ -754,9 +769,11 @@ function VehicleSort:getVehicles()
 	local veh = {}
 	
 	for k, v in ipairs(allveh) do
-		if v.spec_vehicleSort ~= nil then
-			v.spec_vehicleSort.realId = k;
-			table.insert(veh, v);
+		if not v.isDeleted then
+			if v.spec_vehicleSort ~= nil then
+				v.spec_vehicleSort.realId = k;
+				table.insert(veh, v);
+			end
 		end
 	end
 	return veh;
@@ -947,6 +964,12 @@ function VehicleSort:getOrderedVehicles()
 	VehicleSort.HiddenCount = 0;
 	local vehList = VehicleSort:getVehicles();
   
+	-- We don't want to do everything all the time
+	if #VehicleSort.Sorted == #vehList then
+		VehicleSort:dp("Sorted list seems to be up to date. No need to redo everything", "getOrderedVehicles");
+		return VehicleSort.Sorted;
+	end
+  
 	for _, veh in pairs(vehList) do
 		if veh.spec_vehicleSort.orderId ~= nil then
 			table.insert(orderedToOrder, {orderId=veh.spec_vehicleSort.orderId, realId=veh.spec_vehicleSort.realId} );
@@ -981,20 +1004,21 @@ function VehicleSort:getOrderedVehicles()
 		ordered = VehicleSort:reshuffleVehicles(ordered);
 	end
 	
-	VehicleSort:SyncSorted();
+	--VehicleSort:SyncSorted();
 	return ordered;
 
 end
 
 function VehicleSort:reshuffleVehicles(list)
 	local newList = {};
-	local i = 1;
-	for k, v in ipairs(list) do
+	--local i = 1;
+	for _, v in ipairs(list) do
 		table.insert(newList, v);
-		if k ~= i then
-			g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
-		end
-		i = i + 1;
+		--ToDo: SyncSorted should do that
+		--g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
+		--g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
+		--g_currentMission.vehicles[v]['spec_vehicleSort']['id'] = g_currentMission.vehicles[v]['id'];
+		--i = i + 1;
 	end
 
 	return newList;
@@ -1145,7 +1169,9 @@ function VehicleSort:initVS()
 end
 
 function VehicleSort:isCrane(realId)
-	return g_currentMission.vehicles[realId]['typeName'] == 'crane';
+	if g_currentMission.vehicles[realId] ~= nil then
+		return g_currentMission.vehicles[realId]['typeName'] == 'crane';
+	end
 end
 
 function VehicleSort:isHidden(realId)
@@ -1154,11 +1180,15 @@ end
 
 function VehicleSort:isTrain(realId)
 	--VehicleSort:dp(string.format('realId {%d}', realId), 'isTrain');
-	return g_currentMission.vehicles[realId]['typeName'] == 'locomotive';
+	if g_currentMission.vehicles[realId] ~= nil then
+		return g_currentMission.vehicles[realId]['typeName'] == 'locomotive';
+	end
 end
 
 function VehicleSort:isSteerableImplement(realId)
-	return g_currentMission.vehicles[realId]['spec_attachable'] ~= nil;
+	if g_currentMission.vehicles[realId] ~= nil then
+		return g_currentMission.vehicles[realId]['spec_attachable'] ~= nil;
+	end
 end
 
 function VehicleSort:isControlled(realId)
@@ -1308,17 +1338,20 @@ function VehicleSort:SyncSorted()
 	for k, v in ipairs(VehicleSort.Sorted) do
 		if g_currentMission.vehicles[v] ~= nil then
 			if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
-				if g_currentMission.vehicles[v]['spec_vehicleSort']['id'] ~= g_currentMission.vehicles[v]['id'] then
-					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = nil;
-				else
-					g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
-					g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
-				end
+				g_currentMission.vehicles[v]['spec_vehicleSort']['id'] = g_currentMission.vehicles[v]['id'];
+				g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
+				g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
 			end
 		else
 			-- When there is o vehicle, we can actually drop that entry
-			table.remove(VehicleSort.Sorted, k);
+			-- ToDo: that would screw up our list ordering. And it shouldn't happen anyways
+			--table.remove(VehicleSort.Sorted, k);
 		end
+	end
+	
+	-- After selling or resetting vehicles our selectedIndex could point to an non existing vehicle, so better to reset it then
+	if g_currentMission.vehicles[VehicleSort.selectedIndex] == nil then
+		VehicleSort.selectedIndex = 1;
 	end
 end
 
@@ -1387,7 +1420,7 @@ function VehicleSort:saveConfig()
 end
 
 function VehicleSort:drawStoreImage(realId)
-	if not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
+	if g_currentMission.vehicles[realId] ~= nil and not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
 		local imgFileName = VehicleSort:getStoreImageByConf(g_currentMission.vehicles[realId]['configFileName']);
 		--VehicleSort:dp(string.format('configFileName {%s}', configFileName));
 		--VehicleSort:dp(storeItem, 'drawStoreImage');
@@ -1683,9 +1716,10 @@ function VehicleSort:getVehImplementsFillInfobox(realId)
 end
 
 function VehicleSort:isActionAllowed()
-	if g_currentMission.inGameMenu.isOpen or g_currentMission.shopMenu.isOpen then
+	-- We don't want to accidently switch vehicle when the vehicle list is opened and we change to a menu
+	if string.len(g_gui.currentGuiName) > 0 or #g_gui.dialogs > 0 then
 		return false;
-	elseif VehicleSort.showConfig or VehicleSort.showSteerables then
+	elseif VehicleSort.showConfig or VehicleSort.showVehicles then
 		return true;
 	end
 end
@@ -1767,20 +1801,20 @@ end
 -- This is required to block the camera zoom & handtool selection while drawlist or drawconfig is open
 --
 function VehicleSort.onInputCycleHandTool(self, superFunc, _, _, direction)
-	if not VehicleSort.showSteerables and not VehicleSort.showConfig then
+	if not VehicleSort.showVehicles and not VehicleSort.showConfig then
 		superFunc(self, _, _, direction);
 	end
 end
 
 function VehicleSort.zoomSmoothly(self, superFunc, offset)
-	if not VehicleSort.showConfig and not VehicleSort.showSteerables then -- don't zoom camera when mouse wheel is used to scroll displayed list
+	if not VehicleSort.showConfig and not VehicleSort.showVehicles then -- don't zoom camera when mouse wheel is used to scroll displayed list
 		superFunc(self, offset);
 	end
 end
 
 -- I think it's convinient to have the moveup/down fast keys on KEY_1 and KEY_2, but that conflicts with the cruisecontrol
 function VehicleSort.setCruiseControlMaxSpeed(self, superFunc, speed)
-	if not VehicleSort.showConfig and not VehicleSort.showSteerables then
+	if not VehicleSort.showConfig and not VehicleSort.showVehicles then
 		superFunc(self, speed);
 	end
 end

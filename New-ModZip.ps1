@@ -33,13 +33,21 @@ if($srcPath.Length -gt 0 -and $dstPath.Length -gt 0)
         }
     }
 
-    Compress-Archive -Path (Join-Path $tmpPath "\*") -DestinationPath (Join-Path $dstPath $dstFilename)
-
-    Remove-Item -Path $tmpPath -Recurse -Force
+    ##Compress-Archive -Path (Join-Path $tmpPath "\*") -DestinationPath (Join-Path $dstPath $dstFilename) -CompressionLevel Fastest
+	#Add-Type -Assembly "System.IO.Compression.FileSystem" ;
+	#[System.IO.Compression.ZipFile]::CreateFromDirectory($tmpPath, (Join-Path $dstPath $dstFilename), [System.IO.Compression.CompressionLevel]::Optimal, $false);
+    # For some reason neither PS nor the .NET libraries create an archive suitable for FS19. the translations folder is included, but not used by the Giants engine
+	# Switching to a quick and dirty Winrar solution for now
+	$binary = "C:\Program Files\winrar\WinRAR.exe"
+    $folder = Join-Path $tmpPath "\*"
+    $file = Join-Path $dstPath $dstFilename
+	$rarargs = @("a", "-afzip -ep1 -r", "`"$file`"", "`"$($folder)`"" )
+	Start-Process -FilePath $binary -ArgumentList $rarargs -Wait
+	Remove-Item -Path $tmpPath -Recurse -Force
 }
 
 
 # Install-Module -Name MarkdownToHtml
-Import-Module MarkdownToHtml
+#Import-Module MarkdownToHtml
 
-ConvertFrom-Markdown -MarkdownContent (Get-Content README.md) | Out-File .\test.html 
+#ConvertFrom-Markdown -MarkdownContent (Get-Content README.md) | Out-File .\test.html 
