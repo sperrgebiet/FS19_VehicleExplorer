@@ -41,7 +41,7 @@
 		<text name="vs_off"									text="Aus" />
 		<text name="vs_train"								text="Zug" />
 		<text name="vs_crane"								text="Zug-Kran" />
-		<text name="vs_implement"							text="Geräte" />
+		<text name="vs_implement"							text="Anbaugeräte" />
 		<text name="hired"									text="H" />
 		<text name="courseplay"								text="CP" />
 		<text name="followme"								text="FM" />
@@ -71,5 +71,9 @@
 		<text name="def"									text="ADBlue" />	
 		<text name="liter"									text="Liter" />
 		<text name="useTwoColoredList"						text="Verwende zwei abwechselnde Farben für die Fahrzeugliste" />
+		<text name="isLowered"								text="Abgesenkt" />
+		<text name="turnedOnImplement"						text="Eingeschaltet" />
+		<text name="yes"									text="Ja" />
+		<text name="no"										text="Nein" />
 	</texts>
 </l10n>

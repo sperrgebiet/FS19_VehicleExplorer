@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.1.0";
+VehicleStatus.Version = "0.9.2.0";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -205,7 +205,7 @@ function VehicleStatus:getVehImplementsDamage(realId)
 			local imp = implements[i];
 			
 			if (imp ~= nil and imp.object ~= nil and imp.object.getVehicleDamage ~= nil) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
+				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. ": " .. VehicleSort:calcPercentage(imp.object:getVehicleDamage(), 1) .. " %";
 				table.insert(texts, line);
 			end
 		end
@@ -246,7 +246,7 @@ function VehicleStatus:getVehImplementsDirt(realId)
 			local imp = implements[i];
 			
 			if (imp ~= nil and imp.object ~= nil and VehicleStatus:getDirtPercForObject(imp.object) ~= nil) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
+				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. ": " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
 				table.insert(texts, line);
 			end
 		end
@@ -299,5 +299,35 @@ function VehicleStatus:getDefLevel(realId)
 		end
 	else
 		return nil;
+	end
+end
+
+function VehicleStatus:getImplementStatus(realId)
+	local impStatus = {};
+	local implements = VehicleSort:getVehImplements(realId);
+	if implements ~= nil then
+		for i = 1, #implements do
+			local imp = implements[i];
+			if imp ~= nil and imp.object ~= nil then
+				if imp.object.typeName ~= 'attachableFrontloader' then
+					local isTurnedOn = nil;
+					local isLowered = nil;
+					
+					if imp.object.getIsTurnedOn then
+						isTurnedOn = imp.object:getIsTurnedOn();
+					end
+					if imp.object.getIsLowered then
+						isLowered = imp.object:getIsLowered();
+					end
+					
+					local entry = {jointDescIndex = imp.object.jointDescIndex, isTurnedOn = isTurnedOn, isLowered = isLowered, name = VehicleSort:getAttachmentName(imp.object)};
+					table.insert(impStatus, entry);
+				end
+			end
+		end
+	end
+	
+	if #impStatus > 0 then
+		return impStatus;
 	end
 end

@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.1.2";
+VehicleSort.Version = "0.9.2.0";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -147,10 +147,9 @@ function VehicleSort:onPostLoad(savegame)
 		end
 		
 		if self.spec_vehicleSort ~= nil then
-			local specVS = self.spec_vehicleSort;
-			specVS.id = self.id;
+			self.spec_vehicleSort.id = self.id;
 			if orderId ~= nil then
-				specVS.orderId = orderId;
+				self.spec_vehicleSort.orderId = orderId;
 			end
 		end
 		
@@ -159,15 +158,6 @@ function VehicleSort:onPostLoad(savegame)
 			VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
 			self:setIsTabbable(false);
 		end
-		
-		--Check to avoid issues after a vehicle reset
-		--ToDo with the implementation of the onDelete this shouldn't be neceesary anymore
-		--if VehicleSort.Sorted[orderId] ~= nil then
-		--	if g_currentMission.vehicles[VehicleSort.Sorted[orderId]]['id'] ~= self.id then
-		--		VehicleSort:dp('Sync required after vehicle reset');
-		--		VehicleSort:SyncSorted();
-		--	end
-		--end
 	end
 end
 
@@ -177,84 +167,38 @@ function VehicleSort:onDelete()
 
 	if self.spec_vehicleSort ~= nil then
 		table.remove(VehicleSort.Sorted, self.spec_vehicleSort.orderId);
-		VehicleSort.Sorted = VehicleSort:reshuffleVehicles(VehicleSort.Sorted);
-		VehicleSort:SyncSorted();
+		--We've to build the list again, as we've new realId's after a vehicle got removed
+		VehicleSort.dirtyState = true;
+		VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
+		--VehicleSort:SyncSorted();
 	end
 end
 
 function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsToggleList',self, VehicleSort.action_vsToggleList ,false ,true ,false ,true)
-	if result then
-		table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
+	local actions = {
+					"vsToggleList",
+					"vsLockListItem",
+					"vsMoveCursorUp",
+					"vsMoveCursorDown",
+					"vsMoveCursorUpFast",
+					"vsMoveCursorDownFast",
+					"vsChangeVehicle",
+					"vsShowConfig",
+					"vsTogglePark",
+					"vsRepair",
+					"vsTab",
+					"vsTabBack"
+				};
 
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsLockListItem',self, VehicleSort.action_vsLockListItem ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorUp',self, VehicleSort.action_vsMoveCursorUp ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorDown',self, VehicleSort.action_vsMoveCursorDown ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorUpFast',self, VehicleSort.action_vsMoveCursorUpFast ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsMoveCursorDownFast',self, VehicleSort.action_vsMoveCursorDownFast ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsChangeVehicle',self, VehicleSort.action_vsChangeVehicle ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsShowConfig',self, VehicleSort.action_vsShowConfig ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end	
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTogglePark',self, VehicleSort.action_vsTogglePark ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end	
-
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsRepair',self, VehicleSort.action_vsRepair ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTab',self, VehicleSort.action_vsTab ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
-	
-	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'vsTabBack',self, VehicleSort.action_vsTabBack ,false ,true ,false ,true)
-	if result then
-        table.insert(VehicleSort.eventName, eventName);
-		g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
-    end
+	for _, action in pairs(actions) do
+		local actionMethod = string.format("action_%s", action);
+		local result, eventName = InputBinding.registerActionEvent(g_inputBinding, action, self, VehicleSort[actionMethod], false, true, false, true)
+		if result then
+			table.insert(Tardis.eventName, eventName);
+			g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
+		end
+	end
 	
 end
 
@@ -342,12 +286,6 @@ function VehicleSort:action_vsToggleList(actionName, keyStatus, arg3, arg4, arg5
 	if VehicleSort.showVehicles and not VehicleSort.showConfig then
 		VehicleSort.showVehicles = false;
 		VehicleSort.selectedLock = false;
-		
-		-- When dirtyState is true it means there was a resort going on, hence we save the ordered list back to g_currentMission.vehicles to have a proper 'tab'-order
-		if VehicleSort.dirtyState then
-			-- I don't like to alter g_currentMission.vehicles, as I have no idea what other mods do with it, and actually it doesn't help with the tab order anyways
-			-- VehicleSort:SyncSortedWithGame();
-		end
 	else
 		VehicleSort.showVehicles = true;
 		if VehicleSort.showConfig then
@@ -819,6 +757,7 @@ function VehicleSort:getAttachmentName(obj)
 	return val;
 end
 
+-- Not using :getFullName, as it will throw lua call stacks for not getting the helper name when using CP
 function VehicleSort:getAttachmentBrand(obj)
     local storeItem = g_storeManager:getItemByXMLFilename(obj.configFileName);
     if storeItem ~= nil then
@@ -895,13 +834,12 @@ function VehicleSort:getFullVehicleName(realId)
 		end
 	end
 
-
 	if VehicleSort:isTrain(realId) then
 		nam = nam .. VehicleSort:getName(realId, string.format('%s', g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_train));
 	elseif VehicleSort:isCrane(realId) then
 		nam = nam .. VehicleSort:getName(realId, string.format('%s', g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_crane));
 	elseif VehicleSort.config[3][2] then -- Show brand
-		nam = nam .. string.format('%s', VehicleSort:getNameBrand(realId));
+		nam = nam .. string.format('%s %s', VehicleSort:getBrandName(realId), VehicleSort:getName(realId));
 	else
 	  --VehicleSort:dp(veh.spec_vehicleSort, 'getFullVehicleName', 'Table spec_vehicleSort');
 	  nam = nam .. string.format('%s', VehicleSort:getName(realId));
@@ -952,9 +890,17 @@ function VehicleSort:getName(realId, sFallback)
 	end
 end
 
-function VehicleSort:getNameBrand(realId)
-	--return Utils.getNoNil(getXMLString(obj.xmlFile, 'vehicle.storeData.brand'), 'LIZARD');
-	return g_currentMission.vehicles[realId]:getFullName();
+function VehicleSort:getBrandName(realId)
+	--return g_currentMission.vehicles[realId]:getFullName();		--Problem is that getFullName also returns the helper name.
+	local storeItem = g_storeManager:getItemByXMLFilename(g_currentMission.vehicles[realId].configFileName);
+    if storeItem ~= nil then
+		local brand = g_brandManager:getBrandByIndex(storeItem.brandIndex);
+		if brand ~= nil then
+            return brand.title;
+		else
+			return 'Lizard';
+        end
+    end
 end
 
 function VehicleSort:getOrderedVehicles()
@@ -964,11 +910,13 @@ function VehicleSort:getOrderedVehicles()
 	VehicleSort.HiddenCount = 0;
 	local vehList = VehicleSort:getVehicles();
   
-	-- We don't want to do everything all the time
-	if #VehicleSort.Sorted == #vehList then
-		VehicleSort:dp("Sorted list seems to be up to date. No need to redo everything", "getOrderedVehicles");
+	-- We don't want to do everything all the time, unless we know that something has changed, like after a vehicle got deleted
+	if #VehicleSort.Sorted == #vehList and not VehicleSort.dirtyState then
+		--VehicleSort:dp("Sorted list seems to be up to date. No need to redo everything", "getOrderedVehicles");
 		return VehicleSort.Sorted;
 	end
+  
+	--VehicleSort:dp("Sorted list seems outdated. So doing the ordering again.", "getOrderedVehicles");
   
 	for _, veh in pairs(vehList) do
 		if veh.spec_vehicleSort.orderId ~= nil then
@@ -1011,16 +959,17 @@ end
 
 function VehicleSort:reshuffleVehicles(list)
 	local newList = {};
-	--local i = 1;
+	local i = 1;
 	for _, v in ipairs(list) do
+		VehicleSort:dp(string.format('Reshuffle vehile: orderId {%d}, realId {%d}', i, v), 'reshuffleVehicles');
 		table.insert(newList, v);
-		--ToDo: SyncSorted should do that
-		--g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
-		--g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
-		--g_currentMission.vehicles[v]['spec_vehicleSort']['id'] = g_currentMission.vehicles[v]['id'];
-		--i = i + 1;
+		g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
+		g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
+		i = i + 1;
 	end
 
+	-- After a reshuffle our list should be in a proper state
+	VehicleSort.dirtyState = false;
 	return newList;
 end
 
@@ -1051,7 +1000,7 @@ function VehicleSort:getTextColor(index, realId)
 				return VehicleSort.tColor.standard2;
 			end
 		else
-				return VehicleSort.tColor.standard;
+			return VehicleSort.tColor.standard;
 		end
 	end
 end
@@ -1092,7 +1041,6 @@ end
 function VehicleSort:getHorsePowerFromStore(realId)
 	VehicleSort:dp(string.format('realId {%s}', tostring(realId)));
 	local confFile = string.lower(g_currentMission.vehicles[realId]['configFileName']);
-	--local storeItem = g_storeManager:getItemByXMLFilename(confFile);
 	storeItem = g_storeManager.xmlFilenameToItem[confFile:lower()];
 	VehicleSort:dp(storeItem);
 	if storeItem ~= nil then
@@ -1118,54 +1066,52 @@ function VehicleSort:getControllerName(realId)
 end
 
 function VehicleSort:initVS()
-  VehicleSort:dp('Start Init', 'VehicleSort:init');
-  if g_dedicatedServerInfo ~= nil then -- Dedicated server does not need the initialization process
-    VehicleSort:dp('Skipping undesired initialization on dedicated server.', 'VehicleSort:init');
-    return;
-  end
-  VehicleSort.dbgX = 0.01;
-  VehicleSort.dbgY = 0.5;
-  VehicleSort.tPos = {};
-  VehicleSort.tPos.x = 0.5;
-  VehicleSort.tPos.center = 0.5;
-  VehicleSort.tPos.y = g_currentMission.inGameMenu.hud.topNotification.origY + g_currentMission.inGameMenu.hud.topNotification.infoOffsetY;  -- y Position of Textfield, originally hardcoded 0.9
-  VehicleSort.tPos.yOffset = g_currentMission.inGameMenu.hud.topNotification.infoOffsetY;  --* 1.5; -- y Position offset for headings, originally hardcoded 0.007
-  VehicleSort.tPos.size = g_currentMission.inGameMenu.hud.topNotification.infoTextSize;  -- TextSize, originally hardcoded 0.018
-  VehicleSort.tPos.sizeBig = VehicleSort.tPos.size + 0.002;
-  VehicleSort.tPos.sizeSmall = VehicleSort.tPos.size - 0.002;
-  VehicleSort.tPos.sizeIncr = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY; -- Text size increase for headings
-  VehicleSort.tPos.spacing = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY;  -- Spacing between lines, originally hardcoded 0.005
-  VehicleSort.tPos.padHeight = VehicleSort.tPos.spacing;
-  VehicleSort.tPos.padSides = VehicleSort.tPos.padHeight;
-  --VehicleSort.tPos.columnWidth = (((1 - VehicleSort.tPos.x) / 2) );
-  VehicleSort.tPos.columnWidth = 1 / 5;				--Max 3 columns for vehicles, and one left/right for spacing
-  VehicleSort.tPos.alignmentL = RenderText.ALIGN_LEFT;  -- Text Alignment
-  VehicleSort.tPos.alignmentC = RenderText.ALIGN_CENTER;  -- Text Alignment
-  VehicleSort.tPos.alignmentR = RenderText.ALIGN_RIGHT;  -- Text Alignment
+	VehicleSort:dp('Start Init', 'VehicleSort:init');
+	if g_dedicatedServerInfo ~= nil then -- Dedicated server does not need the initialization process
+		VehicleSort:dp('Skipping undesired initialization on dedicated server.', 'VehicleSort:init');
+		return;
+	end
+	VehicleSort.dbgX = 0.01;
+	VehicleSort.dbgY = 0.5;
+	VehicleSort.tPos = {};
+	VehicleSort.tPos.x = 0.5;
+	VehicleSort.tPos.center = 0.5;
+	VehicleSort.tPos.y = g_currentMission.inGameMenu.hud.topNotification.origY + g_currentMission.inGameMenu.hud.topNotification.infoOffsetY;  -- y Position of Textfield, originally hardcoded 0.9
+	VehicleSort.tPos.yOffset = g_currentMission.inGameMenu.hud.topNotification.infoOffsetY;  --* 1.5; -- y Position offset for headings, originally hardcoded 0.007
+	VehicleSort.tPos.size = g_currentMission.inGameMenu.hud.topNotification.infoTextSize;  -- TextSize, originally hardcoded 0.018
+	VehicleSort.tPos.sizeBig = VehicleSort.tPos.size + 0.002;
+	VehicleSort.tPos.sizeSmall = VehicleSort.tPos.size - 0.002;
+	VehicleSort.tPos.sizeIncr = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY; -- Text size increase for headings
+	VehicleSort.tPos.spacing = g_currentMission.inGameMenu.hud.speedMeter.cruiseControlTextOffsetY;  -- Spacing between lines, originally hardcoded 0.005
+	VehicleSort.tPos.padHeight = VehicleSort.tPos.spacing;
+	VehicleSort.tPos.padSides = VehicleSort.tPos.padHeight;
+	--VehicleSort.tPos.columnWidth = (((1 - VehicleSort.tPos.x) / 2) );
+	VehicleSort.tPos.columnWidth = 1 / 5;				--Max 3 columns for vehicles, and one left/right for spacing
+	VehicleSort.tPos.alignmentL = RenderText.ALIGN_LEFT;  -- Text Alignment
+	VehicleSort.tPos.alignmentC = RenderText.ALIGN_CENTER;  -- Text Alignment
+	VehicleSort.tPos.alignmentR = RenderText.ALIGN_RIGHT;  -- Text Alignment
+
+	VehicleSort:dp(VehicleSort.tPos, 'VehicleSort:init', 'tPos');
+	VehicleSort.userPath = getUserProfileAppPath();
+	VehicleSort.saveBasePath = VehicleSort.userPath .. 'modsSettings/VehicleExplorer/';
+-- ToDo MP
+	if g_currentMission.missionDynamicInfo.serverAddress ~= nil then --multi-player game and player is not the host (dedi already handled above)
+		VehicleSort.savePath = VehicleSort.saveBasePath .. g_currentMission.missionDynamicInfo.serverAddress .. '/';
+	else
+		VehicleSort.savePath = VehicleSort.saveBasePath .. 'savegame' .. g_careerScreen.selectedIndex .. '/';
+	end
+	
+	createFolder(VehicleSort.userPath .. 'modsSettings/');
+	createFolder(VehicleSort.saveBasePath);
+	createFolder(VehicleSort.savePath);
+	VehicleSort.xmlFilename = VehicleSort.savePath .. 'VeExConfig.xml';
+	VehicleSort.bg = createImageOverlay('dataS2/menu/blank.png'); --credit: Decker_MMIV, VehicleGroupsSwitcher mod
+	VehicleSort.bgX = 0.5;
   
-  if g_seasons ~= nil then
-    VehicleSort:dp('Seasons mod detected. Lowering VehicleSort display to below the seasons weather display to avoid overlap', 'VehicleSort:init');
-    VehicleSort.tPos.y = VehicleSort.tPos.y - (6 * VehicleSort.tPos.size) - (6 * VehicleSort.tPos.spacing);
-  end
-  VehicleSort:dp(VehicleSort.tPos, 'VehicleSort:init', 'tPos');
-  VehicleSort.userPath = getUserProfileAppPath();
-  VehicleSort.saveBasePath = VehicleSort.userPath .. 'modsSettings/VehicleExplorer/';
-  if g_currentMission.missionDynamicInfo.serverAddress ~= nil then --multi-player game and player is not the host (dedi already handled above)
-    VehicleSort.savePath = VehicleSort.saveBasePath .. g_currentMission.missionDynamicInfo.serverAddress .. '/';
-  else
-    VehicleSort.savePath = VehicleSort.saveBasePath .. 'savegame' .. g_careerScreen.selectedIndex .. '/';
-  end
-  createFolder(VehicleSort.userPath .. 'modsSettings/');
-  createFolder(VehicleSort.saveBasePath);
-  createFolder(VehicleSort.savePath);
-  VehicleSort.xmlFilename = VehicleSort.savePath .. 'VeExConfig.xml';
-  VehicleSort.bg = createImageOverlay('dataS2/menu/blank.png'); --credit: Decker_MMIV, VehicleGroupsSwitcher mod
-  VehicleSort.bgX = 0.5;
-  
-  VehicleSort:dp(string.format('Initialized userPath [%s] saveBasePath [%s] savePath [%s]',
-    tostring(VehicleSort.userPath),
-    tostring(VehicleSort.saveBasePath),
-    tostring(VehicleSort.savePath)), 'VehicleSort:init');
+	VehicleSort:dp(string.format('Initialized userPath [%s] saveBasePath [%s] savePath [%s]',
+	tostring(VehicleSort.userPath),
+	tostring(VehicleSort.saveBasePath),
+	tostring(VehicleSort.savePath)), 'VehicleSort:init');
 end
 
 function VehicleSort:isCrane(realId)
@@ -1330,67 +1276,66 @@ function VehicleSort:reSort(old, new)
 	local u = VehicleSort.Sorted[old];
 	table.remove(VehicleSort.Sorted, old);
 	table.insert(VehicleSort.Sorted, new, u);
-	VehicleSort:SyncSorted();
-	VehicleSort.dirtyState = true;
+	VehicleSort.Sorted = VehicleSort:reshuffleVehicles(VehicleSort.Sorted);
 end
 
-function VehicleSort:SyncSorted()
-	for k, v in ipairs(VehicleSort.Sorted) do
-		if g_currentMission.vehicles[v] ~= nil then
-			if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
-				g_currentMission.vehicles[v]['spec_vehicleSort']['id'] = g_currentMission.vehicles[v]['id'];
-				g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
-				g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
-			end
-		else
-			-- When there is o vehicle, we can actually drop that entry
-			-- ToDo: that would screw up our list ordering. And it shouldn't happen anyways
-			--table.remove(VehicleSort.Sorted, k);
-		end
-	end
-	
-	-- After selling or resetting vehicles our selectedIndex could point to an non existing vehicle, so better to reset it then
-	if g_currentMission.vehicles[VehicleSort.selectedIndex] == nil then
-		VehicleSort.selectedIndex = 1;
-	end
-end
-
-function VehicleSort:SyncSortedWithGame()
-	local allVeh = {}	
-	local newOrder = {};
-	local newSorted = {};
-
-	for _, v in ipairs(g_currentMission.vehicles) do
-		table.insert(allVeh, v);
-	end
-	
-	for k, v in ipairs(VehicleSort.Sorted) do
-		VehicleSort:dp(string.format('Sorted Index {%d}, realId {%d}, Vehicle {%s}', k, v, g_currentMission.vehicles[v]['configFileName']), 'SyncSortedWithGame');
-		
-		local newVeh = g_currentMission.vehicles[v];
-		newVeh.spec_vehicleSort.orderId = k;
-		newVeh.spec_vehicleSort.realId = k;
-		table.insert(newOrder, newVeh);
-		table.insert(newSorted, k);
-	end
-	-- Add the unsorted vehicles like trailers, implements etc.
-	for k, _ in pairs(allVeh) do
-		if allVeh[k]['spec_vehicleSort'] == nil then
-			table.insert(newOrder, allVeh[k]);
-		end
-	end
-
-	VehicleSort:dp(string.format('#newOrder {%d} - #g_currentMission.vehicles {%d}', #newOrder, #g_currentMission.vehicles), 'SyncSortedWithGame');
-	if #newOrder == #g_currentMission.vehicles then
-		VehicleSort.Sorted = newSorted;
-		g_currentMission.vehicles = newOrder;
-		-- Update tab order
-		--g_inputBinding.events['SWITCH_VEHICLE'].targetObject.loadVehiclesById = newOrder;
-		--g_inputBinding.events['SWITCH_VEHICLE_BACK'].targetObject.loadVehiclesById = newOrder;
-		
-		VehicleSort:dp('Write back of orderd vehicles to g_currentMission.vehicles');
-	end
-end
+--function VehicleSort:SyncSorted()
+--	for k, v in ipairs(VehicleSort.Sorted) do
+--		if g_currentMission.vehicles[v] ~= nil then
+--			if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
+--				g_currentMission.vehicles[v]['spec_vehicleSort']['id'] = g_currentMission.vehicles[v]['id'];
+--				g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = k;
+--				g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
+--			end
+--		else
+--			-- When there is o vehicle, we can actually drop that entry
+--			-- ToDo: that would screw up our list ordering. And it shouldn't happen anyways
+--			--table.remove(VehicleSort.Sorted, k);
+--		end
+--	end
+--	
+--	-- After selling or resetting vehicles our selectedIndex could point to an non existing vehicle, so better to reset it then
+--	if g_currentMission.vehicles[VehicleSort.selectedIndex] == nil then
+--		VehicleSort.selectedIndex = 1;
+--	end
+--end
+--
+--function VehicleSort:SyncSortedWithGame()
+--	local allVeh = {}	
+--	local newOrder = {};
+--	local newSorted = {};
+--
+--	for _, v in ipairs(g_currentMission.vehicles) do
+--		table.insert(allVeh, v);
+--	end
+--	
+--	for k, v in ipairs(VehicleSort.Sorted) do
+--		VehicleSort:dp(string.format('Sorted Index {%d}, realId {%d}, Vehicle {%s}', k, v, g_currentMission.vehicles[v]['configFileName']), 'SyncSortedWithGame');
+--		
+--		local newVeh = g_currentMission.vehicles[v];
+--		newVeh.spec_vehicleSort.orderId = k;
+--		newVeh.spec_vehicleSort.realId = k;
+--		table.insert(newOrder, newVeh);
+--		table.insert(newSorted, k);
+--	end
+--	-- Add the unsorted vehicles like trailers, implements etc.
+--	for k, _ in pairs(allVeh) do
+--		if allVeh[k]['spec_vehicleSort'] == nil then
+--			table.insert(newOrder, allVeh[k]);
+--		end
+--	end
+--
+--	VehicleSort:dp(string.format('#newOrder {%d} - #g_currentMission.vehicles {%d}', #newOrder, #g_currentMission.vehicles), 'SyncSortedWithGame');
+--	if #newOrder == #g_currentMission.vehicles then
+--		VehicleSort.Sorted = newSorted;
+--		g_currentMission.vehicles = newOrder;
+--		-- Update tab order
+--		--g_inputBinding.events['SWITCH_VEHICLE'].targetObject.loadVehiclesById = newOrder;
+--		--g_inputBinding.events['SWITCH_VEHICLE_BACK'].targetObject.loadVehiclesById = newOrder;
+--		
+--		VehicleSort:dp('Write back of orderd vehicles to g_currentMission.vehicles');
+--	end
+--end
 
 function VehicleSort:toggleParkState(selectedIndex)
 	local realId = VehicleSort.Sorted[selectedIndex];
@@ -1430,7 +1375,6 @@ function VehicleSort:drawStoreImage(realId)
 			local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
 			local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
 			local imgY = VehicleSort.config[17][2] - storeImgY;
-
 			
 			-- Background rendering for the images, based on the saved configvalue
 			if VehicleSort.config[19][2] then
@@ -1452,8 +1396,7 @@ function VehicleSort:drawStoreImage(realId)
 						local storeImage = createImageOverlay(imgFileName);
 						if storeImage > 0 then
 							local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
-							
-							
+									
 							-- Background rendering for the images, based on the saved configvalue
 							if VehicleSort.config[19][2] then
 								local bgW = storeImgX;
@@ -1463,7 +1406,6 @@ function VehicleSort:drawStoreImage(realId)
 								VehicleSort:renderBg(bgX, bgY, bgW, bgH);
 							end
 							-- Must be rendered after the background, otherwise it's covered by it
-							
 							renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 						end
 					end
@@ -1498,6 +1440,7 @@ function VehicleSort:drawInfobox(realId)
 		if not VehicleSort.config[15][2] then				-- If there is no picture we can move more right
 			imgWidth = 0.01;
 		end
+
 		local infoX = 0.5 - VehicleSort.bgW / 2 - imgWidth - VehicleSort.tPos.padSides;
 		local infoY = VehicleSort.config[17][2];
 		local txtY = infoY - VehicleSort.tPos.padHeight - txtSize - VehicleSort.tPos.spacing;
@@ -1674,6 +1617,9 @@ function VehicleSort:getInfoTexts(realId)
 		else
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.motor .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
 		end
+		if not doSpacing then
+			doSpacing = true;
+		end		
 		table.insert(texts, line);
 		
 		if VehicleStatus:getIsTurnedOn(veh) then
@@ -1681,6 +1627,9 @@ function VehicleSort:getInfoTexts(realId)
 		else
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOn .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
 		end
+		if not doSpacing then
+			doSpacing = true;
+		end				
 		table.insert(texts, line);		
 		
 		if VehicleStatus:getIsLightTurnedOn(veh) then
@@ -1688,13 +1637,42 @@ function VehicleSort:getInfoTexts(realId)
 		else
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
 		end
+		if not doSpacing then
+			doSpacing = true;
+		end				
 		table.insert(texts, line);
 		
+		-- Implement status, lowered and turnedOn
+		if VehicleSort:getVehImplements(realId) ~= nil then
+			local impStatus = VehicleStatus:getImplementStatus(realId);
+			
+			if impStatus ~= nil and #impStatus > 0 then		-- We've to check for nil again, as we filter out frontloaders
+				-- Some spacing, but just if we actually had some data so far
+				-- This spacing is actually meant after the light state. But we just want it if there are implements, otherwise we've too much spacing at the end of the infobox
+				if doSpacing then
+					table.insert(texts, " ");
+					doSpacing = false;
+				end
+			
+				for _, v in ipairs(impStatus) do
+					if v.isLowered ~= nil or v.isTurnedOn ~= nil then
+						local yesno = '';
+						if v.isLowered ~= nil then
+							if v.isLowered then yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.yes; else yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.no; end
+							table.insert(texts, string.format('%s | %s: %s', v.name, g_i18n.modEnvironments[VehicleSort.ModName].texts.isLowered, yesno));
+						end
+						if v.isTurnedOn ~= nil then
+							if v.isTurnedOn then yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.yes; else yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.no; end
+							table.insert(texts, string.format('%s | %s: %s', v.name, g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOnImplement, yesno));
+						end
+					end
+				end
+			end
+		end
+
 		return texts;
 	end
 end
-
-
 
 function VehicleSort:getVehImplementsFillInfobox(realId)
 	local texts = {};
@@ -1706,7 +1684,7 @@ function VehicleSort:getVehImplementsFillInfobox(realId)
 			local imp = implements[i];
 			
 			if imp ~= nil and imp.object ~= nil and (string.len(VehicleSort:getFillDisplay(imp.object)) > 1) then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. " (" .. string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. "): " .. VehicleSort:getFillDisplay(imp.object, true);
+				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. ": " .. VehicleSort:getFillDisplay(imp.object, true);
 				table.insert(texts, line);
 			end
 		end

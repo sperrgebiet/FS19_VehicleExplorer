@@ -71,5 +71,9 @@
 		<text name="def"									text="DEF" />
 		<text name="liter"									text="Litro" />
 		<text name="useTwoColoredList"						text="Utilice dos colores alternos para la lista de vehículos" />
+		<text name="isLowered"								text="Se baja" />
+		<text name="turnedOnImplement"						text="Encendido" />
+		<text name="yes"									text="Yes" />
+		<text name="no"										text="No" />		
 	</texts>
 </l10n>
