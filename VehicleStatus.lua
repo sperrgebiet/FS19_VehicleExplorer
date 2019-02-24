@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.2.0";
+VehicleStatus.Version = "0.9.2.1";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -70,7 +70,17 @@ function VehicleStatus:onPostLoad(savegame)
 			if brakeLightsOn then
 				self:setBrakeLightsVisibility(brakeLightsOn, true);
 			end
-		end		
+		end
+
+		-- Handling trains differently
+		if self.typeName == 'locomotive' then			
+			if VehicleSort.loadTrainStatus[self.id] == nil then
+				VehicleSort.loadTrainStatus[self.id] = {};
+				VehicleSort.loadTrainStatus.entries = VehicleSort.loadTrainStatus.entries + 1;
+			end
+			VehicleSort.loadTrainStatus[self.id]['motorTurnedOn'] = Utils.getNoNil(getXMLBool(savegame.xmlFile, savegame.key .. ".vehicleStatus#isMotorStarted"), false);
+			VehicleSort:dp(string.format('Added train motor to loadTrainStatus. id {%d}', self.id));
+		end
 	end
 end
 

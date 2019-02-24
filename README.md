@@ -58,10 +58,7 @@ Feedback, this readme and additional information incl. source code can be find a
 * ~~The actual 'tab order' of vehicles is not changed~~ -> Workaround available
 * Metric measuring units are used
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
-* A wrong value for horse power is displayed for trains
-* Sometimes selling or resetting a vehicle is causing a flickering of the vehicle list. I've already an idea why, just have to look more into it.
-As a workaround you just have to move any vehicle a position up or down, then a reshuffle is triggered and the list is rendered properly again.
-* If a train is parked, although this state gets saved, on loading a savegame it's not restored. So the train is tabbable.
+
 
 ### Incompatible Mods
 * ~~SpeedControl~~
@@ -114,7 +111,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.2.0 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.2.1 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -177,10 +174,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 * ~~Die eigentliche 'Tab-Reihenfolge' des Spiels wird nicht verändert~~ -> Workaround vorhanden
 * Metrische Masseinheit wird für die Geschwindigkeitsanzeige verwendet
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
-* Bei Zügen wird die Leistung/PS falsch berechnet
-* Manchmal verursacht das verkaufen oder zurücksetzen eines Fahrzeuges ein flackern der Fahrzeugliste. Ich hab auch schon eine Idee warum, muss mich nur mehr damit beschäftigen.
-Als vorübergehende Lösung braucht man einfach nur ein Fahrzeug eine Position rauf oder runter schieben, dabei wird ein reorganisieren der Liste angestossen und es funktioniert wieder.
-* Ist ein Zug geparkt, wird dieser Status zwar gespeichert, beim Laden des Spielstandes wird der Zug jedoch nicht wieder "geparkt".
+
 
 ### Inkompatible Mods
 * ~~SpeedControl~~
@@ -232,7 +226,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.2.0 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.2.1 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

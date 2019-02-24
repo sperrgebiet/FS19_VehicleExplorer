@@ -7,10 +7,12 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.2.0";
+VehicleSort.Version = "0.9.2.1";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
+
+VehicleSort.firstRun = true;
 
 print(string.format('VehicleSort v%s - DebugMode %s)', VehicleSort.Version, tostring(VehicleSort.debug)));
 
@@ -24,6 +26,10 @@ VehicleSort.showImplementsMax = 3;
 
 -- Integration environment for Tardis
 envTardis = nil;
+
+-- Trains get apparently handled differently for isTabbable and motorStatus, so we'll set that state on postMapload again
+VehicleSort.loadTrainStatus = {};
+VehicleSort.loadTrainStatus.entries = 0;
 
 VehicleSort.config = {											--Id		-Order in configMenu
   {'showTrain', true, 1},										-- 1		1
@@ -128,8 +134,13 @@ function VehicleSort:loadMap(name)
 		table.insert(VehicleSort.orderedConfig, val);
 	end
 	table.sort(VehicleSort.orderedConfig, function(a, b) return a[2][3] < b[2][3] end)	
-	
+end
+
+function VehicleSort:prepareVeEx()
+	-- Primarily necessary so that the train status get set
+	-- But it also doesn't harm to have the list ready for tabbing and opening it for the first time
 	VehicleSort.Sorted = VehicleSort:getOrderedVehicles();
+	VehicleSort.firstRun = false;
 end
 
 function VehicleSort:onLoad(savegame)
@@ -157,6 +168,16 @@ function VehicleSort:onPostLoad(savegame)
 		if isParked then
 			VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
 			self:setIsTabbable(false);
+		end
+		
+		-- For any reason trains get handled differently, and simply ignore what we set at this stage. So lets store the status to hande it later on.
+		if self.typeName == 'locomotive' then
+			if VehicleSort.loadTrainStatus[self.id] == nil then
+				VehicleSort.loadTrainStatus[self.id] = {};
+				VehicleSort.loadTrainStatus.entries = VehicleSort.loadTrainStatus.entries + 1;
+			end
+			VehicleSort.loadTrainStatus[self.id]['isParked'] = isParked;
+			VehicleSort:dp(string.format('Added train isParked to loadTrainStatus. orderId {%d}, id {%d}', orderId, self.id));
 		end
 	end
 end
@@ -241,6 +262,13 @@ function VehicleSort:saveToXMLFile(xmlFile, key)
 		if VehicleSort:isParked(self.spec_vehicleSort.realId) then
 			setXMLBool(xmlFile, key.."#isParked", true);
 		end
+	end
+end
+
+function VehicleSort:update()
+	-- Don't really like to add VeEx to update as it's not really necessary, but haven't found another solution to set the train motor&parked stated after load
+	if VehicleSort.firstRun then
+		VehicleSort:prepareVeEx();
 	end
 end
 
@@ -711,6 +739,11 @@ function VehicleSort:getVehicles()
 			if v.spec_vehicleSort ~= nil then
 				v.spec_vehicleSort.realId = k;
 				table.insert(veh, v);
+				
+				-- Handle trains at this stage for first load, as we loop through all vehicles anyways
+				if VehicleSort:isTrain(k) and VehicleSort.loadTrainStatus.entries > 0 then
+					VehicleSort:handlePostloadTrains(k);
+				end
 			end
 		end
 	end
@@ -1772,6 +1805,28 @@ function VehicleSort:getNextInTabList(orderId, backwards)
 		end
 	end
 	return nextId;
+end
+
+function VehicleSort:handlePostloadTrains(realId)
+	local id = g_currentMission.vehicles[realId]['id'];
+	
+	if VehicleSort.loadTrainStatus[id] ~= nil then
+		if VehicleSort.loadTrainStatus[id]['motorTurnedOn'] then
+			g_currentMission.vehicles[realId]:startMotor();
+		else
+			g_currentMission.vehicles[realId]:setLocomotiveState(Locomotive.STATE_MANUAL_TRAVEL_ACTIVE);
+			g_currentMission.vehicles[realId]:stopMotor();
+		end
+
+		g_currentMission.vehicles[realId]:setIsTabbable(not VehicleSort.loadTrainStatus[id]['isParked']);
+		
+		VehicleSort:dp(string.format('Train realId {%d} should be fine now. isParked {%s}, motorTurnedOn {%s}', realId, 
+							tostring(VehicleSort.loadTrainStatus[id]['isParked']), tostring(VehicleSort.loadTrainStatus[id]['motorTurnedOn'])));		
+
+							VehicleSort.loadTrainStatus[id] = nil;
+		VehicleSort.loadTrainStatus.entries = VehicleSort.loadTrainStatus.entries - 1;
+	end
+
 end
 
 --
