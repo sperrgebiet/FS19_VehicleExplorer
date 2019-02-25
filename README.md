@@ -58,6 +58,7 @@ Feedback, this readme and additional information incl. source code can be find a
 * ~~The actual 'tab order' of vehicles is not changed~~ -> Workaround available
 * Metric measuring units are used
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
+* Crane order doesn't get saved/restored yet. These get saved in the items.xml, and the save/load methods are different.
 
 
 ### Incompatible Mods
@@ -174,7 +175,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 * ~~Die eigentliche 'Tab-Reihenfolge' des Spiels wird nicht verändert~~ -> Workaround vorhanden
 * Metrische Masseinheit wird für die Geschwindigkeitsanzeige verwendet
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
-
+* Reihenfolge von Kränen wird nicht gespeichert/wiederhergestellt. Diese werden in der items.xml gespeichert und die Funktionen fürs speichern/laden funktionieren anderst.
 
 ### Inkompatible Mods
 * ~~SpeedControl~~
