@@ -30,6 +30,7 @@ envTardis = nil;
 -- Trains get apparently handled differently for isTabbable and motorStatus, so we'll set that state on postMapload again
 VehicleSort.loadTrainStatus = {};
 VehicleSort.loadTrainStatus.entries = 0;
+VehicleSort.loadItemsEnterable = {};
 
 VehicleSort.config = {											--Id		-Order in configMenu
   {'showTrain', true, 1},										-- 1		1
@@ -1829,6 +1830,57 @@ function VehicleSort:handlePostloadTrains(realId)
 
 end
 
+function VehicleSort:onPostLoadPlaceables(xmlFile, key, resetVehicles)
+	VehicleSort:dp(string.format('key {%s}', key), 'onPostLoadPlaceables');
+end
+
+function VehicleSort:savePlaceables(self, xmlFile, key, usedModNames)
+	VehicleSort:dp(string.format('key {%s}', key), 'savePlaceables');
+	
+	VehiclePlaceable:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
+	
+--	if self.spec_vehicleSort ~= nil then
+--		if self.spec_vehicleSort.orderId ~= nil then
+--			setXMLInt(xmlFile, key..".vehicleSort#UserOrder", self.spec_vehicleSort.orderId);
+--		end
+--		
+--		if VehicleSort:isParked(self.spec_vehicleSort.realId) then
+--			setXMLBool(xmlFile, key..".vehicleSort#isParked", true);
+--		end
+--	end
+end
+
+function VehicleSort:loadPlaceables(self, superFunc, ...)
+	VehicleSort:dp(string.format('key {%s}', key), 'loadPlaceables');
+	
+	superFunc(self, ...);
+	
+    --self.VehicleSort:loadFromXMLFile(xmlFile, key..".VehicleSort", resetVehicles)
+
+--	if xmlFile ~= nil and key ~= nil then
+--		local key = key..".vehicleSort";
+--		
+--		local orderId = getXMLInt(xmlFile, key..".vehicleSort#UserOrder");
+--		if orderId ~= nil then
+--			VehicleSort:dp(string.format('Loaded orderId {%d} for placeableId {%d}', orderId, self.id), 'loadPlaceables');
+--		end
+--		
+--		if self.spec_vehicleSort ~= nil then
+--			self.spec_vehicleSort.id = self.id;
+--			if orderId ~= nil then
+--				self.spec_vehicleSort.orderId = orderId;
+--			end
+--		end
+--		
+--		local isParked = Utils.getNoNil(getXMLBool(xmlFile, key.."#isParked"), false);
+--		if isParked then
+--			VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
+--			self:setIsTabbable(false);
+--		end
+--	end
+
+end
+
 --
 -- Extends default game functions
 -- This is required to block the camera zoom & handtool selection while drawlist or drawconfig is open
@@ -1857,3 +1909,8 @@ if g_dedicatedServerInfo == nil then
   Player.onInputCycleHandTool = Utils.overwrittenFunction(Player.onInputCycleHandTool, VehicleSort.onInputCycleHandTool);
   Drivable.setCruiseControlMaxSpeed = Utils.overwrittenFunction(Drivable.setCruiseControlMaxSpeed, VehicleSort.setCruiseControlMaxSpeed);
 end
+
+-- As there are also placeables which get treated as vehicles (e.g. cranes) we've to add ourself to those elements too
+VehiclePlaceable.saveToXMLFile = Utils.overwrittenFunction(VehiclePlaceable.saveToXMLFile, VehicleSort.savePlaceables);
+--VehiclePlaceable.loadFromXMLFile = Utils.overwrittenFunction(VehiclePlaceable.loadFromXMLFile, VehicleSort.loadPlaceables);
+VehiclePlaceable.loadFromXMLFile = Utils.overwrittenFunction(VehiclePlaceable.onPostLoad, VehicleSort.onPostLoadPlaceables);
