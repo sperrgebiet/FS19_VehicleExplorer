@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="42">
 	<author>sperrgebiet</author>
-	<version>0.9.2.1</version>
+	<version>0.9.3.0</version>
 	<title>Vehicle Explorer</title>
 	<description>
 		<en>
-			<![CDATA[
-			This is a revamp of the good old VehicleSort from FS17.
-			
-			For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
-			Besides that it has a couple of additional functionality. See below.
-			
-			More Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
-			]]>
+<![CDATA[
+This is a revamp of the good old VehicleSort from FS17.
+For beginners: VehicleExplorer helps you organize your vehicles, by showing you a list which can be organized, well, sorted by you.
+
+More Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+]]>
 		</en>
 		<de>
-			<![CDATA[
-			Dies ist eine Reinkarnation von VehicleSort aus LS17
-			Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zeigt eine Liste welche dann selbst nach eigenen Wünschen sortiert werden kann.
-			
-			Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
-			]]>
+<![CDATA[
+Dies ist eine Reinkarnation von VehicleSort aus LS17.
+Für Neueinsteiger: VehicleExplorer hilft beim organisiere der Fahrzeuge. Es zeigt eine Liste welche dann selbst nach eigenen Wünschen sortiert werden kann.
+
+Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
+]]>
 		</de>
 	</description>
 	
