@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.2.1";
+VehicleSort.Version = "0.9.3.0";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -178,7 +178,7 @@ function VehicleSort:onPostLoad(savegame)
 				VehicleSort.loadTrainStatus.entries = VehicleSort.loadTrainStatus.entries + 1;
 			end
 			VehicleSort.loadTrainStatus[self.id]['isParked'] = isParked;
-			VehicleSort:dp(string.format('Added train isParked to loadTrainStatus. orderId {%d}, id {%d}', orderId, self.id));
+			--VehicleSort:dp(string.format('Added train isParked to loadTrainStatus. orderId {%d}, id {%d}', orderId, Utils.getNoNil(self.id, 0)));
 		end
 	end
 end
@@ -217,7 +217,7 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 		local actionMethod = string.format("action_%s", action);
 		local result, eventName = InputBinding.registerActionEvent(g_inputBinding, action, self, VehicleSort[actionMethod], false, true, false, true)
 		if result then
-			table.insert(Tardis.eventName, eventName);
+			table.insert(VehicleSort.eventName, eventName);
 			g_inputBinding.events[eventName].displayIsVisible = VehicleSort.config[13][2];
 		end
 	end
@@ -1830,55 +1830,58 @@ function VehicleSort:handlePostloadTrains(realId)
 
 end
 
-function VehicleSort:onPostLoadPlaceables(xmlFile, key, resetVehicles)
-	VehicleSort:dp(string.format('key {%s}', key), 'onPostLoadPlaceables');
+function VehicleSort:placeableSaveToXMLFile(xmlFile, key, usedModNames)
+	VehicleSort:dp(string.format('key {%s}', key), 'placeableSaveToXMLFile');
+	
+	if xmlFile ~= nil and key ~= nil and self.vehicle.spec_vehicleSort ~= nil then
+		local key = key..".vehicleSort";
+		if self.vehicle.spec_vehicleSort.orderId ~= nil then
+			setXMLInt(xmlFile, key.."#UserOrder", self.vehicle.spec_vehicleSort.orderId);
+		end
+		
+		if VehicleSort:isParked(self.vehicle.spec_vehicleSort.realId) then
+			setXMLBool(xmlFile, key.."#isParked", true);
+		end
+	end
 end
 
-function VehicleSort:savePlaceables(self, xmlFile, key, usedModNames)
-	VehicleSort:dp(string.format('key {%s}', key), 'savePlaceables');
-	
-	VehiclePlaceable:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
-	
---	if self.spec_vehicleSort ~= nil then
---		if self.spec_vehicleSort.orderId ~= nil then
---			setXMLInt(xmlFile, key..".vehicleSort#UserOrder", self.spec_vehicleSort.orderId);
---		end
---		
---		if VehicleSort:isParked(self.spec_vehicleSort.realId) then
---			setXMLBool(xmlFile, key..".vehicleSort#isParked", true);
---		end
---	end
-end
+function VehicleSort:placeableLoadFromXMLFile(superFunc, xmlFile, key, resetVehicles)
 
-function VehicleSort:loadPlaceables(self, superFunc, ...)
-	VehicleSort:dp(string.format('key {%s}', key), 'loadPlaceables');
-	
-	superFunc(self, ...);
-	
-    --self.VehicleSort:loadFromXMLFile(xmlFile, key..".VehicleSort", resetVehicles)
+	if xmlFile == nil and key == nil then
+		return false;		
+	end
 
---	if xmlFile ~= nil and key ~= nil then
---		local key = key..".vehicleSort";
---		
---		local orderId = getXMLInt(xmlFile, key..".vehicleSort#UserOrder");
---		if orderId ~= nil then
---			VehicleSort:dp(string.format('Loaded orderId {%d} for placeableId {%d}', orderId, self.id), 'loadPlaceables');
---		end
---		
---		if self.spec_vehicleSort ~= nil then
---			self.spec_vehicleSort.id = self.id;
---			if orderId ~= nil then
---				self.spec_vehicleSort.orderId = orderId;
---			end
---		end
---		
---		local isParked = Utils.getNoNil(getXMLBool(xmlFile, key.."#isParked"), false);
---		if isParked then
---			VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
---			self:setIsTabbable(false);
---		end
---	end
+	local mainLoad = superFunc(self, xmlFile, key, resetVehicles);
+	
+	if mainLoad then
+		VehicleSort:dp(string.format('key {%s}', key), 'placeableLoadFromXMLFile');		
+		
+		local key = key..".vehicleSort";
+		
+		if hasXMLProperty(xmlFile, key) then
+			local orderId = getXMLInt(xmlFile, key.."#UserOrder");
+			if orderId ~= nil then
+				VehicleSort:dp(string.format('Loaded orderId {%d} for placeableId {%d}', orderId, self.id), 'placeableLoadFromXMLFile');
+			end
+			
+			if self.vehicle.spec_vehicleSort ~= nil then
+				self.vehicle.spec_vehicleSort.id = self.id;
+				if orderId ~= nil then
+					self.vehicle.spec_vehicleSort.orderId = orderId;
+				end
+			end
+			
+			local isParked = Utils.getNoNil(getXMLBool(xmlFile, key.."#isParked"), false);
+			if isParked then
+				VehicleSort:dp(string.format('Set isParked {%s} for orderId {%d} / vehicleId {%d}', tostring(isParked), orderId, self.id), 'onPostLoad');
+				self.vehicle:setIsTabbable(false);
+			else
+				self.vehicle:setIsTabbable(true);
+			end
+		end
+	end
 
+	return mainLoad;
 end
 
 --
@@ -1911,6 +1914,7 @@ if g_dedicatedServerInfo == nil then
 end
 
 -- As there are also placeables which get treated as vehicles (e.g. cranes) we've to add ourself to those elements too
-VehiclePlaceable.saveToXMLFile = Utils.overwrittenFunction(VehiclePlaceable.saveToXMLFile, VehicleSort.savePlaceables);
---VehiclePlaceable.loadFromXMLFile = Utils.overwrittenFunction(VehiclePlaceable.loadFromXMLFile, VehicleSort.loadPlaceables);
-VehiclePlaceable.loadFromXMLFile = Utils.overwrittenFunction(VehiclePlaceable.onPostLoad, VehicleSort.onPostLoadPlaceables);
+-- Load must be overwritten. With a simpel appendedFunction we get errors in the log, as the main load method already returns true, before our
+-- additional load is finished
+VehiclePlaceable.saveToXMLFile = Utils.appendedFunction(VehiclePlaceable.saveToXMLFile, VehicleSort.placeableSaveToXMLFile);
+VehiclePlaceable.loadFromXMLFile = Utils.overwrittenFunction(VehiclePlaceable.loadFromXMLFile, VehicleSort.placeableLoadFromXMLFile);
