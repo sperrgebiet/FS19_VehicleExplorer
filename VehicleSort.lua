@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.0";
+VehicleSort.Version = "0.9.3.1";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1399,48 +1399,49 @@ function VehicleSort:saveConfig()
 end
 
 function VehicleSort:drawStoreImage(realId)
-	if g_currentMission.vehicles[realId] ~= nil and not VehicleSort:isTrain(realId) and not VehicleSort:isCrane(realId) then
+	if g_currentMission.vehicles[realId] ~= nil and not VehicleSort:isTrain(realId) then
 		local imgFileName = VehicleSort:getStoreImageByConf(g_currentMission.vehicles[realId]['configFileName']);
 		--VehicleSort:dp(string.format('configFileName {%s}', configFileName));
 		--VehicleSort:dp(storeItem, 'drawStoreImage');
-
-		local storeImage = createImageOverlay(imgFileName);
-		if storeImage > 0 then
-			local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
-			local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
-			local imgY = VehicleSort.config[17][2] - storeImgY;
-			
-			-- Background rendering for the images, based on the saved configvalue
-			if VehicleSort.config[19][2] then
-				local bgW = storeImgX;
-				local bgH = storeImgY;
-				local bgX = imgX + (bgW / 2);
-				local bgY = imgY;
-				VehicleSort:renderBg(bgX, bgY, bgW, bgH);
-			end
-			-- Must be rendered after the background, otherwise it's covered by it
-			renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
-			
-			if (VehicleSort:getVehImplements(realId) ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
-				local impList = VehicleSort:getVehImplements(realId);
-				for i = 1, VehicleSort.config[24][2] do			-- Limit to the configured amount of implements to show
-					local imp = impList[i];
-					if imp ~= nil and imp.object ~= nil then
-						local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
-						local storeImage = createImageOverlay(imgFileName);
-						if storeImage > 0 then
-							local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
-									
-							-- Background rendering for the images, based on the saved configvalue
-							if VehicleSort.config[19][2] then
-								local bgW = storeImgX;
-								local bgH = storeImgY;
-								local bgX = imgX + (bgW / 2);
-								local bgY = imgY;
-								VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+		if string.len(imgFileName) > 0 then
+			local storeImage = createImageOverlay(imgFileName);
+			if storeImage > 0 then
+				local storeImgX, storeImgY = getNormalizedScreenValues(128, 128)
+				local imgX = 0.5 - VehicleSort.bgW / 2 - storeImgX;
+				local imgY = VehicleSort.config[17][2] - storeImgY;
+				
+				-- Background rendering for the images, based on the saved configvalue
+				if VehicleSort.config[19][2] then
+					local bgW = storeImgX;
+					local bgH = storeImgY;
+					local bgX = imgX + (bgW / 2);
+					local bgY = imgY;
+					VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+				end
+				-- Must be rendered after the background, otherwise it's covered by it
+				renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
+				
+				if (VehicleSort:getVehImplements(realId) ~= nil) and (imgFileName ~= "data/store/store_empty.png") then
+					local impList = VehicleSort:getVehImplements(realId);
+					for i = 1, VehicleSort.config[24][2] do			-- Limit to the configured amount of implements to show
+						local imp = impList[i];
+						if imp ~= nil and imp.object ~= nil then
+							local imgFileName = VehicleSort:getStoreImageByConf(imp.object.configFileName);
+							local storeImage = createImageOverlay(imgFileName);
+							if storeImage > 0 then
+								local imgY = VehicleSort.config[17][2] - (storeImgY * (i + 1) );
+										
+								-- Background rendering for the images, based on the saved configvalue
+								if VehicleSort.config[19][2] then
+									local bgW = storeImgX;
+									local bgH = storeImgY;
+									local bgX = imgX + (bgW / 2);
+									local bgY = imgY;
+									VehicleSort:renderBg(bgX, bgY, bgW, bgH);
+								end
+								-- Must be rendered after the background, otherwise it's covered by it
+								renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 							end
-							-- Must be rendered after the background, otherwise it's covered by it
-							renderOverlay(storeImage, imgX, imgY, storeImgX, storeImgY)
 						end
 					end
 				end
