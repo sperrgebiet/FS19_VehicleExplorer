@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.1";
+VehicleSort.Version = "0.9.3.2";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -271,6 +271,10 @@ function VehicleSort:update()
 	if VehicleSort.firstRun then
 		VehicleSort:prepareVeEx();
 	end
+	
+	--This should allow to have the default keybindings for Tab & Shift+Tab, while still using the ordered tabbing from VeEx
+	VehicleSort:overwriteDefaultTabBinding();
+	
 end
 
 function VehicleSort:draw()
@@ -1883,6 +1887,36 @@ function VehicleSort:placeableLoadFromXMLFile(superFunc, xmlFile, key, resetVehi
 	end
 
 	return mainLoad;
+end
+
+function VehicleSort:isActionAllowed()
+	-- We don't want to accidently switch vehicle when the vehicle list is opened and we change to a menu
+	if string.len(g_gui.currentGuiName) > 0 or #g_gui.dialogs > 0 then
+		return false;
+	elseif VehicleSort.showConfig or VehicleSort.showVehicles then
+		return true;
+	end
+end
+
+function VehicleSort:overwriteDefaultTabBinding()
+	local state = false;
+	if not (string.len(g_gui.currentGuiName) > 0) then
+		if g_inputBinding.nameActions.SWITCH_VEHICLE.bindings[1].isActive ~= state then
+			VehicleSort:dp(string.format("SWITCH_VEHICLE does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
+			local eventsTab = InputBinding.getEventsForActionName(g_inputBinding, "SWITCH_VEHICLE")
+			if eventsTab[1] ~= nil then
+				g_inputBinding:setActionEventActive(eventsTab[1].id, state)
+			end
+		end
+		
+		if g_inputBinding.nameActions.SWITCH_VEHICLE_BACK.bindings[1].isActive ~= state then
+			VehicleSort:dp(string.format("SWITCH_VEHICLE_BACK does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
+			local eventsShiftTab = InputBinding.getEventsForActionName(g_inputBinding, "SWITCH_VEHICLE_BACK")
+			if eventsShiftTab[1] ~= nil then
+				g_inputBinding:setActionEventActive(eventsShiftTab[1].id, state)
+			end
+		end
+	end
 end
 
 --
