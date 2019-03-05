@@ -25,7 +25,7 @@
 		<text name="showFillLevels"							text="Show fill level in vehicle list" />
 		<text name="showPercentages"						text="Show fill level as percentage" />
 		<text name="showEmpty"								text="Show fill level of empty vehicles" />
-		<text name="showHelp"								text="Show input binding (needs restart to take effect)" />
+		<text name="showHelp"								text="Show input binding (incl. Tardis if available)" />
 		<text name="bgTrans"								text="Background alpha transparency" />
 		<text name="txtSize"								text="Text size" />
 		<text name="showSteerableImplements"				text="Show steerable implements" />
@@ -37,10 +37,8 @@
 		<text name="infoStart"								text="Move Infobox/image vertically" />
 		<text name="infoBg"									text="Show Infobox background" />
 		<text name="imageBg"								text="Show image background" />
-		<text name="vs_on"									text="On" />
-		<text name="vs_off"									text="Off" />
 		<text name="vs_train"								text="Train" />
-		<text name="vs_crane"								text="Train crane" />
+		<text name="vs_crane"								text="Crane" />
 		<text name="vs_implement"							text="Implement" />
 		<text name="hired"									text="H" />
 		<text name="courseplay"								text="CP" />
@@ -59,7 +57,6 @@
 		<text name="left"									text="L" />
 		<text name="right"									text="R" />
 		<text name="center"									text="C" />
-		<text name="dirt"									text="Dirt" />
 		<text name="cleanOnRepair"							text="Clean on repair" />
 		<text name="RepairDone"								text="Repair done" />
 		<text name="RepairCleaningDone"						text="Repair und cleaning done" />
@@ -67,13 +64,9 @@
 		<text name="enterVehonTeleport"						text="Enter vehicle after teleportation" />
 		<text name="showImgMaxImp"							text="Max. images of implements" />
 		<text name="showInfoMaxImpl"						text="Max. number of implements in infobox" />
-		<text name="diesel"									text="Diesel" />
-		<text name="def"									text="DEF" />
-		<text name="liter"									text="Liter" />
 		<text name="useTwoColoredList"						text="Use two alternating colors for the vehicle list" />
 		<text name="isLowered"								text="Lowered" />
-		<text name="turnedOnImplement"						text="Turned on" />
-		<text name="yes"									text="Sí" />
-		<text name="no"										text="No" />		
+		<text name="turnedOnImplement"						text="Turned on" />	
+		<text name="useVeExTabOrder"						text="Use VehicleExplorers ordered list for tabbing" />
 	</texts>
 </l10n>

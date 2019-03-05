@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.2.1";
+VehicleStatus.Version = "0.9.3.3";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -157,7 +157,17 @@ end
 
 function VehicleStatus:getSpeedStr(vehObj)
 	if vehObj.getLastSpeed ~= nil then
-		return tostring(math.floor(vehObj:getLastSpeed())) .. " " .. "km/h";		--TODO: Change to the current measuring unit
+		local unit = nil
+		local speed = nil
+		if g_i18n.useMiles then
+			speed = math.floor(vehObj:getLastSpeed() * 0.621371)
+			unit = g_i18n.texts.unit_mph
+		else
+			speed = math.floor(vehObj:getLastSpeed())
+			unit = g_i18n.texts.unit_kmh
+		end
+		
+		return tostring(speed) .. " " .. unit;
 	end
 end
 
@@ -256,7 +266,7 @@ function VehicleStatus:getVehImplementsDirt(realId)
 			local imp = implements[i];
 			
 			if (imp ~= nil and imp.object ~= nil and VehicleStatus:getDirtPercForObject(imp.object) ~= nil) then
-				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. ": " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
+				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.texts.setting_dirt .. ": " .. VehicleStatus:getDirtPercForObject(imp.object) .. " %";
 				table.insert(texts, line);
 			end
 		end

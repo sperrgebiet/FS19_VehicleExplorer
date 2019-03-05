@@ -55,7 +55,6 @@ Feedback, this readme and additional information incl. source code can be find a
   * Right mouse click: Select vehicle (to e.g. move it)
   * Right mouse click: Change value in the config menu
   * Mouse wheel: Selection up/down in list
-* Metric measuring units are used
 * Max of three columns. If you've more vehicles (which would be insane anyways ;) , just disable the display of brand name etc
 
 
@@ -110,7 +109,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.3.2 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.3.3 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -170,7 +169,6 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Rechte Maustaste: Fahrzeug auswählen (zum Verschieben)
   * Rechte Maustaste: Wert im Konfigurationsmenü ändern
   * Mausrad: Rauf/Runter in der Liste
-* Metrische Masseinheit wird für die Geschwindigkeitsanzeige verwendet
 * Maximal drei Spalten in der Liste. Wenn du mehr Fahrzeuge hast )was sowieso schon bedenklich ist ;), dann einfach die Markennamen oder Füllmengen deaktiveren um mehr Platz zu haben.
 
 ### Inkompatible Mods
@@ -223,7 +221,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.3.2 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+0.9.3.3 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.2";
+VehicleSort.Version = "0.9.3.3";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -60,6 +60,7 @@ VehicleSort.config = {											--Id		-Order in configMenu
   {'showInfoMaxImpl', VehicleSort.showInfoMaxImpl, 15},			-- 25		15
   {'showImplementsMax', VehicleSort.showImplementsMax, 10},		-- 26		10
   {'useTwoColoredList', true, 18},								-- 27		18
+  {'useVeExTabOrder', true, 28},								-- 28		28
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -272,8 +273,10 @@ function VehicleSort:update()
 		VehicleSort:prepareVeEx();
 	end
 	
-	--This should allow to have the default keybindings for Tab & Shift+Tab, while still using the ordered tabbing from VeEx
-	VehicleSort:overwriteDefaultTabBinding();
+	--This should allow to have the default keybindings for Tab & Shift+Tab, while still using the ordered tabbing from VeEx, at least if it's activated
+	if VehicleSort.config[28][2] then
+		VehicleSort:overwriteDefaultTabBinding();
+	end
 	
 end
 
@@ -398,7 +401,7 @@ function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, a
 	VehicleSort:dp("action_vsChangeVehicle fires", "action_vsChangeVehicle");
 	if VehicleSort.showVehicles then
 		local realVeh = g_currentMission.vehicles[VehicleSort.Sorted[VehicleSort.selectedIndex]];
-		if not realVeh:getIsControlled() then
+		if realVeh.getIsControlled and not realVeh:getIsControlled() then
 
 			VehicleSort:dp(string.format('VehicleSort.wasTeleportAction {%s}', tostring(VehicleSort.wasTeleportAction)));
 			
@@ -422,6 +425,22 @@ function VehicleSort:action_vsShowConfig(actionName, keyStatus, arg3, arg4, arg5
     
 	VehicleSort.showConfig = not VehicleSort.showConfig;
 	VehicleSort:saveConfig();
+	
+	--Directly set the displayIsVisible for the F1 help menu
+	if VehicleSort.config[13][2] then
+		VehicleSort:setHelpVisibility(VehicleSort.eventName, true)
+		--If Tardis integration is available we'll also do the same for it
+		if envTardis ~= nil and #Tardis.eventName > 0 then
+			VehicleSort:setHelpVisibility(Tardis.eventName, true)
+		end	
+	else
+		VehicleSort:setHelpVisibility(VehicleSort.eventName, false)
+		if envTardis ~= nil and #Tardis.eventName > 0 then
+			VehicleSort:setHelpVisibility(Tardis.eventName, false)
+		end
+	end
+	
+	InputBinding:notifyEventChanges();
 end
 
 function VehicleSort:action_vsTogglePark(actionName, keyStatus, arg3, arg4, arg5)
@@ -472,8 +491,8 @@ function VehicleSort:drawConfig()
 	local yPos = VehicleSort.tPos.y;
 	local size = VehicleSort:getTextSize();
 	local y = VehicleSort.tPos.y;
-	local txtOn = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_on;
-	local txtOff = g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
+	local txtOn = g_i18n.texts.ui_on;
+	local txtOff = g_i18n.texts.ui_off;
 	local texts = {};
 	VehicleSort.bgW = (VehicleSort.tPos.columnWidth * 2 )+ VehicleSort.tPos.padSides + getTextWidth(size, txtOff);		--For config we can use wider columns
 
@@ -1000,10 +1019,14 @@ function VehicleSort:reshuffleVehicles(list)
 	local i = 1;
 	for _, v in ipairs(list) do
 		VehicleSort:dp(string.format('Reshuffle vehile: orderId {%d}, realId {%d}', i, v), 'reshuffleVehicles');
-		table.insert(newList, v);
-		g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
-		g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
-		i = i + 1;
+		-- Actually that shouldn't be necessary. But just had an corner case where an Hauer Weight suddenly showed up in the VehicleList
+		-- So just to be sure and avoid any callstacks lets check if our spec is available
+		if g_currentMission.vehicles[v]['spec_vehicleSort'] ~= nil then
+			table.insert(newList, v);
+			g_currentMission.vehicles[v]['spec_vehicleSort']['orderId'] = i;
+			g_currentMission.vehicles[v]['spec_vehicleSort']['realId'] = v;
+			i = i + 1;
+		end
 	end
 
 	-- After a reshuffle our list should be in a proper state
@@ -1061,32 +1084,42 @@ end
 function VehicleSort:getHorsePower(realId)
 	if VehicleSort:isTrain(realId) then
 		--VehicleSort:dp(string.format('isTrain -> realId {%s}', tostring(realId)), 'getHorsePower');
-		--return VehicleSort:getHorsePowerFromStore(realId);
+		return VehicleSort:getHorsePowerFromStore(realId);
 	else
 		local veh = g_currentMission.vehicles[realId];
 		if veh.spec_motorized ~= nil then
 			local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque;
 			local maxRpm = veh.spec_motorized.motor.maxRpm;
-			return math.ceil(maxMotorTorque / 0.0044);
+			if maxRpm == 2200 then
+				return math.ceil(maxMotorTorque / 0.0044);
+			else
+				--Maybe I'm just too stupid. But somehow I don't get the results with the more complex formula I want. Hence getting max power from store
+				--HP = (torqueScale * torquecurvevalue * Pi * RPM / 30) * 1.35962161
+				-- motor.lastMotorRpm
+				--local torqueCurveVal = veh.spec_motorized.motor.torqueCurve.keyframes[6][1]
+				--local torqueCurveRPM = veh.spec_motorized.motor.torqueCurve.keyframes[6]['time']
+				--local hp = (maxMotorTorque * torqueCurveVal * math.pi * torqueCurveRPM / 30) * 1.35962161
+				--VehicleSort:dp(string.format('maxRPM ~= 2200. HP for {%s} is: {%s}', veh.configFileName, hp))
+				--VehicleSort:dp(string.format('torqueCurveVal {%s}, torqueCurveRPM {%s}, maxMotorTorque {%s}', tostring(torqueCurveVal), tostring(torqueCurveRPM), tostring(maxMotorTorque)))
+				--return math.ceil(hp);
+				return math.ceil(VehicleSort:getHorsePowerFromStore(realId))
+			end
 		end
 	end
 end
 
-
---
--- For some reason the g_storemanager behaves funny for trains and never returns a table. so skip this for now
---
 function VehicleSort:getHorsePowerFromStore(realId)
-	VehicleSort:dp(string.format('realId {%s}', tostring(realId)));
+	--VehicleSort:dp(string.format('realId {%s}', tostring(realId)));
+	local motorConfig = g_currentMission.vehicles[realId]['configurations']['motor']
 	local confFile = string.lower(g_currentMission.vehicles[realId]['configFileName']);
 	storeItem = g_storeManager.xmlFilenameToItem[confFile:lower()];
-	VehicleSort:dp(storeItem);
+	--VehicleSort:dp(storeItem);
 	if storeItem ~= nil then
 		if storeItem.configurations ~= nil then
-			VehicleSort:dp(storeItem.configurations);
+			--VehicleSort:dp(storeItem.configurations);
 			if storeItem.configurations.motor ~= nil then
-				if storeItem.configurations.motor.power ~= nil then
-					return storeItem.configurations.motor.power;
+				if storeItem.configurations.motor[motorConfig].power ~= nil then
+					return storeItem.configurations.motor[motorConfig].power;
 				end
 			end
 		end
@@ -1582,7 +1615,7 @@ function VehicleSort:getInfoTexts(realId)
 		-- Get vehicle Dirt
 		local dirtPerc = VehicleStatus:getDirtPercForObject(g_currentMission.vehicles[realId]);
 		if dirtPerc ~= nil then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.dirt .. ": " .. dirtPerc .. " %";
+			line = g_i18n.texts.setting_dirt .. ": " .. dirtPerc .. " %";
 			table.insert(texts, line);		
 			doSpacing = true;			
 		end
@@ -1632,13 +1665,13 @@ function VehicleSort:getInfoTexts(realId)
 			-- Diesel & DEF FillLevel
 			local level, capacity = VehicleStatus:getDieselLevel(realId)
 			if level ~= nil and capacity ~= nil then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.diesel .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.liter;
+				line = g_i18n.texts.fillType_diesel .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.texts.unit_liter;
 				table.insert(texts, line);
 			end
 			
 			local level, capacity = VehicleStatus:getDefLevel(realId)
 			if level ~= nil and capacity ~= nil then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.def .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.liter;
+				line = g_i18n.texts.fillType_def_short .. ": " .. level .. "/" .. capacity .. " " .. g_i18n.texts.unit_liter;
 				table.insert(texts, line);
 			end
 		end
@@ -1652,9 +1685,9 @@ function VehicleSort:getInfoTexts(realId)
 		
 		-- Motor on/TurnedOn, Lights
 		if VehicleStatus:getIsMotorStarted(veh) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.motor .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_on;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.motor .. ": " .. g_i18n.texts.ui_on;
 		else
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.motor .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.motor .. ": " .. g_i18n.texts.ui_off;
 		end
 		if not doSpacing then
 			doSpacing = true;
@@ -1662,9 +1695,9 @@ function VehicleSort:getInfoTexts(realId)
 		table.insert(texts, line);
 		
 		if VehicleStatus:getIsTurnedOn(veh) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOn .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_on;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOn .. ": " .. g_i18n.texts.ui_on;
 		else
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOn .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOn .. ": " .. g_i18n.texts.ui_off;
 		end
 		if not doSpacing then
 			doSpacing = true;
@@ -1672,9 +1705,9 @@ function VehicleSort:getInfoTexts(realId)
 		table.insert(texts, line);		
 		
 		if VehicleStatus:getIsLightTurnedOn(veh) then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_on;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.texts.ui_on;
 		else
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.vs_off;
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.lights .. ": " .. g_i18n.texts.ui_off;
 		end
 		if not doSpacing then
 			doSpacing = true;
@@ -1697,11 +1730,11 @@ function VehicleSort:getInfoTexts(realId)
 					if v.isLowered ~= nil or v.isTurnedOn ~= nil then
 						local yesno = '';
 						if v.isLowered ~= nil then
-							if v.isLowered then yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.yes; else yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.no; end
+							if v.isLowered then yesno = g_i18n.texts.ui_yes; else yesno = g_i18n.texts.ui_no; end
 							table.insert(texts, string.format('%s | %s: %s', v.name, g_i18n.modEnvironments[VehicleSort.ModName].texts.isLowered, yesno));
 						end
 						if v.isTurnedOn ~= nil then
-							if v.isTurnedOn then yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.yes; else yesno = g_i18n.modEnvironments[VehicleSort.ModName].texts.no; end
+							if v.isTurnedOn then yesno = g_i18n.texts.ui_yes; else yesno = g_i18n.texts.ui_no; end
 							table.insert(texts, string.format('%s | %s: %s', v.name, g_i18n.modEnvironments[VehicleSort.ModName].texts.turnedOnImplement, yesno));
 						end
 					end
@@ -1901,19 +1934,29 @@ end
 function VehicleSort:overwriteDefaultTabBinding()
 	local state = false;
 	if not (string.len(g_gui.currentGuiName) > 0) then
-		if g_inputBinding.nameActions.SWITCH_VEHICLE.bindings[1].isActive ~= state then
-			VehicleSort:dp(string.format("SWITCH_VEHICLE does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
+		if g_inputBinding.nameActions.SWITCH_VEHICLE.bindings[1] ~= nil and g_inputBinding.nameActions.SWITCH_VEHICLE.bindings[1].isActive ~= state then
+			--VehicleSort:dp(string.format("SWITCH_VEHICLE does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
 			local eventsTab = InputBinding.getEventsForActionName(g_inputBinding, "SWITCH_VEHICLE")
 			if eventsTab[1] ~= nil then
 				g_inputBinding:setActionEventActive(eventsTab[1].id, state)
 			end
 		end
 		
-		if g_inputBinding.nameActions.SWITCH_VEHICLE_BACK.bindings[1].isActive ~= state then
-			VehicleSort:dp(string.format("SWITCH_VEHICLE_BACK does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
+		if g_inputBinding.nameActions.SWITCH_VEHICLE_BACK.bindings[1] ~= nil and g_inputBinding.nameActions.SWITCH_VEHICLE_BACK.bindings[1].isActive ~= state then
+			--VehicleSort:dp(string.format("SWITCH_VEHICLE_BACK does not equal state. state = {%s} Going to change it.", tostring(state)), "setTabBinding")
 			local eventsShiftTab = InputBinding.getEventsForActionName(g_inputBinding, "SWITCH_VEHICLE_BACK")
 			if eventsShiftTab[1] ~= nil then
 				g_inputBinding:setActionEventActive(eventsShiftTab[1].id, state)
+			end
+		end
+	end
+end
+
+function VehicleSort:setHelpVisibility(eventTable, state)
+	if #eventTable > 0 then
+		for _, eventName in pairs(eventTable) do
+			if g_inputBinding.events[eventName] ~= nil and g_inputBinding.events[eventName].id ~= nil then
+				g_inputBinding:setActionEventTextVisibility(g_inputBinding.events[eventName].id, state)
 			end
 		end
 	end
