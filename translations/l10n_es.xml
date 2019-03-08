@@ -46,7 +46,7 @@
 		<text name="helper"									text="Ayudante" />
 		<text name="cp_course"								text="Ruta CP" />
 		<text name="cp_courseunknown"						text="Ruta temporal" />
-		<text name="damage"									text="Daño" />
+		<text name="wear"									text="Daño" />
 		<text name="motor"									text="Motor" />
 		<text name="turnedOn"								text="Encendido" />
 		<text name="lights"									text="Luces" />

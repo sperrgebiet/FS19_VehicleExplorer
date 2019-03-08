@@ -46,7 +46,7 @@
 		<text name="helper"									text="Helper" />
 		<text name="cp_course"								text="CP Course" />
 		<text name="cp_courseunknown"						text="Temporary course" />
-		<text name="damage"									text="Damage" />
+		<text name="wear"									text="Llevar" />
 		<text name="motor"									text="Engine" />
 		<text name="turnedOn"								text="Started" />
 		<text name="lights"									text="Lights" />

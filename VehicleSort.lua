@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.3";
+VehicleSort.Version = "0.9.3.4";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1590,15 +1590,15 @@ function VehicleSort:getInfoTexts(realId)
 		end
 		
 		-- Get vehicle wear
-		if veh.getVehicleDamage ~= nil then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.damage .. ": " .. VehicleSort:calcPercentage(veh:getVehicleDamage(), 1) .. " %";
+		if veh.getWearTotalAmount ~= nil then
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.wear .. ": " .. VehicleSort:calcPercentage(veh:getWearTotalAmount(), 1) .. " %";
 			table.insert(texts, line);
 
 			if VehicleSort:getVehImplements(realId) ~= nil then
-				local impDamage = VehicleStatus:getVehImplementsDamage(realId);
-				if #impDamage > 0 then
+				local impWear = VehicleStatus:getVehImplementsWear(realId);
+				if #impWear > 0 then
 					for i=1, VehicleSort.config[25][2] do
-						table.insert(texts, impDamage[i]);
+						table.insert(texts, impWear[i]);
 					end
 				end
 				doSpacing = true;
