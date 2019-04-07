@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.4";
+VehicleSort.Version = "0.9.3.5";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -878,7 +878,7 @@ function VehicleSort:getFullVehicleName(realId)
 	if VehicleSort:isParked(realId) then
 		nam = '[P] '; -- Prefix for parked (not part of tab list) vehicles
 	end
-	if (g_currentMission.vehicles[realId].getIsCourseplayDriving ~= nil and g_currentMission.vehicles[realId]:getIsCourseplayDriving()) then -- CoursePlay
+	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].getIsCourseplayDriving ~= nil and g_currentMission.vehicles[realId]:getIsCourseplayDriving() then -- CoursePlay
 		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
 	elseif VehicleSort:isHired(realId) then -- credit: Vehicle Groups Switcher mod
 		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
@@ -1222,7 +1222,7 @@ end
 
 -- ToDo
 function VehicleSort:isHired(realId)
-	if g_currentMission.vehicles[realId].spec_aiVehicle ~= nil then
+	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].spec_aiVehicle ~= nil then
 		return g_currentMission.vehicles[realId].spec_aiVehicle.isActive;
 	end
 end
