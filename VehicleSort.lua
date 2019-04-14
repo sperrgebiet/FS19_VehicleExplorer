@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.5";
+VehicleSort.Version = "0.9.3.6";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -873,21 +873,21 @@ end
 function VehicleSort:getFullVehicleName(realId)
 	local nam = '';
 	local ret = {};
-	local fmt = '(%s) ';
+	local tmpString = '(%s) ';
   
 	if VehicleSort:isParked(realId) then
 		nam = '[P] '; -- Prefix for parked (not part of tab list) vehicles
 	end
-	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].getIsCourseplayDriving ~= nil and g_currentMission.vehicles[realId]:getIsCourseplayDriving() then -- CoursePlay
-		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
-	elseif VehicleSort:isHired(realId) then -- credit: Vehicle Groups Switcher mod
-		nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
-	--elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
-	--	nam = nam .. string.format(fmt, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
+	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].getIsCourseplayDriving and g_currentMission.vehicles[realId]:getIsCourseplayDriving() then -- CoursePlay
+		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
+	elseif (g_currentMission.vehicles[realId].getIsFollowMeActive and g_currentMission.vehicles[realId]:getIsFollowMeActive()) then	--FollowMe
+		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
+	elseif VehicleSort:isHired(realId) then
+		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
 	elseif VehicleSort:isControlled(realId) then
 		local con = VehicleSort:getControllerName(realId);
 		if VehicleSort.config[5][2] and con ~= nil and con ~= 'Unknown' and con ~= '' then
-			nam = nam .. string.format(fmt, con);
+			nam = nam .. string.format(tmpString, con);
 		end
 	end
 
@@ -1082,27 +1082,29 @@ function VehicleSort:getTextSize()
 end
 
 function VehicleSort:getHorsePower(realId)
-	if VehicleSort:isTrain(realId) then
-		--VehicleSort:dp(string.format('isTrain -> realId {%s}', tostring(realId)), 'getHorsePower');
-		return VehicleSort:getHorsePowerFromStore(realId);
-	else
-		local veh = g_currentMission.vehicles[realId];
-		if veh.spec_motorized ~= nil then
-			local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque;
-			local maxRpm = veh.spec_motorized.motor.maxRpm;
-			if maxRpm == 2200 then
-				return math.ceil(maxMotorTorque / 0.0044);
-			else
-				--Maybe I'm just too stupid. But somehow I don't get the results with the more complex formula I want. Hence getting max power from store
-				--HP = (torqueScale * torquecurvevalue * Pi * RPM / 30) * 1.35962161
-				-- motor.lastMotorRpm
-				--local torqueCurveVal = veh.spec_motorized.motor.torqueCurve.keyframes[6][1]
-				--local torqueCurveRPM = veh.spec_motorized.motor.torqueCurve.keyframes[6]['time']
-				--local hp = (maxMotorTorque * torqueCurveVal * math.pi * torqueCurveRPM / 30) * 1.35962161
-				--VehicleSort:dp(string.format('maxRPM ~= 2200. HP for {%s} is: {%s}', veh.configFileName, hp))
-				--VehicleSort:dp(string.format('torqueCurveVal {%s}, torqueCurveRPM {%s}, maxMotorTorque {%s}', tostring(torqueCurveVal), tostring(torqueCurveRPM), tostring(maxMotorTorque)))
-				--return math.ceil(hp);
-				return math.ceil(VehicleSort:getHorsePowerFromStore(realId))
+	if g_currentMission.vehicles[realId] ~= nil then
+		if VehicleSort:isTrain(realId) then
+			--VehicleSort:dp(string.format('isTrain -> realId {%s}', tostring(realId)), 'getHorsePower');
+			return VehicleSort:getHorsePowerFromStore(realId)
+		else
+			local veh = g_currentMission.vehicles[realId]
+			if veh.spec_motorized ~= nil then
+				local maxMotorTorque = veh.spec_motorized.motor.peakMotorTorque
+				local maxRpm = veh.spec_motorized.motor.maxRpm
+				if maxRpm == 2200 then
+					return math.ceil(maxMotorTorque / 0.0044)
+				else
+					--Maybe I'm just too stupid. But somehow I don't get the results with the more complex formula I want. Hence getting max power from store
+					--HP = (torqueScale * torquecurvevalue * Pi * RPM / 30) * 1.35962161
+					-- motor.lastMotorRpm
+					--local torqueCurveVal = veh.spec_motorized.motor.torqueCurve.keyframes[6][1]
+					--local torqueCurveRPM = veh.spec_motorized.motor.torqueCurve.keyframes[6]['time']
+					--local hp = (maxMotorTorque * torqueCurveVal * math.pi * torqueCurveRPM / 30) * 1.35962161
+					--VehicleSort:dp(string.format('maxRPM ~= 2200. HP for {%s} is: {%s}', veh.configFileName, hp))
+					--VehicleSort:dp(string.format('torqueCurveVal {%s}, torqueCurveRPM {%s}, maxMotorTorque {%s}', tostring(torqueCurveVal), tostring(torqueCurveRPM), tostring(maxMotorTorque)))
+					--return math.ceil(hp);
+					return math.ceil(VehicleSort:getHorsePowerFromStore(realId))
+				end
 			end
 		end
 	end
@@ -1220,7 +1222,6 @@ function VehicleSort:isParked(realId)
 	end
 end
 
--- ToDo
 function VehicleSort:isHired(realId)
 	if g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].spec_aiVehicle ~= nil then
 		return g_currentMission.vehicles[realId].spec_aiVehicle.isActive;
