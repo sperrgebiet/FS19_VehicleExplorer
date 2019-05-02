@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.6";
+VehicleSort.Version = "0.9.3.8";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -968,11 +968,13 @@ function VehicleSort:getOrderedVehicles()
 	local vehList = VehicleSort:getVehicles();
   
 	-- We don't want to do everything all the time, unless we know that something has changed, like after a vehicle got deleted
+	-- TEST: Always return a Sorted list. Lets see if that helps us avoid the mixup with implements
+	--[[
 	if #VehicleSort.Sorted == #vehList and not VehicleSort.dirtyState then
 		--VehicleSort:dp("Sorted list seems to be up to date. No need to redo everything", "getOrderedVehicles");
 		return VehicleSort.Sorted;
 	end
-  
+	]]
 	--VehicleSort:dp("Sorted list seems outdated. So doing the ordering again.", "getOrderedVehicles");
   
 	for _, veh in pairs(vehList) do
@@ -1103,7 +1105,10 @@ function VehicleSort:getHorsePower(realId)
 					--VehicleSort:dp(string.format('maxRPM ~= 2200. HP for {%s} is: {%s}', veh.configFileName, hp))
 					--VehicleSort:dp(string.format('torqueCurveVal {%s}, torqueCurveRPM {%s}, maxMotorTorque {%s}', tostring(torqueCurveVal), tostring(torqueCurveRPM), tostring(maxMotorTorque)))
 					--return math.ceil(hp);
-					return math.ceil(VehicleSort:getHorsePowerFromStore(realId))
+					local powerFromStore = VehicleSort:getHorsePowerFromStore(realId)
+					if powerFromStore ~= nil then
+						return math.ceil(powerFromStore)
+					end
 				end
 			end
 		end
