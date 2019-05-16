@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.8";
+VehicleSort.Version = "0.9.3.9";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1644,7 +1644,7 @@ function VehicleSort:getInfoTexts(realId)
 
 		-- Get vehicle filllevel
 		if string.len(VehicleSort:getFillDisplay(veh, true)) > 1 then
-			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. ":" .. VehicleSort:getFillDisplay(veh, true);
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.fillLevel .. ": " .. VehicleSort:getFillDisplay(veh, true);
 			table.insert(texts, line);
 			doSpacing = true;
 		end
