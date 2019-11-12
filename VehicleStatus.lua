@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.3.6";
+VehicleStatus.Version = "0.9.4.0";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -349,5 +349,30 @@ function VehicleStatus:getImplementStatus(realId)
 	
 	if #impStatus > 0 then
 		return impStatus;
+	end
+end
+
+function VehicleStatus:getFieldNumber(realId)
+	local veh = g_currentMission.vehicles[realId];
+	
+	if veh.getIsOnField and veh:getIsOnField() then
+		--Took the majority of the getFieldNumber code from VehicleInspector by HappyLooser. Kudos to him/her
+		local veh_pos_x, veh_pos_y, veh_pos_z = getWorldTranslation(veh.components[1].node)
+		
+		for fieldNum,fieldDef in ipairs(g_fieldManager.fields) do
+			for a=1, #fieldDef.getFieldStatusPartitions do
+				local b = fieldDef.getFieldStatusPartitions[a];
+				local x, z, wX, wZ, hX, hZ = b.x0, b.z0, b.widthX, b.widthZ, b.heightX, b.heightZ;
+				local distanceMax = math.max(wX, wZ, hX, hZ);
+				local distance = MathUtil.vector2Length(veh_pos_x - x, veh_pos_z - z);
+				if distance <= distanceMax then
+					--print("distance...".. tostring(distance).. " - maxDistance...".. tostring(distanceMax))
+					return fieldDef.fieldId;
+				end;				
+			end;			
+		end;
+
+	else
+		return false;
 	end
 end

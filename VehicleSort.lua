@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.3.9";
+VehicleSort.Version = "0.9.4.0";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1574,6 +1574,15 @@ function VehicleSort:getInfoTexts(realId)
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_course .. ": " .. courseName;
 			table.insert(texts, line);
 			doSpacing = true;
+		end
+		
+		if veh.getIsOnField and veh:getIsOnField() then
+			local fieldId = VehicleStatus:getFieldNumber(realId)
+			if fieldId ~= nil and fieldId ~= false then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.field .. ": " .. tostring(fieldId);
+				table.insert(texts, line);
+				doSpacing = true;
+			end
 		end
 		
 		if VehicleSort:isHired(realId) then

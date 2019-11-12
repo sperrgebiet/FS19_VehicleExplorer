@@ -68,5 +68,6 @@
 		<text name="isLowered"								text="Se baja" />
 		<text name="turnedOnImplement"						text="Encendido" />
 		<text name="useVeExTabOrder"						text="Use VehicleExplorers ordered list for tabbing" />
+		<text name="field"									text="Campo" />
 	</texts>
 </l10n>

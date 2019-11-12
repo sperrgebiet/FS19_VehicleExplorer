@@ -68,5 +68,6 @@
 		<text name="isLowered"								text="Lowered" />
 		<text name="turnedOnImplement"						text="Turned on" />	
 		<text name="useVeExTabOrder"						text="Use VehicleExplorers ordered list for tabbing" />
+		<text name="field"									text="Field" />
 	</texts>
 </l10n>

@@ -68,5 +68,6 @@
 		<text name="isLowered"								text="Abgesenkt" />
 		<text name="turnedOnImplement"						text="Eingeschaltet" />
 		<text name="useVeExTabOrder"						text="Verwende VehicleExplorers sortierte Liste für den Fahzeugwechsel via Tabulator" />
+		<text name="field"									text="Feld" />
 	</texts>
 </l10n>
