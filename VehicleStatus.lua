@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.4.0";
+VehicleStatus.Version = "0.9.4.1";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -374,5 +374,35 @@ function VehicleStatus:getFieldNumber(realId)
 
 	else
 		return false;
+	end
+end
+
+function VehicleStatus:getOperatingHours(obj)	
+	if obj.getOperatingTime then
+		local milliSeconds = obj:getOperatingTime()
+		local hours = string.format("%.1f h", (milliSeconds / 3600000));
+		return hours;
+	end
+end
+
+function VehicleStatus:getVehImplementsOperatingHours(realId)
+	local texts = {};
+	local line = "";
+
+	local implements = VehicleSort:getVehImplements(realId);
+	if implements ~= nil then
+	
+		for i = 1, #implements do
+			local imp = implements[i];
+			
+			if (imp ~= nil and imp.object ~= nil and imp.object.getOperatingTime ~= nil) then
+				line = string.gsub(VehicleSort:getAttachmentName(imp.object), "%s$", "") .. " | " .. g_i18n.modEnvironments[VehicleSort.ModName].texts.operationHours .. ": " .. VehicleStatus:getOperatingHours(imp.object);
+				table.insert(texts, line);
+			end
+		end
+		
+		return texts;
+	else
+		return nil;
 	end
 end

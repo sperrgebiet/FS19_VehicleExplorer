@@ -69,5 +69,6 @@
 		<text name="turnedOnImplement"						text="Encendido" />
 		<text name="useVeExTabOrder"						text="Use VehicleExplorers ordered list for tabbing" />
 		<text name="field"									text="Campo" />
+		<text name="operationHours"							text="Operation hours" />
 	</texts>
 </l10n>

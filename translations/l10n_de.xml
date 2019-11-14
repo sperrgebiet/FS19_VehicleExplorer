@@ -69,5 +69,6 @@
 		<text name="turnedOnImplement"						text="Eingeschaltet" />
 		<text name="useVeExTabOrder"						text="Verwende VehicleExplorers sortierte Liste für den Fahzeugwechsel via Tabulator" />
 		<text name="field"									text="Feld" />
+		<text name="operationHours"							text="Betriebsstunden" />
 	</texts>
 </l10n>

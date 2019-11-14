@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.0";
+VehicleSort.Version = "0.9.4.1";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1597,6 +1597,29 @@ function VehicleSort:getInfoTexts(realId)
 				doSpacing = true;
 			end
 		end		
+
+		-- Some spacing, but just if we actually had some data so far
+		if doSpacing then
+			table.insert(texts, " ");
+			doSpacing = false;
+		end
+		
+		-- Operating time; Kudos to Watsi for the idea
+		if veh.getOperatingTime then
+			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.operationHours .. ": " .. VehicleStatus:getOperatingHours(veh);
+			table.insert(texts, line);
+			
+			if VehicleSort:getVehImplements(realId) ~= nil then
+				local impHours = VehicleStatus:getVehImplementsOperatingHours(realId);
+				if #impHours > 0 then
+					for i=1, VehicleSort.config[25][2] do
+						table.insert(texts, impHours[i]);
+					end
+				end
+				doSpacing = true;
+			end
+			doSpacing = true;
+		end
 
 		-- Some spacing, but just if we actually had some data so far
 		if doSpacing then
