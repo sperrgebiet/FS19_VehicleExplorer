@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.2";
+VehicleSort.Version = "0.9.4.3";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1587,9 +1587,24 @@ function VehicleSort:getInfoTexts(realId)
 		
 		if (veh.ad ~= nil and veh.ad.isActive) then
 			if veh.ad.nameOfSelectedTarget ~= nil then
-				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.ad_destination .. ": " .. veh.ad.nameOfSelectedTarget;
-				table.insert(texts, line);
-				doSpacing = true;				
+				if veh.ad.nameOfSelectedTarget_Unload ~= nil and veh.ad.mode ~= 1 then
+					local target1 = "";
+					local target2 = "";
+					if veh.ad.onRouteToSecondTarget then
+						target2 = " <<";
+					else
+						target1 = " <<";
+					end
+					
+					line = g_i18n.modEnvironments[VehicleSort.ModName].texts.ad_load .. ": " .. veh.ad.nameOfSelectedTarget .. target1;
+					table.insert(texts, line);
+					line = g_i18n.modEnvironments[VehicleSort.ModName].texts.ad_unload .. ": " .. veh.ad.nameOfSelectedTarget_Unload .. target2;
+					table.insert(texts, line);
+				else
+					line = g_i18n.modEnvironments[VehicleSort.ModName].texts.ad_destination .. ": " .. veh.ad.nameOfSelectedTarget;
+					table.insert(texts, line);			
+				end
+				doSpacing = true;
 			end
 		end
 		

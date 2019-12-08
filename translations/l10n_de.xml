@@ -48,6 +48,8 @@
 		<text name="cp_course"								text="CP Kurs" />
 		<text name="cp_courseunknown"						text="Temporärer Kurs" />
 		<text name="ad_destination"							text="AD Ziel" />
+		<text name="ad_load"								text="AD Beladen" />
+		<text name="ad_unload"								text="AD Abladen" />
 		<text name="wear"									text="Abnutzung" />
 		<text name="motor"									text="Motor" />
 		<text name="turnedOn"								text="Gestartet" />

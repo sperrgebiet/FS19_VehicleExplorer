@@ -48,6 +48,8 @@
 		<text name="cp_course"								text="Ruta CP" />
 		<text name="cp_courseunknown"						text="Ruta temporal" />
 		<text name="ad_destination"							text="AD Ruta" />
+		<text name="ad_load"								text="AD Cargado" />
+		<text name="ad_unload"								text="AD Ablad" />
 		<text name="wear"									text="Daño" />
 		<text name="motor"									text="Motor" />
 		<text name="turnedOn"								text="Encendido" />
