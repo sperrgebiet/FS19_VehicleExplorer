@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.1";
+VehicleSort.Version = "0.9.4.2";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -70,7 +70,9 @@ VehicleSort.tColor.selected 	= {0.8879, 0.1878, 0.0037, 1.0}; -- orange
 VehicleSort.tColor.standard 	= {1.0, 1.0, 1.0, 1.0}; -- white
 VehicleSort.tColor.standard2 	= {0.8228, 0.8388, 0.7304, 1.0}; -- eggcolor
 VehicleSort.tColor.hired 		= {0.0, 0.5, 1.0, 1.0}; 	-- blue
+VehicleSort.tColor.courseplay 	= {0.270, 0.55, 0.88, 1.0}; 	-- baby blue
 VehicleSort.tColor.followme 	= {0.92, 0.31, 0.69, 1.0}; 	-- light pink
+VehicleSort.tColor.autodrive 	= {0.03, 0.78, 0.85, 1.0}; 	-- aqua/turquoise
 VehicleSort.tColor.self  		= {0.0, 1.0, 0.0, 1.0}; -- green
 VehicleSort.tColor.motorOn		= {0.9301, 0.7605, 0.0232, 1.0}; -- yellow
 
@@ -882,6 +884,8 @@ function VehicleSort:getFullVehicleName(realId)
 		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.courseplay);
 	elseif (g_currentMission.vehicles[realId].getIsFollowMeActive and g_currentMission.vehicles[realId]:getIsFollowMeActive()) then	--FollowMe
 		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.followme);
+	elseif (g_currentMission.vehicles[realId].ad ~= nil and g_currentMission.vehicles[realId].ad.isActive) then	--AutoDrive
+		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.autodrive);		
 	elseif VehicleSort:isHired(realId) then
 		nam = nam .. string.format(tmpString, g_i18n.modEnvironments[VehicleSort.ModName].texts.hired);
 	elseif VehicleSort:isControlled(realId) then
@@ -1048,13 +1052,18 @@ function VehicleSort:getTextColor(index, realId)
 		return VehicleSort.tColor.isParked;
 	elseif VehicleSort:isControlled(realId) then
 		return VehicleSort.tColor.self;
+	-- Not sure yet if it make sense to have multiple different colors for CP, AD, FM. I imagine it's getting to busy then. But lets give it a try
+	-- Has to be before 'isHired', otherwise will end up with the same hired color
+	elseif g_currentMission.vehicles[realId] ~= nil and g_currentMission.vehicles[realId].getIsCourseplayDriving and g_currentMission.vehicles[realId]:getIsCourseplayDriving() then
+		return VehicleSort.tColor.courseplay;
+	elseif (g_currentMission.vehicles[realId].getIsFollowMeActive and g_currentMission.vehicles[realId]:getIsFollowMeActive()) then
+		return VehicleSort.tColor.followme;
+	elseif (g_currentMission.vehicles[realId].ad ~= nil and g_currentMission.vehicles[realId].ad.isActive) then
+		return VehicleSort.tColor.autodrive;		
 	elseif VehicleSort:isHired(realId) then
 		return VehicleSort.tColor.hired;
 	elseif VehicleStatus:getIsMotorStarted(g_currentMission.vehicles[realId]) then
 		return VehicleSort.tColor.motorOn;
---  FollowMe is not out there yet
---  elseif (veh.modFM ~= nil and veh.modFM.FollowVehicleObj ~= nil) then
---	return VehicleSort.tColor.followme
 	else
 		if VehicleSort.config[27][2] then						--Alterate the list colors if enabled
 			if index % 2 == 0 then
@@ -1574,6 +1583,14 @@ function VehicleSort:getInfoTexts(realId)
 			line = g_i18n.modEnvironments[VehicleSort.ModName].texts.cp_course .. ": " .. courseName;
 			table.insert(texts, line);
 			doSpacing = true;
+		end
+		
+		if (veh.ad ~= nil and veh.ad.isActive) then
+			if veh.ad.nameOfSelectedTarget ~= nil then
+				line = g_i18n.modEnvironments[VehicleSort.ModName].texts.ad_destination .. ": " .. veh.ad.nameOfSelectedTarget;
+				table.insert(texts, line);
+				doSpacing = true;				
+			end
 		end
 		
 		if veh.getIsOnField and veh:getIsOnField() then

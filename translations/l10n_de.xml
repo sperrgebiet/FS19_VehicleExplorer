@@ -43,9 +43,11 @@
 		<text name="hired"									text="H" />
 		<text name="courseplay"								text="CP" />
 		<text name="followme"								text="FM" />
+		<text name="autodrive"								text="AD" />
 		<text name="helper"									text="Helfer" />
 		<text name="cp_course"								text="CP Kurs" />
 		<text name="cp_courseunknown"						text="Temporärer Kurs" />
+		<text name="ad_destination"							text="AD Ziel" />
 		<text name="wear"									text="Abnutzung" />
 		<text name="motor"									text="Motor" />
 		<text name="turnedOn"								text="Gestartet" />
