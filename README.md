@@ -18,6 +18,7 @@ Feedback, this readme and additional information incl. source code can be find a
 * Park your vehicles, so that a switch of vehicles via Tab ignores them
 * Repair vehicles and its implements
 * Let your vehicle and implements get cleaned on a repair from your friendly VeEx staff ;)
+* If Seasons is enabled, you can also let the vehicle and implements get repainted
 * Displaying a store image next to the list
 * Info box with additional informations
 * Motor on/off, turned on/off (for e.g. harvester) and light status is saved and restored
@@ -109,7 +110,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.4.5 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.4.6 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -132,6 +133,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Dies meine ich wortwörtlich, siehe Bekannte Probleme ;)
 * Parke die Fahrzeuge, sodass sie von einem Fahrzeugwechsel via Tab ignoriert werden
 * Reparatur von Fahrzeugen und angehängten Geräten
+* Mit Seasons ist es auch möglich das Fahrzeug und Geräte neu lackieren zu lassen
 * Waschen von Fahrzeugen und Anbaugeräten nach einer Reparatur durch das freundliche VeEx Personal
 * Anzeige eines Shop-Bildes neben der Fahrzeugliste
 * Info Box neben der Fahrzeugliste mit weiteren Details
@@ -221,7 +223,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-0.9.4.5 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+00.9.4.6 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

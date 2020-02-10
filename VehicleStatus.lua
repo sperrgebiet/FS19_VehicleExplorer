@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.4.5";
+VehicleStatus.Version = "0.9.4.6";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -225,7 +225,7 @@ function VehicleStatus:RepaintVehicleWithImplements(realId)
 			if implements ~= nil then
 				for i = 1, #implements do
 					local imp = implements[i];
-					if imp ~= nil and imp.object ~= nil and imp.object.spec_FS19_RM_Seasons.ageWear ~= nil then
+					if imp ~= nil and imp.object ~= nil and imp.object.repaintVehicle then
 						imp.object:repaintVehicle();
 						VehicleSort:dp(string.format('Repainted implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:RepaintVehicleWithImplements');
 					end
