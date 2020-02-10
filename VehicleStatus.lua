@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.4.1";
+VehicleStatus.Version = "0.9.4.4";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -207,6 +207,27 @@ function VehicleStatus:CleanVehicleWithImplements(realId)
 					if imp ~= nil and imp.object ~= nil and imp.object.spec_washable ~= nil then
 						VehicleStatus:setDirtOnObject(imp.object, 0)
 						VehicleSort:dp(string.format('Cleaned implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:CleanVehicleWithImplements');
+					end
+				end
+			end
+		end
+	end
+end
+
+function VehicleStatus:RepaintVehicleWithImplements(realId)
+	veh = g_currentMission.vehicles[realId];
+	VehicleSort:dp(string.format('realId {%s} for configFileName {%s}', realId, veh.configFileName), 'VehicleStatus:RepaintVehicleWithImplements');
+	if veh ~= nil then
+		if veh.spec_FS19_RM_Seasons ~= nil and veh.spec_FS19_RM_Seasons.ageWear ~= nil then
+			veh:repaintVehicle();
+			VehicleSort:dp(string.format('Repainted vehicle realId {%s} - configFileName {%s}', tostring(realId), veh.configFileName), 'VehicleStatus:RepaintVehicleWithImplements');
+			local implements = VehicleSort:getVehImplements(realId);
+			if implements ~= nil then
+				for i = 1, #implements do
+					local imp = implements[i];
+					if imp ~= nil and imp.object ~= nil and imp.object.spec_FS19_RM_Seasons.ageWear ~= nil then
+						imp.object:repaintVehicle();
+						VehicleSort:dp(string.format('Repainted implement configFileName {%s}', tostring(imp.object.configFileName)), 'VehicleStatus:RepaintVehicleWithImplements');
 					end
 				end
 			end

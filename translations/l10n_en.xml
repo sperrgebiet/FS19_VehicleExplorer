@@ -63,7 +63,9 @@
 		<text name="center"									text="C" />
 		<text name="cleanOnRepair"							text="Clean on repair" />
 		<text name="RepairDone"								text="Repair done" />
-		<text name="RepairCleaningDone"						text="Repair und cleaning done" />
+		<text name="CleaningDone"							text="Cleaning done" />
+		<text name="paintonRepair"							text="Repaint on repair (Seasons required)" />
+		<text name="RepaintDone"							text="Repainting done" />
 		<text name="integrateTardis"						text="Tardis integration" />
 		<text name="enterVehonTeleport"						text="Enter vehicle after teleportation" />
 		<text name="showImgMaxImp"							text="Max. images of implements" />

@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.3";
+VehicleSort.Version = "0.9.4.4";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -45,22 +45,23 @@ VehicleSort.config = {											--Id		-Order in configMenu
   {'bgTrans', VehicleSort.bgTransDef, 17},              		-- 10		17
   {'showSteerableImplements', true, 11},                		-- 11		11
   {'showImplements', true, 9},	                         		-- 12		9
-  {'showHelp', true, 27},                               		-- 13		27
-  {'saveStatus', true, 24},                             		-- 14		24
+  {'showHelp', true, 28},                               		-- 13		28
+  {'saveStatus', true, 25},                             		-- 14		25
   {'showImg', true, 12},                                		-- 15		12
   {'showInfo', true, 14},                               		-- 16		14
   {'infoStart', VehicleSort.infoYStart, 21},            		-- 17		21
-  {'infoBg', true, 19},                                 		-- 18		19
+  {'infoBg', true, 18},                                 		-- 18		18
   {'imageBg', true, 20},                                		-- 19		20
   {'listAlignment', VehicleSort.listAlignment, 22},     		-- 20		22
   {'cleanOnRepair', true, 23},                          		-- 21		23
-  {'integrateTardis', true, 25},                        		-- 22		25
-  {'enterVehonTeleport', true, 26},                     		-- 23		26
+  {'integrateTardis', true, 26},                        		-- 22		26
+  {'enterVehonTeleport', true, 27},                     		-- 23		27
   {'showImgMaxImp', VehicleSort.showImgMaxImp, 13},     		-- 24		13
   {'showInfoMaxImpl', VehicleSort.showInfoMaxImpl, 15},			-- 25		15
   {'showImplementsMax', VehicleSort.showImplementsMax, 10},		-- 26		10
-  {'useTwoColoredList', true, 18},								-- 27		18
-  {'useVeExTabOrder', true, 28},								-- 28		28
+  {'useTwoColoredList', true, 19},								-- 27		19
+  {'useVeExTabOrder', true, 29},								-- 28		29
+  {'paintonRepair', true, 24},									-- 29		24
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -456,16 +457,27 @@ function VehicleSort:action_vsRepair(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp(string.format('action_vsRepair fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsRepair");
 	if VehicleSort.showVehicles then
 	
-		local infoText = "";
+		local infoText = {};
+		local blinkTime = 2000;
 		VehicleStatus:RepairVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
-		infoText = g_i18n.modEnvironments[VehicleSort.ModName].texts.RepairDone;
+		table.insert(infoText, g_i18n.modEnvironments[VehicleSort.ModName].texts.RepairDone);
 		
 		if VehicleSort.config[21][2] then
 			VehicleStatus:CleanVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
-			infoText = g_i18n.modEnvironments[VehicleSort.ModName].texts.RepairCleaningDone;
+			--We want the blinking text to be centered
+			
+			table.insert(infoText, g_i18n.modEnvironments[VehicleSort.ModName].texts.CleaningDone);
+			blinkTime = 3000;
 		end
 		
-		g_currentMission:showBlinkingWarning(infoText, 2000);
+		--If Seasons is activated and we enabled 'repaint' in the config we also have to take care of this
+		if (g_seasons ~= nil) and (VehicleSort.config[29][2]) then
+			VehicleStatus:RepaintVehicleWithImplements(VehicleSort.Sorted[VehicleSort.selectedIndex]);
+			table.insert(infoText, g_i18n.modEnvironments[VehicleSort.ModName].texts.RepaintDone);
+			blinkTime = 4000;
+		end
+		
+		VehicleSort:showCenteredBlinkingWarning(infoText, blinkTime);
 		
 	end
 end
@@ -2030,6 +2042,50 @@ function VehicleSort:setHelpVisibility(eventTable, state)
 			end
 		end
 	end
+end
+
+function VehicleSort:showCenteredBlinkingWarning(text, blinkDuration)
+	local centeredText = "";
+
+	if type(text) == 'table' then
+		VehicleSort:dp(string.format('We got a table to handle'), 'showCenteredBlinkingWarning');
+		local textWidth = 0;
+		
+		--First we get the longest text as baseline
+		for i=1, #text do
+			local length = string.len(text[i])
+			if length > textWidth then
+				textWidth = length
+			end
+		end
+		
+		VehicleSort:dp(string.format('Max textWidth: {%d}', textWidth), 'showCenteredBlinkingWarning');
+		
+		for i=1, #text do
+			VehicleSort:dp(string.format('Line: {%s}', text[i]), 'showCenteredBlinkingWarning');
+			if string.len(text[i]) < textWidth then
+				local spaceCount = 0;
+				local spaces = "";
+				spaceCount = math.floor((textWidth - string.len(text[i])) / 2)
+				VehicleSort:dp(string.format('Line: {%s}; SpaceCount: {%d}', text[i], spaceCount), 'showCenteredBlinkingWarning');
+
+				for j=0, spaceCount do
+					spaces = string.format('%s%s', spaces, " ");
+				end
+
+				centeredText = string.format('%s%s%s\n', centeredText, spaces, text[i]);
+				VehicleSort:dp(string.format('CenteredText: {%s} after adding line {%s}',centeredText, text[i]));
+			elseif string.len(text[i]) == textWidth then
+				centeredText = string.format('%s%s\n', centeredText, text[i]);
+				VehicleSort:dp(string.format('Line length: {%s} equals textWidth {%d}', text[i], textWidth), 'showCenteredBlinkingWarning');
+			end
+		end
+	else
+		centeredText = text;
+	end
+
+	VehicleSort:dp(string.format('CenteredText: {%s}', centeredText), 'showCenteredBlinkingWarning');
+	g_currentMission:showBlinkingWarning(centeredText, blinkDuration);
 end
 
 --

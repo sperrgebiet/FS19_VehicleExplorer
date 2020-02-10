@@ -63,7 +63,9 @@
 		<text name="center"									text="Z" />
 		<text name="cleanOnRepair"							text="Bei Reparatur waschen" />
 		<text name="RepairDone"								text="Reparatur durchgeführt" />
-		<text name="RepairCleaningDone"						text="Fahrzeug repariert und gewaschen" />
+		<text name="CleaningDone"							text="Fahrzeug gewaschen" />
+		<text name="paintonRepair"							text="Neulackierung bei Reparatur (Seasons benötigt)" />
+		<text name="RepaintDone"							text="Nachlackierung durchgeführt" />
 		<text name="integrateTardis"						text="Tardis Integration" />
 		<text name="enterVehonTeleport"						text="Ins Fahrzeug wechseln beim Teleportieren" />
 		<text name="showImgMaxImp"							text="Max. Bilder von Anbaugeräten" />
