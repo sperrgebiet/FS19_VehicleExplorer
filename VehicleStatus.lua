@@ -6,7 +6,7 @@ VehicleStatus = {};
 
 VehicleStatus.ModName = g_currentModName;
 VehicleStatus.ModDirectory = g_currentModDirectory;
-VehicleStatus.Version = "0.9.4.4";
+VehicleStatus.Version = "0.9.4.5";
 
 
 VehicleStatus.debug = fileExists(VehicleStatus.ModDirectory ..'debug');
@@ -218,7 +218,7 @@ function VehicleStatus:RepaintVehicleWithImplements(realId)
 	veh = g_currentMission.vehicles[realId];
 	VehicleSort:dp(string.format('realId {%s} for configFileName {%s}', realId, veh.configFileName), 'VehicleStatus:RepaintVehicleWithImplements');
 	if veh ~= nil then
-		if veh.spec_FS19_RM_Seasons ~= nil and veh.spec_FS19_RM_Seasons.ageWear ~= nil then
+		if veh.repaintVehicle then
 			veh:repaintVehicle();
 			VehicleSort:dp(string.format('Repainted vehicle realId {%s} - configFileName {%s}', tostring(realId), veh.configFileName), 'VehicleStatus:RepaintVehicleWithImplements');
 			local implements = VehicleSort:getVehImplements(realId);
