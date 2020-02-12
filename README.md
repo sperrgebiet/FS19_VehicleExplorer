@@ -15,6 +15,7 @@ Feedback, this readme and additional information incl. source code can be find a
   * Your order is saved in the default vehicles.xml, so no additional clutter
 * Enter your vehicles directly with a click of a (mouse) button
   * This is meant literally, see known issues ;)
+* EasyTab: Switch between the last two selected vehicles
 * Park your vehicles, so that a switch of vehicles via Tab ignores them
 * Repair vehicles and its implements
 * Let your vehicle and implements get cleaned on a repair from your friendly VeEx staff ;)
@@ -79,6 +80,7 @@ Feedback, this readme and additional information incl. source code can be find a
 |LAlt + R|Repair vehicle incl. implements|
 |Tab|Next vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)|
 |Shift + Tab|Previous vehicle; VeEx own switch vehicle implementation (necessary to tab through vehicles in your own order)|
+|LCtrl + Tab|easyTab; Easily tab between the last two vehicles you switched through VeEx|
 |Mouse Left|Enter vehicle|
 |Mouse Right|Select item/change values in config|
 |Mouse Wheel|List up/down|
@@ -110,7 +112,7 @@ Additionally Ifko[nator] for the RegisterSpecialization script.
 
 
 ## Latest Version
-0.9.4.6 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
+0.9.4.7 - I consider it as Beta. I tested it quite a lot myself, but hope for some helpful feedback from the community.
 
 -----
 
@@ -131,6 +133,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
   * Die Reihenfolge wird in der Standard vehicles.xml gespeichert, also kein zusätzliches Wirrwar
 * Fahrzeugwechsel einfach durch einen Mausklick
   * Dies meine ich wortwörtlich, siehe Bekannte Probleme ;)
+* EasyTab: Zwischen den letzten beiden Fahrzeugen wechseln
 * Parke die Fahrzeuge, sodass sie von einem Fahrzeugwechsel via Tab ignoriert werden
 * Reparatur von Fahrzeugen und angehängten Geräten
 * Mit Seasons ist es auch möglich das Fahrzeug und Geräte neu lackieren zu lassen
@@ -193,6 +196,7 @@ Feedback, dieses ReadMe und weitere Informationen sowie der Quelltext findet sic
 |LAlt + R|Repariere Fahrzeug inkl. Anbaugeräte|
 |Tab|Nächstes Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird|
 |Shift + Tab|Vorheriges Fahrzeug; VeEx eigene Implementierung des Fahrzeugwechsels via Tabulator, damit man auch die eigene Sortierung verwendet wird|
+|LCtrl + Tab|easyTab; Zwischen den beiden letzten Fahrzeugen wechseln welche in VeEx ausgewählt wurden|
 |Linke Maustaste|Ins Fahrzeug wechseln|
 |Rechte Maustaste|Fahrzeug auswählen/Eintrag im Konfigurationsmenü ändern|
 |Mausrad|Liste rauf/runterscrollen|
@@ -223,7 +227,7 @@ Auch Kudos an die Jungs und Mädls von CoursePlay, VehicleInspector, VehicleFrui
 Des weiteren noch Ifko[nator] für das RegisterSpecialization Skript.
 
 ## Letzte Version
-00.9.4.6 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
+00.9.4.7 - I würd mal sagen dies ist noch eine Beta. Ich hab zwar selbst recht viel getestet, hoffe aber auf hilfreiche Rückmeldungen von der Community.
 
 
 # Screenshots

@@ -14,6 +14,7 @@
 		<text name="input_vsRepair"							text="VeEx: Repair vehicles incl. implements" />
 		<text name="input_vsTab"							text="VeEx: Switch to next vehicle" />
 		<text name="input_vsTabBack"						text="VeEx: Switch to previous vehicle" />
+		<text name="input_vsEasyTab"						text="VeEx: EasyTab" />
 		<text name="configHeadline"							text="VehicleSort Configuration" />
 		<text name="with"									text="with" />
 		<text name="horsePower"								text="HP" />

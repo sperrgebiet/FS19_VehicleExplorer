@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.5";
+VehicleSort.Version = "0.9.4.7";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -23,6 +23,7 @@ VehicleSort.listAlignment = 2;						-- 1 = Left, 2 = Center, 3 = Right)
 VehicleSort.showImgMaxImp = 9;
 VehicleSort.showInfoMaxImpl = 9;
 VehicleSort.showImplementsMax = 3;
+VehicleSort.easyTabTable = {};
 
 -- Integration environment for Tardis
 envTardis = nil;
@@ -214,7 +215,8 @@ function VehicleSort:RegisterActionEvents(isSelected, isOnActiveVehicle)
 					"vsTogglePark",
 					"vsRepair",
 					"vsTab",
-					"vsTabBack"
+					"vsTabBack",
+					"vsEasyTab"
 				};
 
 	for _, action in pairs(actions) do
@@ -412,6 +414,7 @@ function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, a
 						(envTardis ~= nil and not VehicleSort.wasTeleportAction) or 
 						(envTardis ~= nil and VehicleSort.wasTeleportAction and VehicleSort.config[23][2]) then
 				g_currentMission:requestToEnterVehicle(realVeh);
+				VehicleSort:easyTab(realVeh);
 				VehicleSort.wasTeleportAction = false;
 			elseif envTardis ~= nil then
 				VehicleSort.wasTeleportAction = false;
@@ -490,6 +493,11 @@ end
 function VehicleSort:action_vsTabBack(actionName, keyStatus, arg3, arg4, arg5)
 	VehicleSort:dp(string.format('action_vsTabBack fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsTabBack");
 	VehicleSort:tabVehicle(true);
+end
+
+function VehicleSort:action_vsEasyTab(actionName, keyStatus, arg3, arg4, arg5)
+	VehicleSort:dp(string.format('action_vsEasyTab fires - VehicleSort.showVehicles {%s}', tostring(VehicleSort.showVehicles)), "action_vsEasyTab");
+	VehicleSort:easyTab();
 end
 
 --
@@ -1926,6 +1934,25 @@ function VehicleSort:getNextInTabList(orderId, backwards)
 		end
 	end
 	return nextId;
+end
+
+function VehicleSort:easyTab(realVeh)
+	-- We use this method for the action as well as set the table. So if a parameter gets passed, we've to do the logic to set the easyTab table
+	if realVeh ~= nil then
+		VehicleSort:dp('realVeh is not null, so altering our easyTabTable', 'easyTab');
+		table.insert(VehicleSort.easyTabTable, 1, realVeh);
+		table.remove(VehicleSort.easyTabTable, 3);
+	else
+		VehicleSort:dp('realVeh is not present, so we are going to tab', 'easyTab');
+		if #VehicleSort.easyTabTable == 1 then
+			g_currentMission:requestToEnterVehicle(VehicleSort.easyTabTable[1]);
+		elseif #VehicleSort.easyTabTable > 1 then
+			g_currentMission:requestToEnterVehicle(VehicleSort.easyTabTable[2]);
+			--Shift table again to have the proper order the next time
+			table.insert(VehicleSort.easyTabTable, 1, VehicleSort.easyTabTable[2]);
+			table.remove(VehicleSort.easyTabTable, 3);
+		end
+	end
 end
 
 function VehicleSort:handlePostloadTrains(realId)

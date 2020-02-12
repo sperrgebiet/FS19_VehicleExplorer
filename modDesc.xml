@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="47">
 	<author>sperrgebiet</author>
-	<version>0.9.4.6</version>
+	<version>0.9.4.7</version>
 	<title>Vehicle Explorer</title>
 	<description>
 		<en>
@@ -51,6 +51,7 @@ Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
 		<action name="vsRepair" 			axisType="HALF" />
 		<action name="vsTab" 				axisType="HALF" />
 		<action name="vsTabBack" 			axisType="HALF" />
+		<action name="vsEasyTab" 			axisType="HALF" />
 	</actions>
 
 	<inputBinding>	
@@ -90,7 +91,10 @@ Mehr Details: https://github.com/sperrgebiet/FS19_VehicleExplorer
 		</actionBinding>
 		<actionBinding action="vsTabBack">
 			<binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_tab" index="1" />
-		</actionBinding>			
+		</actionBinding>
+		<actionBinding action="vsEasyTab">
+			<binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_tab" index="1" />
+		</actionBinding>
     </inputBinding>	
 
 </modDesc>

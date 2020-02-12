@@ -14,6 +14,7 @@
 		<text name="input_vsRepair"							text="VeEx: Fahrzeug inkl. Geräte reparieren" />
 		<text name="input_vsTab"							text="VeEx: Zum nächsten Fahrzeug wechseln" />
 		<text name="input_vsTabBack"						text="VeEx: Zum vorigen Fahrzeug wechseln" />
+		<text name="input_vsEasyTab"						text="VeEx: EasyTab" />
 		<text name="configHeadline"							text="VehicleSort-Konfiguration" />
 		<text name="with"									text="mit" />
 		<text name="horsePower"								text="PS" />
