@@ -67,5 +67,6 @@
 		<text name="isLowered"								text="TRANSLATEDTEXT" />
 		<text name="turnedOnImplement"						text="TRANSLATEDTEXT" />
 		<text name="useVeExTabOrder"						text="TRANSLATEDTEXT" />		
+		<text name="hideListOnChange"						text="TRANSLATEDTEXT" />
 	</texts>
 </l10n>

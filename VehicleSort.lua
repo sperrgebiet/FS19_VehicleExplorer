@@ -63,6 +63,7 @@ VehicleSort.config = {											--Id		-Order in configMenu
   {'useTwoColoredList', true, 19},								-- 27		19
   {'useVeExTabOrder', true, 29},								-- 28		29
   {'paintonRepair', true, 24},									-- 29		24
+  {'hideListOnChange', true, 30},								-- 30 		30
 };
 
 VehicleSort.tColor = {}; -- text colours
@@ -415,6 +416,11 @@ function VehicleSort:action_vsChangeVehicle(actionName, keyStatus, arg3, arg4, a
 						(envTardis ~= nil and VehicleSort.wasTeleportAction and VehicleSort.config[23][2]) then
 				g_currentMission:requestToEnterVehicle(realVeh);
 				VehicleSort:easyTab(realVeh);
+
+				if VehicleSort.config[30][2] then
+					VehicleSort:action_vsToggleList();
+				end
+				
 				VehicleSort.wasTeleportAction = false;
 			elseif envTardis ~= nil then
 				VehicleSort.wasTeleportAction = false;
