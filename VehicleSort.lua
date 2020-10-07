@@ -7,7 +7,7 @@ VehicleSort.eventName = {};
 
 VehicleSort.ModName = g_currentModName;
 VehicleSort.ModDirectory = g_currentModDirectory;
-VehicleSort.Version = "0.9.4.7";
+VehicleSort.Version = "0.9.4.8";
 
 
 VehicleSort.debug = fileExists(VehicleSort.ModDirectory ..'debug');
@@ -1588,7 +1588,7 @@ function VehicleSort:getInfoTexts(realId)
 			local courseName = "";
 			if veh.cp.currentCourseName ~= nil then
 				courseName = veh.cp.currentCourseName;
-			elseif veh.cp.mapHotspot.fullViewName ~= nil then
+			elseif veh.cp.mapHotspot ~= nil and veh.cp.mapHotspot.fullViewName ~= nil then
 				local str = tostring(veh.cp.mapHotspot.fullViewName);
 				local t = {}
 				for s in str:gmatch("[^\r\n]+") do
