@@ -77,5 +77,6 @@
 		<text name="useVeExTabOrder"						text="Verwende VehicleExplorers sortierte Liste für den Fahzeugwechsel via Tabulator" />
 		<text name="field"									text="Feld" />
 		<text name="operationHours"							text="Betriebsstunden" />
+		<text name="hideListOnChange"						text="Hide list on vehicle change" />
 	</texts>
 </l10n>

@@ -77,5 +77,6 @@
 		<text name="useVeExTabOrder"						text="Use VehicleExplorers ordered list for tabbing" />
 		<text name="field"									text="Field" />
 		<text name="operationHours"							text="Operation hours" />
+		<text name="hideListOnChange"						text="Hide list on vehicle change" />
 	</texts>
 </l10n>
